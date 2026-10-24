@@ -84,29 +84,8 @@ export default function Home() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4">
-        {/* قسم الهيرو (الأسطورة) */}
-        <section className="py-12 md:py-20 grid md:grid-cols-2 gap-8 items-center">
-          <div className="order-2 md:order-1 text-center md:text-right">
-            <span className="inline-flex items-center gap-1 bg-[#d93844] text-white text-xs px-3 py-1 rounded-full mb-4"><Sparkles size={12}/> عروض مختارة</span>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-[#34212a] leading-tight mb-4">ستايل جديد،<br/><span className="text-[#d93844]">كل يوم لك.</span></h1>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto md:mx-0">اكتشفي قطع الموسم، اختاري لونك، وراقبي التوفر قبل ما تخلص.</p>
-            <button className="bg-[#34212a] text-white px-8 py-3 rounded-lg font-bold inline-flex items-center gap-2 hover:bg-black transition">
-              تسوقي الآن <ArrowLeft size={18} />
-            </button>
-            <div className="flex items-center justify-center md:justify-start gap-2 mt-6 text-xs text-gray-500">
-              <span className="w-2 h-2 rounded-full bg-green-500"></span> أسعار ومخزون واضحان لكل قطعة
-            </div>
-          </div>
-          <div className="order-1 md:order-2 relative">
-            <div className="aspect-[4/5] md:aspect-square bg-gray-200 rounded-2xl overflow-hidden shadow-2xl">
-              <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800" alt="لمسة" className="w-full h-full object-cover" />
-            </div>
-            <div className="absolute -bottom-4 -left-4 bg-[#d93844] text-white p-4 rounded-full w-20 h-20 flex flex-col items-center justify-center font-bold shadow-lg" style={{transform: 'rotate(-10deg)'}}>
-              <span className="text-xs">جديد</span>
-              <span className="text-lg">لمسة</span>
-            </div>
-          </div>
-        </section>
+        {/* السلايدر الجديد (بدلاً من الهيرو القديم) */}
+        <HeroSlider products={products} />
 
         {/* شريط المزايا */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 py-8 border-y border-gray-200 my-8">
@@ -141,7 +120,7 @@ export default function Home() {
             ))}
           </div>
 
-          {/* شبكة المنتجات بتصميم شين */}
+          {/* شبكة المنتجات */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {filteredProducts.map(product => {
               const discount = product.compareAtHalalas ? Math.round((1 - product.price / (product.compareAtHalalas / 100)) * 100) : 0;
@@ -185,7 +164,6 @@ export default function Home() {
       </main>
 
       {/* الفوتر */}
-      
       <footer className="bg-white border-t border-gray-100 py-12 mt-12 text-center md:text-right">
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
@@ -193,11 +171,11 @@ export default function Home() {
             <p className="text-gray-500 text-sm mt-3 max-w-xs mx-auto md:mx-0">ملابس تحمل لمستك الخاصة. أزياء يومية مختارة بعناية للباحثات عن إطلالة عصرية.</p>
             <div className="mt-4 space-y-2">
               <p className="text-sm text-gray-600 font-bold flex items-center gap-2 justify-center md:justify-start">
-                <Phone size={16} className="text-[#d93844]"/> 
+                <Phone size={16} className="text-[#d93844]"/>
                 <a href="tel:+967775799926" dir="ltr">+967 775 799 926</a>
               </p>
               <p className="text-sm text-gray-600 font-bold flex items-center gap-2 justify-center md:justify-start">
-                <Mail size={16} className="text-[#d93844]"/> 
+                <Mail size={16} className="text-[#d93844]"/>
                 <a href="mailto:burhanalzekri77@gmail.com" dir="ltr">burhanalzekri77@gmail.com</a>
               </p>
             </div>
@@ -222,7 +200,6 @@ export default function Home() {
           © لمسة ٢٠٢٦ | جميع الحقوق محفوظة
         </div>
       </footer>
-
 
       {/* نافذة السلة */}
       {cartOpen && (
