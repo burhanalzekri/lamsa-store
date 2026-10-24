@@ -16,7 +16,17 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "lamsa_secret_2026";
-const getConn = () => mysql.createConnection({ host: '127.0.0.1', user: 'root', password: '', database: 'lamsa', port: 3306 });
+const getConn = async () => {
+    if (process.env.DATABASE_URL) {
+      // إزالة أي إعدادات SSL موجودة في الرابط لتجنب التعارض
+      const url = process.env.DATABASE_URL.split('?')[0];
+      return mysql.createConnection({
+        uri: url,
+        ssl: { rejectUnauthorized: true }
+      });
+    }
+    return mysql.createConnection({ host: '127.0.0.1', user: 'root', password: '', database: 'lamsa', port: 3306 });
+  };
 
 const requireAdmin = async (req: any, res: any, next: any) => {
   const token = req.headers.authorization?.split(" ")[1];
