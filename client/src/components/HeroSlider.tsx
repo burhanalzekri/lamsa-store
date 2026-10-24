@@ -29,9 +29,10 @@ export default function HeroSlider({ products }: { products: any[] }) {
   const current = sliderProducts[index];
 
   return (
-    <section className="bg-white rounded-3xl shadow-sm my-6 overflow-hidden grid md:grid-cols-2 gap-0 relative">
-      <div className="order-2 md:order-1 p-8 md:p-12 flex flex-col justify-center">
-        <span className="inline-flex items-center gap-1 bg-[#d93844] text-white text-xs px-3 py-1 rounded-full mb-4 self-start">
+    <section className="bg-[#FDF6ED] rounded-3xl shadow-sm my-6 overflow-hidden grid md:grid-cols-2 gap-0 relative border border-[#f0e6d8]">
+      {/* النصوص */}
+      <div className="order-2 md:order-1 p-8 md:p-12 flex flex-col justify-center z-10">
+        <span className="inline-flex items-center gap-1 bg-[#d93844] text-white text-xs px-3 py-1 rounded-full mb-4 self-start shadow-sm">
           <Sparkles size={12}/> عرض خاص
         </span>
         <h1 className="text-3xl md:text-5xl font-extrabold text-[#34212a] leading-tight mb-4">
@@ -45,28 +46,30 @@ export default function HeroSlider({ products }: { products: any[] }) {
         </p>
         <button 
           onClick={() => setLocation(`/product/${current.id}`)} 
-          className="bg-[#34212a] text-white px-8 py-3 rounded-lg font-bold inline-flex items-center gap-2 hover:bg-black transition self-start"
+          className="bg-[#34212a] text-white px-8 py-3 rounded-lg font-bold inline-flex items-center gap-2 hover:bg-black transition self-start shadow-md"
         >
           تسوقي الآن <ArrowLeft size={18} />
         </button>
       </div>
       
-      <div className="order-1 md:order-2 h-64 md:h-[400px]">
+      {/* الصورة (بدون قطع) */}
+      <div className="order-1 md:order-2 relative h-72 md:h-[500px] bg-[#f0e6d8]/30 flex items-center justify-center p-4">
         <img 
           key={current.id}
           src={current.image} 
           alt={current.name} 
-          className="w-full h-full object-cover" 
+          className="max-w-full max-h-full object-contain drop-shadow-lg transition-transform duration-500" 
         />
       </div>
 
       {/* النقاط */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10 bg-white/50 backdrop-blur-sm px-3 py-1.5 rounded-full">
         {sliderProducts.map((_, i) => (
           <button 
             key={i} 
             onClick={() => setIndex(i)} 
-            className={'w-2 h-2 rounded-full transition-all ' + (index === i ? 'bg-[#d93844] w-6' : 'bg-gray-300')}
+            className={'w-2 h-2 rounded-full transition-all ' + (index === i ? 'bg-[#d93844] w-6' : 'bg-gray-400')}
+            aria-label={`Go to slide ${i + 1}`}
           />
         ))}
       </div>
