@@ -1,0 +1,30 @@
+{
+  "id": "/",
+  "name": "لمسة | Lamsa Fashion",
+  "short_name": "لمسة",
+  "description": "تسوّقي إطلالات مختارة بعناية من لمسة.",
+  "lang": "ar-SA",
+  "dir": "rtl",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#f6f2ec",
+  "theme_color": "#482d39",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "/manus-storage/async-images/jNo1vWA8CbyB9n8NDTaLwb/image-5.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/manus-storage/async-images/jNo1vWA8CbyB9n8NDTaLwb/image-5.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ]
+}
