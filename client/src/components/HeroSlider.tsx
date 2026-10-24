@@ -29,7 +29,7 @@ export default function HeroSlider({ products }: { products: any[] }) {
   const current = sliderProducts[index];
 
   return (
-    <section className="bg-[#FDF6ED] rounded-3xl shadow-sm my-6 overflow-hidden grid md:grid-cols-2 gap-0 relative border border-[#f0e6d8]">
+    <section className="bg-gradient-to-br from-[#FDF6ED] to-[#f4ece1] rounded-3xl shadow-lg my-6 overflow-hidden grid md:grid-cols-2 gap-0 relative border border-[#f0e6d8]">
       {/* النصوص */}
       <div className="order-2 md:order-1 p-8 md:p-12 flex flex-col justify-center z-10">
         <span className="inline-flex items-center gap-1 bg-[#d93844] text-white text-xs px-3 py-1 rounded-full mb-4 self-start shadow-sm">
@@ -52,14 +52,24 @@ export default function HeroSlider({ products }: { products: any[] }) {
         </button>
       </div>
       
-      {/* الصورة (بدون قطع) */}
-      <div className="order-1 md:order-2 relative h-72 md:h-[500px] bg-[#f0e6d8]/30 flex items-center justify-center p-4">
-        <img 
-          key={current.id}
-          src={current.image} 
-          alt={current.name} 
-          className="max-w-full max-h-full object-contain drop-shadow-lg transition-transform duration-500" 
-        />
+      {/* الصورة (ثلاثية الأبعاد مع انعكاس) */}
+      <div className="order-1 md:order-2 relative h-72 md:h-[500px] flex items-center justify-center p-8 perspective-[1000px]">
+        <div className="relative w-full h-full flex items-center justify-center">
+          {/* الصورة الرئيسية مع تأثير 3D */}
+          <img 
+            key={current.id}
+            src={current.image} 
+            alt={current.name} 
+            className="max-w-full max-h-full object-contain transition-transform duration-700 animate-[float_6s_ease-in-out_infinite]"
+            style={{
+              transform: 'rotateY(-10deg) rotateX(5deg)',
+              filter: 'drop-shadow(20px 20px 30px rgba(72, 45, 57, 0.25))',
+              borderRadius: '12px'
+            }}
+          />
+          {/* الانعكاس */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-[20%] bg-black/10 blur-2xl rounded-full -z-10" />
+        </div>
       </div>
 
       {/* النقاط */}

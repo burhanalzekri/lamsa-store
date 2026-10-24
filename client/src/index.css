@@ -579,3 +579,10 @@ body { background: #fff; color: #202020; }
 button.bg-\[\#482d39\], button.bg-\[\#34212a\], button.bg-\[\#d93844\] {
   color: white !important;
 }
+
+/* تأثير الطفو للصور */
+@keyframes float {
+  0% { transform: translateY(0px) rotateY(-10deg) rotateX(5deg); }
+  50% { transform: translateY(-15px) rotateY(-10deg) rotateX(5deg); }
+  100% { transform: translateY(0px) rotateY(-10deg) rotateX(5deg); }
+}
