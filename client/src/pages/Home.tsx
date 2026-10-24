@@ -125,12 +125,12 @@ export default function Home() {
             {filteredProducts.map(product => {
               const discount = product.compareAtHalalas ? Math.round((1 - product.price / (product.compareAtHalalas / 100)) * 100) : 0;
               return (
-                <div key={product.id} onClick={() => setLocation(`/product/${product.id}`)} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition border border-gray-100 cursor-pointer">
-                  <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
-                    <img src={product.image || "https://placehold.co/400x500"} alt={product.name} className="w-full h-full object-cover transition duration-700 group-hover:scale-110 product-shadow" />
-                    {discount > 0 && <span className="absolute top-2 right-2 bg-[#d93844] text-white text-xs font-bold px-2 py-1 rounded">-{discount}%</span>}
+                <div key={product.id} onClick={() => setLocation(`/product/${product.id}`)} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border border-gray-100 cursor-pointer product-card-animated">
+                  <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 product-image-wrapper">
+                    <img src={product.image || "https://placehold.co/400x500"} alt={product.name} className="w-full h-full object-cover" />
+                    {discount > 0 && <span className="absolute top-2 right-2 bg-[#d93844] text-white text-xs font-bold px-2 py-1 rounded shadow-sm">-{discount}%</span>}
                     {product.badge && <span className="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-2 py-1 rounded backdrop-blur-sm">{product.badge}</span>}
-                    <button onClick={() => setLocation(`/product/${product.id}`)} className="absolute bottom-2 left-2 bg-white/90 backdrop-blur p-2.5 rounded-full shadow-md text-[#34212a] hover:bg-[#34212a] hover:text-white transition transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
+                    <button onClick={() => setLocation(`/product/${product.id}`)} className="absolute bottom-2 left-2 bg-white/90 backdrop-blur p-2.5 rounded-full shadow-md text-[#34212a] hover:bg-[#34212a] hover:text-white transition-all transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
                       <Plus size={18}/>
                     </button>
                   </div>
