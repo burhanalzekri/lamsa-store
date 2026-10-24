@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Phone, Mail, Heart, Menu, Minus, Plus, Search, ShoppingBag, Sparkles, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
+import HeroSlider from "../components/HeroSlider";
 import { useLocation } from "wouter";
 
 const CART_KEY = "lamsa-cart-v2";
