@@ -402,24 +402,52 @@ app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
   app.get("/api/admin/reports/sales", async (req, res) => {
     try {
       const conn = await getConn();
-      const [daily] = await conn.execute(`
-        SELECT DATE(createdAt) as date, SUM(totalAmount) as total, COUNT(*) as count
-        FROM store_orders
-        WHERE createdAt >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-        GROUP BY DATE(createdAt)
-        ORDER BY date ASC
-      `);
       
-      const [topProducts] = await conn.execute(`
-        SELECT JSON_EXTRACT(items, '$[*].name') as names, SUM(totalAmount) as total
-        FROM store_orders
-        GROUP BY orderNumber
-        ORDER BY total DESC
-        LIMIT 5
-      `);
+      // جلب جميع الطلبات
+      const [orders]: any = await conn.execute('SELECT * FROM store_orders ORDER BY createdAt DESC');
+      
+      // حساب المبيعات اليومية (آخر 30 يوم)
+      const dailyMap: any = {};
+      const now = new Date();
+      
+      orders.forEach((o: any) => {
+        if (!o.createdAt || o.status === 'cancelled') return;
+        const d = new Date(o.createdAt);
+        const diffDays = (now.getTime() - d.getTime()) / (1000 * 3600 * 24);
+        if (diffDays <= 30) {
+          const key = d.toISOString().split('T')[0];
+          if (!dailyMap[key]) dailyMap[key] = { date: key, total: 0, count: 0 };
+          dailyMap[key].total += Number(o.totalAmount) || 0;
+          dailyMap[key].count += 1;
+        }
+      });
+      
+      const daily = Object.values(dailyMap).sort((a: any, b: any) => a.date.localeCompare(b.date));
+      
+      // المنتجات الأكثر مبيعاً (بناءً على تكرار الأسماء)
+      const productMap: any = {};
+      orders.forEach((o: any) => {
+        if (o.status === 'cancelled') return;
+        try {
+          const items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items;
+          if (Array.isArray(items)) {
+            items.forEach((item: any) => {
+              const name = item.name || item.title || 'منتج';
+              if (!productMap[name]) productMap[name] = { names: name, total: 0 };
+              productMap[name].total += (Number(item.price) || 0) * (Number(item.quantity) || 1);
+            });
+          }
+        } catch (e) {}
+      });
+      
+      const topProducts = Object.values(productMap)
+        .sort((a: any, b: any) => b.total - a.total)
+        .slice(0, 5);
       
       await conn.end();
       res.json({ daily, topProducts });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
   
