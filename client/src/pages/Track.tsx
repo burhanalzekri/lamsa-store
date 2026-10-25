@@ -131,7 +131,12 @@ export default function Track() {
             <div className="space-y-6">
               {visibleOrders.map((order, index) => {
                 const currentStep = getStepIndex(order.status);
-                const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+                let items: any[] = [];
+                try {
+                  items = typeof order.items === 'string' ? JSON.parse(order.items) : (Array.isArray(order.items) ? order.items : []);
+                } catch (e) {
+                  items = [];
+                }
                 const delayed = isDelayed(order);
                 
                 return (
@@ -172,14 +177,14 @@ export default function Track() {
                               {step.label}
                             </span>
                           </div>
-                        ))}
+                        )) : <p className="text-gray-400 text-xs">لا توجد تفاصيل</p>}
                       </div>
                     </div>
 
                     <div className="p-4 bg-gray-50 border-t">
                       <h3 className="font-bold text-sm text-gray-700 mb-2">المنتجات:</h3>
                       <div className="space-y-2">
-                        {items?.map((item: any, idx: number) => (
+                        {Array.isArray(items) && items.length > 0 ? items.map((item: any, idx: number) => (
                           <div key={idx} className="flex justify-between text-sm">
                             <span className="text-gray-600">{item.name || item.title}</span>
                             <span className="font-bold">x{item.quantity}</span>
