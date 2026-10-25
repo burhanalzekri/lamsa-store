@@ -209,7 +209,7 @@ async function startServer() {
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
-  app.get("/api/admin/users", async (req, res) => {
+  app.get("/api/admin/users", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       const [rows] = await conn.execute('SELECT id, name, email, role FROM users ORDER BY id DESC');
