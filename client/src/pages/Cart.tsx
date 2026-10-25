@@ -76,21 +76,18 @@ export default function Cart() {
     } catch (e) { setCouponMsg({ text: 'خطأ في الاتصال', type: 'error' }); }
   };
 
-  const saveImage = async () => {
-    if (isGenerating) return;
-    setIsGenerating(true);
-    toast.info('جارٍ إنشاء الصورة...');
+  const saveImage = () => {
     try {
-      await new Promise(r => setTimeout(r, 100));
+      setIsGenerating(true);
       const dataUrl = generateReceiptImage(cart, subtotal, discount, discountAmount, total, user);
-      if (!dataUrl) throw new Error('فشل');
+      if (!dataUrl) { setIsGenerating(false); return toast.error('فشل إنشاء الصورة'); }
       const link = document.createElement('a');
       link.download = 'lamsa-order-' + Date.now() + '.png';
       link.href = dataUrl;
       link.click();
       toast.success('تم حفظ الصورة في المعرض!');
-    } catch (e) { 
-      toast.error('فشل حفظ الصورة.'); 
+    } catch (e) {
+      toast.error('فشل حفظ الصورة.');
     } finally {
       setIsGenerating(false);
     }
@@ -98,9 +95,10 @@ export default function Cart() {
 
   const shareImage = async () => {
     try {
+      setIsGenerating(true);
       toast.info('جارٍ تجهيز الصورة للمشاركة...');
       const dataUrl = generateReceiptImage(cart, subtotal, discount, discountAmount, total, user);
-      if (!dataUrl) return;
+      if (!dataUrl) { setIsGenerating(false); return; }
       const res = await fetch(dataUrl);
       const blob = await res.blob();
       const file = new File([blob], 'lamsa-order.png', { type: 'image/png' });
@@ -114,7 +112,11 @@ export default function Cart() {
         link.click();
         toast.success('تم حفظ الصورة (متصفحك لا يدعم المشاركة المباشرة)');
       }
-    } catch (e) { toast.error('فشل مشاركة الصورة.'); }
+    } catch (e) {
+      toast.error('فشل مشاركة الصورة.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const sendWhatsApp = () => {
@@ -212,25 +214,13 @@ export default function Cart() {
                     <MessageCircle size={18}/> إرسال عبر واتساب
                   </button>
                   <div className="grid grid-cols-2 gap-2">
-                    <button onClick={shareImage} className="bg-[#482d39] text-white py-2 rounded-xl font-bold text-xs hover:bg-[#654151] transition flex justify-center items-center gap-1 shadow-sm">
-                      <Share2 size={16}/> مشاركة
+                    <button onClick={shareImage} disabled={isGenerating} className="bg-[#482d39] text-white py-2 rounded-xl font-bold text-xs hover:bg-[#654151] transition flex justify-center items-center gap-1 shadow-sm disabled:opacity-50">
+                      <Share2 size={16}/> {isGenerating ? '...' : 'مشاركة'}
                     </button>
                     <button onClick={saveImage} disabled={isGenerating} className="bg-[#34212a] text-white py-2 rounded-xl font-bold text-xs hover:bg-black transition flex justify-center items-center gap-1 shadow-sm disabled:opacity-50">
-                      <Camera size={16}/> {isGenerating ? 'جارٍ الحفظ...' : 'حفظ'}
+                      <Camera size={16}/> {isGenerating ? '...' : 'حفظ'}
                     </button>
                   </div>
-                  <button 
-                    onClick={() => {
-                      saveImage();
-                      setTimeout(() => {
-                        window.open('https://wa.me/967775799926', '_blank');
-                      }, 1000);
-                    }}
-                    disabled={isGenerating}
-                    className="w-full bg-[#25D366] text-white py-2 rounded-xl font-bold text-xs hover:bg-[#1DA851] transition flex justify-center items-center gap-1 mt-2 shadow-sm disabled:opacity-50"
-                  >
-                    <MessageCircle size={16}/> حفظ وإرسال عبر واتساب
-                  </button>
                 </div>
                 <div className="mt-4 text-center text-[10px] text-gray-400 flex items-center justify-center gap-1">
                   <ShieldCheck size={12}/> الدفع عند الاستلام آمن ومضمون
