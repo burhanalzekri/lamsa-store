@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Tag, Camera, MessageCircle, Share2, ArrowRight } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Tag, Camera, MessageCircle, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateReceiptImage } from '../lib/generateReceipt';
 
 const CART_KEY = "lamsa-cart-v2";
 
@@ -74,9 +75,6 @@ export default function Cart() {
     } catch (e) { setCouponMsg({ text: 'خطأ في الاتصال', type: 'error' }); }
   };
 
-  // دالة رسم الصورة (بدون صور المنتجات - مضمونة 100%)
-  
-
   const saveImage = () => {
     try {
       const dataUrl = generateReceiptImage(cart, subtotal, discount, discountAmount, total, user);
@@ -145,11 +143,7 @@ export default function Cart() {
           </div>
         ) : (
           <div className="grid lg:grid-cols-3 gap-8">
-            
-            {/* العمود الأيمن: المنتجات */}
             <div className="lg:col-span-2 space-y-4">
-              
-              {/* شريط الشحن */}
               <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                 <p className="text-sm text-center mb-2 font-bold text-[#482d39]">
                   {remainingForFreeShipping > 0 
@@ -161,7 +155,6 @@ export default function Cart() {
                 </div>
               </div>
 
-              {/* بطاقات المنتجات */}
               {cart.map((item, i) => (
                 <div key={i} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
                   <img src={item.image} alt={item.name} className="w-24 h-32 object-cover rounded-lg" />
@@ -186,24 +179,16 @@ export default function Cart() {
               ))}
             </div>
 
-            {/* العمود الأيسر: ملخص الطلب (Sticky) */}
             <div className="lg:col-span-1">
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-24">
                 <h2 className="text-xl font-bold text-[#482d39] mb-4 border-b pb-3">ملخص الطلب</h2>
-                
                 <div className="space-y-3 mb-6 text-sm">
                   <div className="flex justify-between"><span className="text-gray-600">المجموع الفرعي:</span><span className="font-bold">{subtotal.toLocaleString()} ر.ي</span></div>
                   <div className="flex justify-between"><span className="text-gray-600">الشحن:</span><span className="text-green-600 font-bold">مجاني</span></div>
-                  {discount > 0 && (
-                    <div className="flex justify-between text-green-600"><span>الخصم ({discount}%):</span><span className="font-bold">-{discountAmount.toLocaleString()} ر.ي</span></div>
-                  )}
-                  <div className="border-t pt-3 flex justify-between text-lg font-extrabold text-[#34212a]">
-                    <span>الإجمالي:</span>
-                    <span>{total.toLocaleString()} ر.ي</span>
-                  </div>
+                  {discount > 0 && <div className="flex justify-between text-green-600"><span>الخصم ({discount}%):</span><span className="font-bold">-{discountAmount.toLocaleString()} ر.ي</span></div>}
+                  <div className="border-t pt-3 flex justify-between text-lg font-extrabold text-[#34212a]"><span>الإجمالي:</span><span>{total.toLocaleString()} ر.ي</span></div>
                 </div>
 
-                {/* الكوبون */}
                 <div className="mb-6">
                   <label className="block text-xs font-bold text-gray-600 mb-2 flex items-center gap-1"><Tag size={14}/> كود الخصم</label>
                   <div className="relative">
@@ -213,7 +198,6 @@ export default function Cart() {
                   {couponMsg.text && <p className={`text-xs mt-2 font-bold ${couponMsg.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{couponMsg.text}</p>}
                 </div>
 
-                {/* الأزرار */}
                 <div className="space-y-2">
                   <button onClick={sendWhatsApp} className="w-full bg-[#25D366] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#1DA851] transition flex justify-center items-center gap-2 shadow-md">
                     <MessageCircle size={18}/> إرسال عبر واتساب
@@ -227,7 +211,6 @@ export default function Cart() {
                     </button>
                   </div>
                 </div>
-
                 <div className="mt-4 text-center text-[10px] text-gray-400 flex items-center justify-center gap-1">
                   <ShieldCheck size={12}/> الدفع عند الاستلام آمن ومضمون
                 </div>
