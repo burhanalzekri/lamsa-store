@@ -7,7 +7,10 @@ import SettingsPanel from './admin/SettingsPanel';
 import ReportsPanel from './admin/ReportsPanel';
 import VariantsPanel from './admin/VariantsPanel';
 import { toast } from 'sonner';
+import AdminSidebar from './admin/AdminSidebar';
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const handleLogout = () => { localStorage.removeItem('lamsa_user'); localStorage.removeItem('lamsa_token'); window.location.href = '/'; };
 export default function Admin({ user }: { user: any }) {
   const [tab, setTab] = useState<'overview'|'products'|'orders'|'users'|'coupons'|'settings'|'reports'|'variants'>('overview');
   const [stats, setStats] = useState<any>({ products: 0, orders: 0, revenue: 0, lowStock: 0, pendingOrders: 0 });
@@ -95,17 +98,13 @@ export default function Admin({ user }: { user: any }) {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#f8f6f2]" dir="rtl">
-      <aside className="w-full md:w-64 bg-[#482d39] text-white flex-shrink-0 p-4 space-y-2 overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6">لوحة لمسة</h2>
-        <button onClick={()=>setTab('overview')} className={`w-full flex items-center gap-3 p-3 rounded-xl ${tab==='overview'?'bg-white text-[#482d39] font-bold':'hover:bg-white/10'}`}><LayoutDashboard size={20}/> نظرة عامة</button>
-        <button onClick={()=>setTab('products')} className={`w-full flex items-center gap-3 p-3 rounded-xl ${tab==='products'?'bg-white text-[#482d39] font-bold':'hover:bg-white/10'}`}><Package size={20}/> المنتجات</button>
-        <button onClick={()=>setTab('variants')} className={`w-full flex items-center gap-3 p-3 rounded-xl ${tab==='variants'?'bg-white text-[#482d39] font-bold':'hover:bg-white/10'}`}><Layers size={20}/> المتغيرات</button>
-        <button onClick={()=>setTab('orders')} className={`w-full flex items-center gap-3 p-3 rounded-xl ${tab==='orders'?'bg-white text-[#482d39] font-bold':'hover:bg-white/10'}`}><ClipboardList size={20}/> الطلبات</button>
-        <button onClick={()=>setTab('users')} className={`w-full flex items-center gap-3 p-3 rounded-xl ${tab==='users'?'bg-white text-[#482d39] font-bold':'hover:bg-white/10'}`}><Users size={20}/> المستخدمون</button>
-        <button onClick={()=>setTab('coupons')} className={`w-full flex items-center gap-3 p-3 rounded-xl ${tab==='coupons'?'bg-white text-[#482d39] font-bold':'hover:bg-white/10'}`}><Tag size={20}/> الكوبونات</button>
-        <button onClick={()=>setTab('reports')} className={`w-full flex items-center gap-3 p-3 rounded-xl ${tab==='reports'?'bg-white text-[#482d39] font-bold':'hover:bg-white/10'}`}><BarChart3 size={20}/> التقارير</button>
-        <button onClick={()=>setTab('settings')} className={`w-full flex items-center gap-3 p-3 rounded-xl ${tab==='settings'?'bg-white text-[#482d39] font-bold':'hover:bg-white/10'}`}><Settings size={20}/> الإعدادات</button>
-      </aside>
+      <AdminSidebar 
+        tab={tab} 
+        setTab={setTab} 
+        isOpen={sidebarOpen} 
+        setIsOpen={setSidebarOpen} 
+        onLogout={handleLogout} 
+      />
       
       <main className="flex-grow p-4 md:p-8 overflow-y-auto">
         {tab === 'overview' && (
