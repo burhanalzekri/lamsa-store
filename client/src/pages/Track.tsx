@@ -37,16 +37,6 @@ export default function Track() {
   };
 
   useEffect(() => {
-    // تحديث تلقائي كل 30 ثانية إذا كان هناك طلب معروض
-    const interval = setInterval(() => {
-      if (query && searchType === 'id') {
-        performSearch(query, 'id');
-      }
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [query, searchType]);
-
-  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     if (id) {
@@ -62,10 +52,10 @@ export default function Track() {
   };
 
   const steps = [
-    { key: 'pending', label: 'تم الاستلام', icon: <Package size={20}/> },
-    { key: 'processing', label: 'قيد التجهيز', icon: <Clock size={20}/> },
-    { key: 'shipped', label: 'تم الشحن', icon: <Truck size={20}/> },
-    { key: 'completed', label: 'تم التوصيل', icon: <CheckCircle size={20}/> },
+    { key: 'pending', label: 'تم الاستلام', icon: <Package size={18}/> },
+    { key: 'processing', label: 'قيد التجهيز', icon: <Clock size={18}/> },
+    { key: 'shipped', label: 'تم الشحن', icon: <Truck size={18}/> },
+    { key: 'completed', label: 'تم التوصيل', icon: <CheckCircle size={18}/> },
   ];
 
   const getStepIndex = (status: string) => {
@@ -80,7 +70,6 @@ export default function Track() {
     return diffDays > 3;
   };
 
-  // فلترة الطلبات: عرض الطلبات التي مضى عليها أقل من 90 يوماً فقط
   const filterRecentOrders = (ordersList: any[]) => {
     const now = new Date().getTime();
     return ordersList.filter(o => {
@@ -96,7 +85,9 @@ export default function Track() {
   return (
     <div className="min-h-screen bg-[#FAF3E0] py-8" dir="rtl">
       <div className="max-w-2xl mx-auto px-4">
-        <button onClick={() => setLocation('/')} className="mb-6 flex items-center gap-2 text-[#482d39] font-bold hover:underline"><ArrowRight size={20}/> العودة للرئيسية</button>
+        <button onClick={() => setLocation('/')} className="mb-6 flex items-center gap-2 text-[#482d39] font-bold hover:underline">
+          <ArrowRight size={20}/> العودة للرئيسية
+        </button>
         
         <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
           <div className="text-center mb-8">
@@ -108,16 +99,33 @@ export default function Track() {
           </div>
 
           <div className="flex bg-gray-100 p-1 rounded-lg mb-6">
-            <button onClick={() => { setSearchType('id'); setQuery(''); setOrders([]); }} className={`flex-grow py-2 rounded-md text-sm font-bold flex items-center justify-center gap-2 transition ${searchType === 'id' ? 'bg-white shadow-sm text-[#482d39]' : 'text-gray-500'}`}><Hash size={16}/> رقم الطلب</button>
-            <button onClick={() => { setSearchType('phone'); setQuery(''); setOrders([]); }} className={`flex-grow py-2 rounded-md text-sm font-bold flex items-center justify-center gap-2 transition ${searchType === 'phone' ? 'bg-white shadow-sm text-[#482d39]' : 'text-gray-500'}`}><Phone size={16}/> رقم الجوال</button>
+            <button onClick={() => { setSearchType('id'); setQuery(''); setOrders([]); }} className={`flex-grow py-2 rounded-md text-sm font-bold flex items-center justify-center gap-2 transition ${searchType === 'id' ? 'bg-white shadow-sm text-[#482d39]' : 'text-gray-500'}`}>
+              <Hash size={16}/> رقم الطلب
+            </button>
+            <button onClick={() => { setSearchType('phone'); setQuery(''); setOrders([]); }} className={`flex-grow py-2 rounded-md text-sm font-bold flex items-center justify-center gap-2 transition ${searchType === 'phone' ? 'bg-white shadow-sm text-[#482d39]' : 'text-gray-500'}`}>
+              <Phone size={16}/> رقم الجوال
+            </button>
           </div>
 
           <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
-            <input required value={query} onChange={e => setQuery(e.target.value)} placeholder={searchType === 'id' ? "مثال: LMS-123456" : "مثال: 05xxxxxxxx"} className="flex-grow border p-3 rounded-lg outline-none focus:border-[#482d39]" dir="ltr" />
-            <button disabled={loading} type="submit" className="bg-[#482d39] text-white px-6 rounded-lg font-bold hover:bg-[#654151] transition disabled:opacity-50">{loading ? '...' : 'بحث'}</button>
+            <input 
+              required 
+              value={query} 
+              onChange={e => setQuery(e.target.value)} 
+              placeholder={searchType === 'id' ? "مثال: LMS-123456" : "مثال: 05xxxxxxxx"} 
+              className="flex-grow border p-3 rounded-lg outline-none focus:border-[#482d39]" 
+              dir="ltr" 
+            />
+            <button disabled={loading} type="submit" className="bg-[#482d39] text-white px-6 rounded-lg font-bold hover:bg-[#654151] transition disabled:opacity-50">
+              {loading ? '...' : 'بحث'}
+            </button>
           </form>
 
-          {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-center flex items-center justify-center gap-2"><AlertCircle size={16}/>{error}</div>}
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-center flex items-center justify-center gap-2">
+              <AlertCircle size={16}/>{error}
+            </div>
+          )}
 
           {visibleOrders.length > 0 && (
             <div className="space-y-6">
@@ -140,9 +148,13 @@ export default function Track() {
 
                     <div className={`p-4 text-sm text-center ${delayed ? 'bg-amber-50 text-amber-800' : 'bg-green-50 text-green-800'}`}>
                       {delayed ? (
-                        <p className="flex items-center justify-center gap-2"><Clock size={16}/> نعتذر منك، طلبك يتأخر قليلاً عن المعتاد. نعمل جاهدين لتجهيزه في أقرب وقت.</p>
+                        <p className="flex items-center justify-center gap-2">
+                          <Clock size={16}/> نعتذر منك، طلبك يتأخر قليلاً عن المعتاد. نعمل جاهدين لتجهيزه في أقرب وقت.
+                        </p>
                       ) : (
-                        <p className="flex items-center justify-center gap-2"><Heart size={16} className="text-red-500"/> شكراً لثقتك بلمسة! طلبك في أيدٍ أمينة، وسنبقيك على اطلاع دائم.</p>
+                        <p className="flex items-center justify-center gap-2">
+                          <Heart size={16} className="text-red-500"/> شكراً لثقتك بلمسة! طلبك في أيدٍ أمينة، وسنبقيك على اطلاع دائم.
+                        </p>
                       )}
                     </div>
 
@@ -156,16 +168,36 @@ export default function Track() {
                             <div className={`w-11 h-11 rounded-full flex items-center justify-center border-4 border-white shadow-lg transition-all duration-500 ${i <= currentStep ? 'bg-[#d93844] text-white scale-110' : 'bg-gray-200 text-gray-400'}`}>
                               {step.icon}
                             </div>
-                            <span className={`text-[11px] font-bold text-center ${i <= currentStep ? 'text-[#34212a]' : 'text-gray-400'}`}>{step.label}</span>
+                            <span className={`text-[11px] font-bold text-center ${i <= currentStep ? 'text-[#34212a]' : 'text-gray-400'}`}>
+                              {step.label}
+                            </span>
                           </div>
                         ))}
                       </div>
+                    </div>
+
+                    <div className="p-4 bg-gray-50 border-t">
+                      <h3 className="font-bold text-sm text-gray-700 mb-2">المنتجات:</h3>
+                      <div className="space-y-2">
+                        {items?.map((item: any, idx: number) => (
+                          <div key={idx} className="flex justify-between text-sm">
+                            <span className="text-gray-600">{item.name || item.title}</span>
+                            <span className="font-bold">x{item.quantity}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="border-t mt-2 pt-2 text-sm text-gray-600 space-y-1">
+                        <p><b>الاسم:</b> {order.customerName}</p>
+                        <p><b>الهاتف:</b> {order.phone}</p>
+                        <p><b>العنوان:</b> {order.address}</p>
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
             </div>
           )}
 
-          {/* رسالة للطلبات القديمة المخفية */}
           {hasHiddenOrders && (
             <div className="mt-6 text-center text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
               عرضنا لك آخر 90 يوماً فقط. الطلبات الأقدم من ذلك متاحة في صفحة "حسابي".
