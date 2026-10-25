@@ -91,7 +91,7 @@ export const appRouter = router({
     users: router({
       list: adminProcedure.query(() => storeDb.listUsers()),
       setRole: adminProcedure.input(z.object({ userId: z.number().int().positive(), role: z.enum(["user", "admin"]) }))
-        .mutation(({ ctx, input }) => storeDb.setUserRole(input.userId, input.role, ctx.user.id)),
+        .mutation(({ ctx, input }) => storeDb.setUserRole(input.userId, input.role, ctx.user!.id)),
     }),
     reports: router({
       monthly: adminProcedure.input(z.object({
