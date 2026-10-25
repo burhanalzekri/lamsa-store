@@ -237,6 +237,11 @@ export default function ProductDetails() {
               <span className="text-gray-400 text-sm">| {reviews.length} مراجعة</span>
             </div>
             
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold">🚚 شحن مجاني</span>
+              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold">🔄 استبدال خلال 3 أيام</span>
+              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-bold">💳 دفع عند الاستلام</span>
+            </div>
             <div className="flex items-center gap-3 mb-4">
               {!selectedColor || !selectedSize ? (
                 <>
@@ -262,6 +267,12 @@ export default function ProductDetails() {
             
             <p className="text-gray-600 leading-relaxed mb-6">{product.description}</p>
 
+            <div className="grid grid-cols-2 gap-4 mb-6 p-3 bg-gray-50 rounded-lg border text-xs">
+              <div><span className="text-gray-500">الفئة:</span> <b className="text-[#34212a]">{product.category}</b></div>
+              <div><span className="text-gray-500">الخامة:</span> <b className="text-[#34212a]">{product.material || 'قطن'}</b></div>
+              <div><span className="text-gray-500">الكود:</span> <b className="text-[#34212a]">{product.id}</b></div>
+              <div><span className="text-gray-500">التقييم:</span> <b className="text-[#34212a]">{product.rating || 4.5} ⭐</b></div>
+            </div>
             <div className="mb-6">
               <span className="font-bold text-gray-700 block mb-2">المقاس:</span>
               <div className="flex gap-2 flex-wrap">

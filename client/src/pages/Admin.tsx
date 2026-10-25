@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Package, ClipboardList, LayoutDashboard, Users, Tag, Settings, DollarSign, ShoppingBag, AlertTriangle, TrendingUp, BarChart3, Layers } from 'lucide-react';
 import ProductsPanel from './admin/ProductsPanel';
 import CouponsPanel from './admin/CouponsPanel';
@@ -13,10 +14,22 @@ export default function Admin({ user }: { user: any }) {
   const [orders, setOrders] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
   const [lowStockItems, setLowStockItems] = useState<any[]>([]);
   const [orderSearch, setOrderSearch] = useState('');
   const [orderFilter, setOrderFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  const fetchChartData = async () => {
+    try {
+      const token = localStorage.getItem('lamsa_token');
+      const res = await fetch('/api/admin/chart-data', { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const data = await res.json();
+        setChartData(Array.isArray(data) ? data : []);
+      }
+    } catch (e) {}
+  };
 
   const fetchData = async () => {
     try {
@@ -37,7 +50,7 @@ export default function Admin({ user }: { user: any }) {
     } catch (e) {}
   };
 
-  useEffect(() => { if (user?.role === 'admin') fetchData(); }, [user]);
+  useEffect(() => { if (user?.role === 'admin') { fetchData(); fetchChartData(); } }, [user]);
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
@@ -117,7 +130,25 @@ export default function Admin({ user }: { user: any }) {
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-xl shadow-sm border mt-6">
+            <h2 className="text-lg font-bold text-[#482d39] mb-4">📈 المبيعات اليومية (آخر 7 أيام)</h2>
+            {chartData.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">لا توجد بيانات كافية.</p>
+            ) : (
+              <div style={{ width: '100%', height: 250 }}>
+                <ResponsiveContainer>
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="total" stroke="#d93844" strokeWidth={3} dot={{ r: 5 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white p-6 rounded-xl shadow-sm border">
                 <h2 className="text-lg font-bold text-[#482d39] mb-4 flex items-center gap-2"><ShoppingBag size={20}/> آخر الطلبات</h2>
                 {recentOrders.length === 0 ? <p className="text-gray-500 text-sm">لا توجد طلبات بعد.</p> : (
