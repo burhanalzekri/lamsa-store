@@ -619,3 +619,12 @@ button.bg-\[\#482d39\], button.bg-\[\#34212a\], button.bg-\[\#d93844\] {
 .product-card-animated:hover {
   animation: float-product 2s ease-in-out infinite;
 }
+
+/* حركة الشريط المتحرك */
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}

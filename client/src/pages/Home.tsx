@@ -61,9 +61,16 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#FAF3E0] pb-20" dir="rtl">
-      {/* شريط التنبيهات */}
-      <div className="bg-[#34212a] text-white text-xs py-2 text-center flex justify-center items-center gap-2">
-        <Sparkles size={14} /> عروض لمسة على قطع مختارة | تصفحي الجديد قبل نفاد الألوان
+      {/* شريط التنبيهات المتحرك */}
+      <div className="bg-[#34212a] text-white text-xs py-2 overflow-hidden whitespace-nowrap">
+        <div className="animate-marquee inline-block">
+          <span className="mx-4">🚚 توصيل مجاني للطلبات فوق 20,000 ر.ي</span>
+          <span className="mx-4">|</span>
+          <span className="mx-4">✨ عروض مختارة على قطع جديدة</span>
+          <span className="mx-4">|</span>
+          <span className="mx-4">🎁 استخدمي كود LAMSA10 لخصم 10%</span>
+          <span className="mx-4">|</span>
+        </div>
       </div>
 
       {/* الترويسة */}
