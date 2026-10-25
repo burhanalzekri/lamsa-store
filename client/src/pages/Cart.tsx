@@ -124,6 +124,62 @@ export default function Cart() {
     }
   };
 
+  // مشاركة صورة السلة عبر التطبيقات (واتساب، تيليجرام، إلخ)
+  const shareCart = async () => {
+    if (!cartRef.current) return;
+    try {
+      toast.info('جارٍ تجهيز الصورة للمشاركة...');
+      
+      // إخفاء الصور مؤقتاً
+      const images = cartRef.current.querySelectorAll('img');
+      images.forEach((img: any) => { img.style.visibility = 'hidden'; });
+      await new Promise(r => setTimeout(r, 200));
+      
+      // تصوير السلة
+      const canvas = await html2canvas(cartRef.current, { 
+        scale: 2, 
+        backgroundColor: '#FAF3E0',
+        useCORS: false,
+        allowTaint: false,
+        logging: false
+      });
+      
+      // استعادة الصور
+      images.forEach((img: any) => { img.style.visibility = 'visible'; });
+      
+      // تحويل الصورة إلى Blob
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+      if (!blob) throw new Error('فشل إنشاء الصورة');
+      
+      // استخدام Web Share API للمشاركة
+      const file = new File([blob], 'lamsa-order.png', { type: 'image/png' });
+      
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'طلب من متجر لمسة',
+          text: 'تفاصيل طلبي من متجر لمسة 🛍️'
+        });
+        toast.success('تم تجهيز الطلب للمشاركة!');
+      } else {
+        // fallback: إذا لم يدعم المتصفح المشاركة، قم بتنزيل الصورة
+        const link = document.createElement('a');
+        link.download = 'lamsa-order.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        toast.success('تم حفظ الصورة (متصفحك لا يدعم المشاركة المباشرة)');
+      }
+    } catch (e) {
+      console.error(e);
+      // استعادة الصور
+      try {
+        const images = cartRef.current.querySelectorAll('img');
+        images.forEach((img: any) => { img.style.visibility = 'visible'; });
+      } catch (err) {}
+      toast.error('فشل مشاركة السلة.');
+    }
+  };
+
   // إرسال الطلب عبر الواتساب (نص فقط)
   const sendOrderViaWhatsApp = () => {
     if (cart.length === 0) return toast.error('السلة فارغة');
@@ -235,21 +291,26 @@ export default function Cart() {
             </div>
 
             {/* أزرار الطلب */}
-            <div className="grid md:grid-cols-2 gap-3">
-              <button 
-                onClick={captureCart}
-                className="w-full bg-[#34212a] text-white py-4 rounded-xl font-bold text-lg hover:bg-black transition flex justify-center items-center gap-2 shadow-lg"
-              >
-                <Camera size={22}/> 1. حفظ صورة الطلب
-              </button>
+            <div className="grid md:grid-cols-3 gap-3">
               <button 
                 onClick={sendOrderViaWhatsApp}
-                className="w-full bg-[#25D366] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#1DA851] transition flex justify-center items-center gap-2 shadow-lg"
+                className="w-full bg-[#25D366] text-white py-4 rounded-xl font-bold text-sm hover:bg-[#1DA851] transition flex justify-center items-center gap-2 shadow-lg"
               >
-                <MessageCircle size={22}/> 2. إرسال عبر واتساب
+                <MessageCircle size={20}/> واتساب
+              </button>
+              <button 
+                onClick={shareCart}
+                className="w-full bg-[#4A235A] text-white py-4 rounded-xl font-bold text-sm hover:bg-[#381a45] transition flex justify-center items-center gap-2 shadow-lg"
+              >
+                <Share2 size={20}/> مشاركة
+              </button>
+              <button 
+                onClick={captureCart}
+                className="w-full bg-[#34212a] text-white py-4 rounded-xl font-bold text-sm hover:bg-black transition flex justify-center items-center gap-2 shadow-lg"
+              >
+                <Camera size={20}/> حفظ
               </button>
             </div>
-
             <div className="text-center text-xs text-green-600 font-bold flex items-center justify-center gap-1 mt-2">
               <ShieldCheck size={14}/> إرسال آمن ومباشر
             </div>
