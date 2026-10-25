@@ -81,13 +81,22 @@ export default function Cart() {
     if (!cartRef.current) return;
     try {
       toast.info('جارٍ تجهيز الصورة...');
-      const canvas = await html2canvas(cartRef.current, { scale: 2, backgroundColor: '#FAF3E0' });
+      const canvas = await html2canvas(cartRef.current, { 
+        scale: 2, 
+        backgroundColor: '#FAF3E0',
+        useCORS: true,        // للسماح بتحميل الصور من نطاقات أخرى
+        allowTaint: true,     // للسماح بتلوين الصور
+        logging: false
+      });
       const link = document.createElement('a');
       link.download = 'lamsa-order.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
       toast.success('تم حفظ صورة الطلب في المعرض!');
-    } catch (e) { toast.error('فشل تصوير السلة'); }
+    } catch (e) { 
+      console.error(e);
+      toast.error('فشل تصوير السلة. تأكد من اتصالك بالإنترنت.'); 
+    }
   };
 
   // إرسال الطلب عبر الواتساب (نص فقط)
