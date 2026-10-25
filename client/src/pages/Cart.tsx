@@ -76,11 +76,11 @@ export default function Cart() {
     } catch (e) { setCouponMsg({ text: 'خطأ في الاتصال', type: 'error' }); }
   };
 
-  // دالة التصوير (تخفي الصور أولاً لتجنب CORS)
+  // دالة التصوير (تخفي الصور مؤقتاً + تحافظ على الألوان)
   const captureCart = async (): Promise<HTMLCanvasElement | null> => {
     if (!cartRef.current) return null;
     
-    // إخفاء الصور مؤقتاً
+    // إخفاء الصور (لأنها سبب المشكلة)
     const images = cartRef.current.querySelectorAll('img');
     images.forEach((img: any) => { img.style.visibility = 'hidden'; });
     await new Promise(r => setTimeout(r, 200));
@@ -91,14 +91,19 @@ export default function Cart() {
         backgroundColor: '#FAF3E0',
         useCORS: false,
         allowTaint: false,
-        logging: false
+        logging: false,
+        onclone: (clonedDoc: any) => {
+          // ضمان ظهور الألوان في النسخة المنسوخة
+          const style = clonedDoc.createElement('style');
+          style.innerHTML = '* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }';
+          clonedDoc.head.appendChild(style);
+        }
       });
       
       // استعادة الصور
       images.forEach((img: any) => { img.style.visibility = 'visible'; });
       return canvas;
     } catch (e) {
-      // استعادة الصور في حالة الخطأ
       images.forEach((img: any) => { img.style.visibility = 'visible'; });
       throw e;
     }
@@ -121,7 +126,7 @@ export default function Cart() {
     }
   };
 
-  // مشاركة الصورة عبر تطبيقات الهاتف
+  // مشاركة الصورة
   const shareImage = async () => {
     try {
       toast.info('جارٍ تجهيز الصورة للمشاركة...');
@@ -141,7 +146,7 @@ export default function Cart() {
         });
         toast.success('تم تجهيز الطلب للمشاركة!');
       } else {
-        // fallback: تنزيل الصورة إذا لم يدعم المتصفح المشاركة
+        // بديل: حفظ الصورة إذا لم يدعم المتصفح المشاركة
         const link = document.createElement('a');
         link.download = 'lamsa-order.png';
         link.href = canvas.toDataURL('image/png');
@@ -154,27 +159,20 @@ export default function Cart() {
     }
   };
 
-  // إرسال الطلب عبر واتساب (نص فقط)
+  // إرسال الطلب عبر واتساب
   const sendWhatsApp = () => {
     if (cart.length === 0) return toast.error('السلة فارغة');
-    
     let message = '🛍️ *طلب جديد من متجر لمسة*\n\n';
     message += `👤 *العميل:* ${user?.name || 'زائر'}\n`;
     message += `📧 *البريد:* ${user?.email || 'غير مسجل'}\n\n`;
     message += '📦 *المنتجات:*\n';
-    
     cart.forEach((item, index) => {
-      message += `${index + 1}. ${item.name} (${item.color || 'افتراضي'} - ${item.size || 'افتراضي'}) × ${item.quantity} = ${item.price * item.quantity} ر.ي\n`;
+      message += `${index + 1}. ${item.name} (${item.color || '-'} - ${item.size || '-'}) × ${item.quantity} = ${item.price * item.quantity} ر.ي\n`;
     });
-    
     message += `\n💰 *المجموع:* ${subtotal} ر.ي\n`;
     if (discount > 0) message += `🎟️ *الخصم:* ${discount}% (-${discountAmount} ر.ي)\n`;
-    message += `💵 *الإجمالي:* ${total} ر.ي\n\n`;
-    message += '📞 يرجى التواصل لتأكيد الطلب.';
-
-    const phone = '967775799926';
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    message += `💵 *الإجمالي:* ${total} ر.ي\n\n📞 يرجى التواصل لتأكيد الطلب.`;
+    window.open(`https://wa.me/967775799926?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
@@ -196,8 +194,6 @@ export default function Cart() {
           </div>
         ) : (
           <div className="space-y-6">
-            
-            {/* شريط تقدم الشحن المجاني */}
             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
               <p className="text-sm text-center mb-2 font-bold text-[#482d39]">
                 {remainingForFreeShipping > 0 
@@ -209,7 +205,6 @@ export default function Cart() {
               </div>
             </div>
 
-            {/* السلة (للتصوير) */}
             <div ref={cartRef} className="bg-white p-4 md:p-6 rounded-xl shadow-sm border space-y-4">
               <div className="flex justify-between items-center border-b pb-2">
                 <h2 className="text-lg font-bold text-[#482d39]">تفاصيل الطلب</h2>
@@ -235,7 +230,6 @@ export default function Cart() {
                 </div>
               ))}
 
-              {/* الكوبون */}
               <div className="mt-4 bg-gray-50 p-3 rounded-lg border">
                 <label className="block text-xs font-bold text-gray-600 mb-1"><Tag size={14} className="inline"/> كود الخصم</label>
                 <div className="relative">
@@ -245,7 +239,6 @@ export default function Cart() {
                 {couponMsg.text && <p className={`text-xs mt-1 font-bold ${couponMsg.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{couponMsg.text}</p>}
               </div>
 
-              {/* المجاميع */}
               <div className="border-t pt-3 space-y-1 text-sm">
                 <div className="flex justify-between"><span>المجموع:</span><span>{subtotal} ر.ي</span></div>
                 {discount > 0 && <div className="flex justify-between text-green-600"><span>الخصم:</span><span>-{discountAmount} ر.ي</span></div>}
@@ -253,17 +246,15 @@ export default function Cart() {
               </div>
             </div>
 
-            {/* التعليمات */}
             <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl text-sm">
               <p className="font-bold mb-1">📋 كيفية إرسال الطلب:</p>
               <ol className="list-decimal list-inside space-y-1 text-xs">
-                <li>اضغط على <b>"حفظ الصورة"</b> (اختياري - يمكنك إرسال الصورة عبر زر المشاركة).</li>
                 <li>اضغط على <b>"مشاركة"</b> لفتح قائمة تطبيقات الهاتف وإرسال الصورة مباشرة.</li>
                 <li>أو اضغط على <b>"واتساب"</b> لإرسال تفاصيل الطلب كنص.</li>
+                <li>أو اضغط على <b>"حفظ"</b> لحفظ الصورة في المعرض.</li>
               </ol>
             </div>
 
-            {/* الأزرار */}
             <div className="grid grid-cols-3 gap-2">
               <button onClick={sendWhatsApp} className="bg-[#25D366] text-white py-4 rounded-xl font-bold text-sm hover:bg-[#1DA851] transition flex flex-col justify-center items-center gap-1 shadow-lg">
                 <MessageCircle size={22}/> واتساب
