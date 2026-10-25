@@ -38,8 +38,8 @@ export default function Login({ onLogin, goToRegister }: { onLogin: (user: any, 
       <div className="w-full max-w-md relative z-10">
         {/* الشعار */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#482d39] to-[#6b4560] shadow-lg mb-4 relative">
-            <Sparkles className="text-[#E8C87A]" size={32} />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#482d39] shadow-lg shadow-[#482d39]/30 mb-4 relative">
+            <Sparkles className="text-white" size={32} />
             <div className="absolute inset-0 rounded-full border-2 border-[#C9A84C]/40"></div>
           </div>
           <h1 className="text-3xl font-bold text-[#482d39] mb-2">مرحباً بعودتك</h1>
