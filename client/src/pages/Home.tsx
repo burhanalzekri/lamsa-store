@@ -36,7 +36,16 @@ export default function Home() {
       if (exists) return lines.map(l => l.id === product.id ? { ...l, quantity: l.quantity + 1 } : l);
       return [...lines, { ...product, quantity: 1 }];
     });
-    toast.success("أضيف المنتج إلى حقيبتك");
+    toast.success(
+      <div className="flex items-center gap-3" dir="rtl">
+        <img src={product.image} className="w-12 h-12 rounded-lg object-cover" />
+        <div>
+          <p className="font-bold text-sm text-[#34212a]">تمت الإضافة!</p>
+          <p className="text-xs text-gray-500">{product.name}</p>
+        </div>
+      </div>,
+      { duration: 3000 }
+    );
   };
 
   const changeQuantity = (id: string, delta: number) => {
