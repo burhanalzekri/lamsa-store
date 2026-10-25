@@ -57,9 +57,9 @@ export default function ProductsPanel() {
       {isAdding && (
         <form onSubmit={handleSave} className="bg-gray-50 p-4 rounded-xl mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <input required placeholder="اسم المنتج" value={form.name} onChange={e=>setForm({...form, name: e.target.value})} className="border p-2 rounded" />
-          <input required type="number" placeholder="السعر" value={form.price} onChange={e=>setForm({...form, price: Number(e.target.value)})} className="border p-2 rounded" />
-          <input placeholder="التكلفة" type="number" value={form.costPrice} onChange={e=>setForm({...form, costPrice: Number(e.target.value)})} className="border p-2 rounded" />
-          <input placeholder="المخزون" type="number" value={form.stock} onChange={e=>setForm({...form, stock: Number(e.target.value)})} className="border p-2 rounded" />
+          <input required type="number" placeholder="السعر" value={form.price} onChange={e=>setForm({...form, price: e.target.value})} className="border p-2 rounded" />
+          <input placeholder="التكلفة" type="number" value={form.costPrice} onChange={e=>setForm({...form, costPrice: e.target.value})} className="border p-2 rounded" />
+          <input placeholder="المخزون" type="number" value={form.stock} onChange={e=>setForm({...form, stock: e.target.value})} className="border p-2 rounded" />
           <select value={form.category} onChange={e=>setForm({...form, category: e.target.value})} className="border p-2 rounded">
             <option value="فساتين">فساتين</option><option value="عبايات">عبايات</option><option value="حقائب">حقائب</option><option value="أحذية">أحذية</option>
           </select>
