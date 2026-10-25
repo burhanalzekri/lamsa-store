@@ -75,101 +75,11 @@ export default function Cart() {
   };
 
   // دالة رسم الصورة (بدون صور المنتجات - مضمونة 100%)
-  const generateReceiptImage = (): string => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return '';
-
-    const width = 800;
-    const lineHeight = 40;
-    const padding = 40;
-    const headerHeight = 120;
-    const footerHeight = 120;
-    const itemsHeight = cart.length * (lineHeight * 2 + 20);
-    const height = headerHeight + itemsHeight + footerHeight + padding * 2;
-
-    canvas.width = width;
-    canvas.height = height;
-
-    ctx.fillStyle = '#FAF3E0';
-    ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = '#482d39';
-    ctx.fillRect(0, 0, width, headerHeight);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 40px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('متجر لمسة - Lamsa Store', width / 2, 60);
-    ctx.font = '20px Arial';
-    ctx.fillText('تفاصيل الطلب', width / 2, 95);
-
-    ctx.textAlign = 'right';
-    let y = headerHeight + padding + 30;
-    ctx.fillStyle = '#2C3E50';
-    ctx.font = 'bold 24px Arial';
-    ctx.fillText('المنتجات:', width - padding, y);
-    y += 30;
-
-    ctx.font = '20px Arial';
-    cart.forEach((item, index) => {
-      ctx.fillStyle = '#2C3E50';
-      ctx.fillText(`${index + 1}. ${item.name}`, width - padding, y);
-      ctx.fillStyle = '#d93844';
-      ctx.textAlign = 'left';
-      ctx.fillText(`${item.price * item.quantity} ر.ي`, padding, y);
-      ctx.textAlign = 'right';
-      y += 25;
-      ctx.fillStyle = '#888';
-      ctx.font = '16px Arial';
-      ctx.fillText(`المقاس: ${item.size || '-'} | اللون: ${item.color || '-'} | الكمية: ${item.quantity}`, width - padding, y);
-      ctx.font = '20px Arial';
-      y += 40;
-    });
-
-    y += 20;
-    ctx.strokeStyle = '#ccc';
-    ctx.beginPath();
-    ctx.moveTo(padding, y);
-    ctx.lineTo(width - padding, y);
-    ctx.stroke();
-    y += 40;
-
-    ctx.fillStyle = '#2C3E50';
-    ctx.font = '22px Arial';
-    ctx.fillText('المجموع:', width - padding, y);
-    ctx.textAlign = 'left';
-    ctx.fillText(`${subtotal} ر.ي`, padding, y);
-    ctx.textAlign = 'right';
-    y += 35;
-
-    if (discount > 0) {
-      ctx.fillStyle = '#16a34a';
-      ctx.fillText(`الخصم (${discount}%):`, width - padding, y);
-      ctx.textAlign = 'left';
-      ctx.fillText(`-${discountAmount} ر.ي`, padding, y);
-      ctx.textAlign = 'right';
-      y += 35;
-    }
-
-    ctx.fillStyle = '#482d39';
-    ctx.font = 'bold 28px Arial';
-    ctx.fillText('الإجمالي:', width - padding, y);
-    ctx.textAlign = 'left';
-    ctx.fillText(`${total} ر.ي`, padding, y);
-    y += 50;
-
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#888';
-    ctx.font = '18px Arial';
-    ctx.fillText(`العميل: ${user?.name || 'زائر'} | البريد: ${user?.email || 'غير مسجل'}`, width / 2, y);
-    y += 30;
-    ctx.fillText(`للاستفسار: +967775799926`, width / 2, y);
-
-    return canvas.toDataURL('image/png');
-  };
+  
 
   const saveImage = () => {
     try {
-      const dataUrl = generateReceiptImage();
+      const dataUrl = generateReceiptImage(cart, subtotal, discount, discountAmount, total, user);
       if (!dataUrl) return toast.error('فشل إنشاء الصورة');
       const link = document.createElement('a');
       link.download = 'lamsa-order-' + Date.now() + '.png';
@@ -182,7 +92,7 @@ export default function Cart() {
   const shareImage = async () => {
     try {
       toast.info('جارٍ تجهيز الصورة للمشاركة...');
-      const dataUrl = generateReceiptImage();
+      const dataUrl = generateReceiptImage(cart, subtotal, discount, discountAmount, total, user);
       if (!dataUrl) return;
       const res = await fetch(dataUrl);
       const blob = await res.blob();
