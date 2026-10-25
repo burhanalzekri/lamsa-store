@@ -43,7 +43,7 @@ function AppContent() {
   useEffect(() => {
     const token = localStorage.getItem('lamsa_token');
     const savedUser = localStorage.getItem('lamsa_user');
-    if (token && savedUser) setUser(JSON.parse(savedUser));
+    if (token && savedUser) { try { setUser(JSON.parse(savedUser)); } catch (e) { localStorage.removeItem("lamsa_user"); localStorage.removeItem("lamsa_token"); } }
     
     updateCartCount();
     fetch('/api/notifications').then(r => r.json()).then(d => { if(Array.isArray(d)) setNotifications(d); }).catch(() => {});
