@@ -12,6 +12,7 @@ export default function Cart() {
   const [, setLocation] = useLocation();
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [couponMsg, setCouponMsg] = useState({ text: '', type: '' });
 
   useEffect(() => {
@@ -75,16 +76,24 @@ export default function Cart() {
     } catch (e) { setCouponMsg({ text: 'خطأ في الاتصال', type: 'error' }); }
   };
 
-  const saveImage = () => {
+  const saveImage = async () => {
+    if (isGenerating) return;
+    setIsGenerating(true);
+    toast.info('جارٍ إنشاء الصورة...');
     try {
+      await new Promise(r => setTimeout(r, 100));
       const dataUrl = generateReceiptImage(cart, subtotal, discount, discountAmount, total, user);
-      if (!dataUrl) return toast.error('فشل إنشاء الصورة');
+      if (!dataUrl) throw new Error('فشل');
       const link = document.createElement('a');
       link.download = 'lamsa-order-' + Date.now() + '.png';
       link.href = dataUrl;
       link.click();
       toast.success('تم حفظ الصورة في المعرض!');
-    } catch (e) { toast.error('فشل حفظ الصورة.'); }
+    } catch (e) { 
+      toast.error('فشل حفظ الصورة.'); 
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const shareImage = async () => {
@@ -206,9 +215,22 @@ export default function Cart() {
                     <button onClick={shareImage} className="bg-[#482d39] text-white py-2 rounded-xl font-bold text-xs hover:bg-[#654151] transition flex justify-center items-center gap-1 shadow-sm">
                       <Share2 size={16}/> مشاركة
                     </button>
-                    <button onClick={saveImage} className="bg-[#34212a] text-white py-2 rounded-xl font-bold text-xs hover:bg-black transition flex justify-center items-center gap-1 shadow-sm">
-                      <Camera size={16}/> حفظ
+                    <button onClick={saveImage} disabled={isGenerating} className="bg-[#34212a] text-white py-2 rounded-xl font-bold text-xs hover:bg-black transition flex justify-center items-center gap-1 shadow-sm disabled:opacity-50">
+                      <Camera size={16}/> {isGenerating ? 'جارٍ الحفظ...' : 'حفظ'}
                     </button>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      saveImage();
+                      setTimeout(() => {
+                        window.open('https://wa.me/967775799926', '_blank');
+                      }, 1000);
+                    }}
+                    disabled={isGenerating}
+                    className="w-full bg-[#25D366] text-white py-2 rounded-xl font-bold text-xs hover:bg-[#1DA851] transition flex justify-center items-center gap-1 mt-2 shadow-sm disabled:opacity-50"
+                  >
+                    <MessageCircle size={16}/> حفظ وإرسال عبر واتساب
+                  </button>
                   </div>
                 </div>
                 <div className="mt-4 text-center text-[10px] text-gray-400 flex items-center justify-center gap-1">
