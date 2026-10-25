@@ -212,6 +212,7 @@ function AppContent() {
         <Route path="/login"><Login onLogin={(u:any,t:string)=>{setUser(u);localStorage.setItem('lamsa_user',JSON.stringify(u));localStorage.setItem('lamsa_token',t);setLocation('/');}} goToRegister={() => setLocation('/register')} /></Route>
         <Route path="/register"><Register onLogin={(u:any,t:string)=>{setUser(u);localStorage.setItem('lamsa_user',JSON.stringify(u));localStorage.setItem('lamsa_token',t);setLocation('/');}} goToLogin={() => setLocation('/login')} /></Route>
         <Route path="/cart" component={Cart} />
+        <Route path="/thank-you" component={ThankYou} />
         <Route path="/product/:id" component={ProductDetails} />
         <Route path="/track" component={Track} />
         <Route path="/wishlist" component={Wishlist} />
