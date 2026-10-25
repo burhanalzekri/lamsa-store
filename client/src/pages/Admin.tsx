@@ -11,8 +11,7 @@ import AdminSidebar from './admin/AdminSidebar';
 
 export default function Admin({ user }: { user: any }) {
   const [tab, setTab] = useState<'overview'|'products'|'orders'|'users'|'coupons'|'settings'|'reports'|'variants'>('overview');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const handleLogout = () => { localStorage.removeItem('lamsa_user'); localStorage.removeItem('lamsa_token'); window.location.href = '/'; };
+    const handleLogout = () => { localStorage.removeItem('lamsa_user'); localStorage.removeItem('lamsa_token'); window.location.href = '/'; };
   const [stats, setStats] = useState<any>({ products: 0, orders: 0, revenue: 0, lowStock: 0, pendingOrders: 0 });
   const [orders, setOrders] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
@@ -97,14 +96,10 @@ export default function Admin({ user }: { user: any }) {
   });
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[#f8f6f2]" dir="rtl">
-      <AdminSidebar 
-        tab={tab} 
-        setTab={setTab} 
-        isOpen={sidebarOpen} 
-        setIsOpen={setSidebarOpen} 
-        onLogout={handleLogout} 
-      />
+    <div className="flex min-h-screen bg-[#FAF3E0]" dir="rtl">
+      <AdminSidebar tab={tab} setTab={setTab} onLogout={handleLogout} />
+      <div className="flex-1 overflow-x-hidden w-full">
+      
       
       <main className="flex-grow p-4 md:p-8 overflow-y-auto">
         {tab === 'overview' && (
@@ -276,6 +271,8 @@ export default function Admin({ user }: { user: any }) {
           </div>
         )}
       </main>
+    </div>
+      </div>
     </div>
   );
 }
