@@ -7,6 +7,7 @@ export default function ProductsPanel() {
   const [search, setSearch] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [form, setForm] = useState({ name: '', price: '', costPrice: '', category: 'فساتين', image: '', description: '', stock: '10' });
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchProducts = async () => {
     try {
@@ -34,7 +35,22 @@ export default function ProductsPanel() {
     } catch (e) { toast.error("خطأ في الاتصال"); }
   };
 
-  const handleDelete = async (id: string) => {
+  
+  const handleEdit = (product: any) => {
+    setForm({
+      name: product.name,
+      price: String(product.price),
+      costPrice: String(product.costPrice || ''),
+      category: product.category,
+      image: product.image || '',
+      description: product.description || '',
+      stock: String(product.stock || '0')
+    });
+    setEditingId(product.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+const handleDelete = async (id: string) => {
     if(!confirm('هل أنت متأكد من الحذف؟')) return;
     try {
       const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
@@ -73,15 +89,17 @@ export default function ProductsPanel() {
       <div className="overflow-x-auto">
         <table className="w-full text-right text-sm">
           <thead className="bg-gray-50 text-gray-600">
-            <tr><th className="p-2">المنتج</th><th className="p-2">السعر</th><th className="p-2">الفئة</th><th className="p-2">إجراء</th></tr>
+            <tr><th className="p-2">المنتج</th><th className="p-2">السعر</th><th className="p-2">المخزون</th><th className="p-2">الفئة</th><th className="p-2">إجراء</th></tr>
           </thead>
           <tbody>
             {filtered.map(p => (
               <tr key={p.id} className="border-b">
                 <td className="p-2 flex items-center gap-2"><img src={p.image} className="w-8 h-10 object-cover rounded"/>{p.name}</td>
                 <td className="p-2">{p.price} ر.ي</td>
+                <td className="p-2">{p.stock || 0}</td>
                 <td className="p-2">{p.category}</td>
-                <td className="p-2">
+                <td className="p-2 flex gap-2">
+                  <button onClick={() => handleEdit(p)} className="text-blue-500 p-1"><Edit size={16}/></button>
                   <button onClick={() => handleDelete(p.id)} className="text-red-500 p-1"><Trash2 size={16}/></button>
                 </td>
               </tr>
