@@ -47,7 +47,7 @@ async function startServer() {
   app.get('/api/admin/orders-simple', async (req, res) => {
     try {
       const conn = await getConn();
-      const [rows] = await conn.execute('SELECT * FROM orders ORDER BY id DESC');
+      const [rows] = await conn.execute('SELECT * FROM store_orders ORDER BY createdAt DESC');
       await conn.end();
       res.json(rows);
     } catch (e) {
