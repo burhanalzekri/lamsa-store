@@ -271,7 +271,9 @@ export default function Admin({ user }: { user: any }) {
           </div>
         )}
       </main>
-    </div>
+      </main>
+        </div>
+      </div>
     </div>
   );
 }
