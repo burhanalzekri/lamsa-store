@@ -451,8 +451,6 @@ app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
       res.json({ daily, topProducts });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
-    } catch (e: any) { res.status(500).json({ error: e.message }); }
-  });
   
   
   // حذف متغير
