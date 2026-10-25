@@ -1,58 +1,253 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { ClipboardList, Search, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/catalog";
 
-import orderStatusLabel from "@/pages/Admin";
+// تعريف مبسط للطلب
+type Order = {
+  id: number;
+  orderNumber: string;
+  customerName: string;
+  phone: string;
+  city: string;
+  address: string;
+  createdAt: string;
+  items: number;
+  total: number;
+  paymentStatus: "unpaid" | "paid" | "refunded";
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+};
 
-type Order = any;
-type Status = Order["status"];
-const statuses: Array<{ id: Status | "all"; label: string }> = [
-  { id: "all", label: "الكل" }, { id: "pending", label: "جديدة" }, { id: "processing", label: "قيد التجهيز" },
-  { id: "shipped", label: "تم الشحن" }, { id: "delivered", label: "مكتملة" }, { id: "cancelled", label: "ملغاة" },
+const statuses = [
+  { id: "all", label: "الكل" },
+  { id: "pending", label: "جديدة" },
+  { id: "processing", label: "قيد التجهيز" },
+  { id: "shipped", label: "تم الشحن" },
+  { id: "delivered", label: "مكتملة" },
+  { id: "cancelled", label: "ملغاة" },
 ];
 
 export default function AdminOrders() {
-  const utils = { admin: { orders: { list: { invalidate: () => {} } }, overview: { invalidate: () => {} }, products: { invalidate: () => {} } }, store: { products: { invalidate: () => {} } } };
-  const [query, setQuery] = useState({ data: [], isLoading: true, error: null });
-  const setStatus = { mutate: async ({ orderId, status }: { orderId: number, status: string }) => { try { const res = await fetch("/api/admin/orders/" + orderId + "/status", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) }); if (res.ok) { setQuery(prev => ({ ...prev, data: prev.data.map(o => o.id === orderId ? { ...o, status } : o) })); toast.success("تم تحديث الحالة"); } } catch(e) { toast.error("فشل"); } }, isPending: false };
-    
-    
-  });
-  const setPayment = { mutate: async ({ orderId, paymentStatus }: { orderId: number, paymentStatus: string }) => { try { const res = await fetch("/api/admin/orders/" + orderId + "/payment", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ paymentStatus }) }); if (res.ok) { setQuery(prev => ({ ...prev, data: prev.data.map(o => o.id === orderId ? { ...o, paymentStatus } : o) })); toast.success("تم تحديث الدفع"); } } catch(e) { toast.error("فشل"); } }, isPending: false };
-    
-    
-  });
-  useEffect(() => { fetch("/api/admin/orders-simple").then(r => r.json()).then(data => { if (Array.isArray(data)) setQuery({ data, isLoading: false, error: null }); else setQuery({ data: [], isLoading: false, error: "Invalid data" }); }).catch(e => setQuery({ data: [], isLoading: false, error: e.message })); }, []);
-  const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
-  const rows = useMemo(() => (query.data ?? []).filter(order =>
-    (statusFilter === "all" || order.status === statusFilter) &&
-    `${order.orderNumber} ${order.customerName} ${order.phone} ${order.city}`.toLowerCase().includes(search.trim().toLowerCase()),
-  ), [query.data, statusFilter, search]);
-  const allOrders = query.data ?? [];
-  const unpaid = allOrders.filter(order => order.paymentStatus === "unpaid").length;
-  const paidTotal = allOrders.filter(order => order.paymentStatus === "paid").reduce((total, order) => total + order.total, 0);
 
-  if (query.isLoading) return <div className="adm-state-card">جارٍ تحميل الطلبات…</div>;
-  if (query.error) return <div className="adm-state-card adm-error-card">تعذر تحميل الطلبات: {query.error.message}</div>;
+  // جلب البيانات من الـ API البسيط
+  useEffect(() => {
+    fetch("/api/admin/orders-simple")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setOrders(data);
+          setError(null);
+        } else {
+          setOrders([]);
+          setError("البيانات المستلمة غير صالحة");
+        }
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        setError("تعذر الاتصال بالخادم");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
+  // تحديث حالة الطلب
+  const handleUpdateStatus = async (orderId: number, newStatus: string) => {
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? { ...o, status: newStatus as any } : o))
+        );
+        toast.success("تم تحديث حالة الطلب");
+      } else {
+        toast.error("فشل تحديث الحالة");
+      }
+    } catch {
+      toast.error("حدث خطأ في الاتصال");
+    }
+  };
+
+  // تحديث حالة الدفع
+  const handleUpdatePayment = async (orderId: number, newPaymentStatus: string) => {
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/payment`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentStatus: newPaymentStatus }),
+      });
+      if (res.ok) {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? { ...o, paymentStatus: newPaymentStatus as any } : o))
+        );
+        toast.success("تم تحديث حالة الدفع");
+      } else {
+        toast.error("فشل تحديث الدفع");
+      }
+    } catch {
+      toast.error("حدث خطأ في الاتصال");
+    }
+  };
+
+  // تصفية الطلبات
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      const matchesStatus = statusFilter === "all" || order.status === statusFilter;
+      const matchesSearch = `${order.orderNumber} ${order.customerName} ${order.phone} ${order.city}`
+        .toLowerCase()
+        .includes(search.trim().toLowerCase());
+      return matchesStatus && matchesSearch;
+    });
+  }, [orders, statusFilter, search]);
+
+  const unpaid = orders.filter((o) => o.paymentStatus === "unpaid").length;
+  const paidTotal = orders
+    .filter((o) => o.paymentStatus === "paid")
+    .reduce((sum, o) => sum + o.total, 0);
+
+  if (isLoading) return <div className="adm-state-card">جارٍ تحميل الطلبات…</div>;
+  if (error) return <div className="adm-state-card adm-error-card">تعذر تحميل الطلبات: {error}</div>;
 
   return (
     <section className="adm-panel adm-data-panel">
-      <div className="adm-order-summary-row"><div><span className="adm-kicker">الطلبات المسجّلة</span><h2>تابعي الطلب من الاستلام حتى التسليم</h2><p>الطلبات تُنشأ من Checkout المسجل، وتغيير الحالة الملغاة يعيد الكمية للمخزون.</p></div><div className="adm-order-summary"><span>الطلبات</span><b>{allOrders.length}</b></div><div className="adm-order-summary"><span>بانتظار الدفع</span><b>{unpaid}</b></div><div className="adm-order-summary"><span>مدفوع مسجل</span><b>{formatPrice(paidTotal)}</b></div></div>
-      <div className="adm-table-toolbar"><label className="adm-search"><Search size={17} /><input value={search} onChange={event => setSearch(event.target.value)} placeholder="ابحثي بالطلب أو العميل أو الجوال" /></label><span className="adm-payment-warning"><ShieldCheck size={14} /> الدفع يدوي في هذه النسخة؛ لا يوجد مزود دفع مرتبط</span></div>
-      <div className="adm-order-filters">{statuses.map(status => <button key={status.id} className={statusFilter === status.id ? "adm-filter-active" : ""} onClick={() => setStatusFilter(status.id)}>{status.label}{status.id !== "all" && <small>{allOrders.filter(order => order.status === status.id).length}</small>}</button>)}</div>
-      <div className="adm-table-scroll"><table className="adm-table adm-orders-table"><thead><tr><th>رقم الطلب</th><th>العميل وبيانات التوصيل</th><th>التاريخ</th><th>القطع</th><th>الإجمالي</th><th>الدفع</th><th>حالة الطلب</th></tr></thead><tbody>
-        {rows.map(order => <tr key={order.id}>
-          <td className="adm-order-id">{order.orderNumber}</td>
-          <td><div className="adm-customer-cell"><b>{order.customerName}</b><small dir="ltr">{order.phone}</small><small>{order.city} · {order.address}</small></div></td>
-          <td>{new Date(order.createdAt).toLocaleString("ar-SA", { dateStyle: "medium", timeStyle: "short" })}</td><td>{order.items}</td><td>{formatPrice(order.total)}</td>
-          <td><select className={`adm-payment-select adm-payment-${order.paymentStatus}`} aria-label={`حالة الدفع ${order.orderNumber}`} value={order.paymentStatus} disabled={setPayment.isPending || order.paymentStatus === "refunded"} onChange={event => setPayment.mutate({ orderId: order.id, paymentStatus: event.target.value as "unpaid" | "paid" | "refunded" })}><option value="unpaid">غير مدفوع</option><option value="paid">مدفوع</option><option value="refunded">مسترد</option></select></td>
-          <td><select className="adm-order-status-select" aria-label={`حالة الطلب ${order.orderNumber}`} value={order.status} disabled={setStatus.isPending || order.status === "cancelled"} onChange={event => setStatus.mutate({ orderId: order.id, status: event.target.value as Exclude<Status, "cancelled"> })}>{statuses.filter(status => status.id !== "all").map(status => <option key={status.id} value={status.id}>{status.label}</option>)}</select></td>
-        </tr>)}
-        {!rows.length && <tr><td colSpan={7}><div className="adm-empty-state"><ClipboardList size={24} /><p>{search ? "لا توجد طلبات تطابق البحث." : "لا توجد طلبات محفوظة حتى الآن."}</p></div></td></tr>}
-      </tbody></table></div>
-      <div className="adm-table-footer">تعرض الصفحة أحدث ٣٠٠ طلب · البيانات شخصية ومقصورة على المشرفين</div>
+      <div className="adm-order-summary-row">
+        <div>
+          <span className="adm-kicker">الطلبات المسجّلة</span>
+          <h2>تابعي الطلب من الاستلام حتى التسليم</h2>
+          <p>الطلبات تُنشأ من Checkout المسجل، وتغيير الحالة الملغاة يعيد الكمية للمخزون.</p>
+        </div>
+        <div className="adm-order-summary">
+          <span>الطلبات</span>
+          <b>{orders.length}</b>
+        </div>
+        <div className="adm-order-summary">
+          <span>بانتظار الدفع</span>
+          <b>{unpaid}</b>
+        </div>
+        <div className="adm-order-summary">
+          <span>مدفوع مسجل</span>
+          <b>{formatPrice(paidTotal)}</b>
+        </div>
+      </div>
+
+      <div className="adm-table-toolbar">
+        <label className="adm-search">
+          <Search size={17} />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="ابحثي بالطلب أو العميل أو الجوال"
+          />
+        </label>
+        <span className="adm-payment-warning">
+          <ShieldCheck size={14} /> الدفع يدوي في هذه النسخة؛ لا يوجد مزود دفع مرتبط
+        </span>
+      </div>
+
+      <div className="adm-order-filters">
+        {statuses.map((status) => (
+          <button
+            key={status.id}
+            className={statusFilter === status.id ? "adm-filter-active" : ""}
+            onClick={() => setStatusFilter(status.id)}
+          >
+            {status.label}
+            {status.id !== "all" && (
+              <small>{orders.filter((o) => o.status === status.id).length}</small>
+            )}
+          </button>
+        ))}
+      </div>
+
+      <div className="adm-table-scroll">
+        <table className="adm-table adm-orders-table">
+          <thead>
+            <tr>
+              <th>رقم الطلب</th>
+              <th>العميل وبيانات التوصيل</th>
+              <th>التاريخ</th>
+              <th>القطع</th>
+              <th>الإجمالي</th>
+              <th>الدفع</th>
+              <th>حالة الطلب</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredOrders.map((order) => (
+              <tr key={order.id}>
+                <td className="adm-order-id">{order.orderNumber}</td>
+                <td>
+                  <div className="adm-customer-cell">
+                    <b>{order.customerName}</b>
+                    <small dir="ltr">{order.phone}</small>
+                    <small>
+                      {order.city} · {order.address}
+                    </small>
+                  </div>
+                </td>
+                <td>
+                  {new Date(order.createdAt).toLocaleString("ar-SA", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </td>
+                <td>{order.items}</td>
+                <td>{formatPrice(order.total)}</td>
+                <td>
+                  <select
+                    className={`adm-payment-select adm-payment-${order.paymentStatus}`}
+                    value={order.paymentStatus}
+                    onChange={(e) => handleUpdatePayment(order.id, e.target.value)}
+                    disabled={order.paymentStatus === "refunded"}
+                  >
+                    <option value="unpaid">غير مدفوع</option>
+                    <option value="paid">مدفوع</option>
+                    <option value="refunded">مسترد</option>
+                  </select>
+                </td>
+                <td>
+                  <select
+                    className="adm-order-status-select"
+                    value={order.status}
+                    onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
+                    disabled={order.status === "cancelled"}
+                  >
+                    {statuses
+                      .filter((s) => s.id !== "all")
+                      .map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.label}
+                        </option>
+                      ))}
+                  </select>
+                </td>
+              </tr>
+            ))}
+            {!filteredOrders.length && (
+              <tr>
+                <td colSpan={7}>
+                  <div className="adm-empty-state">
+                    <ClipboardList size={24} />
+                    <p>{search ? "لا توجد طلبات تطابق البحث." : "لا توجد طلبات محفوظة حتى الآن."}</p>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      <div className="adm-table-footer">
+        تعرض الصفحة أحدث 300 طلب · البيانات شخصية ومقصورة على المشرفين
+      </div>
     </section>
   );
 }
