@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Package, Tag, Camera, MessageCircle, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
-import html2canvas from 'html2canvas';
+import domtoimage from 'dom-to-image';
 
 const CART_KEY = "lamsa-cart-v2";
 
@@ -81,21 +81,24 @@ export default function Cart() {
     if (!cartRef.current) return;
     try {
       toast.info('جارٍ تجهيز الصورة...');
-      const canvas = await html2canvas(cartRef.current, { 
-        scale: 2, 
-        backgroundColor: '#FAF3E0',
-        useCORS: true,        // للسماح بتحميل الصور من نطاقات أخرى
-        allowTaint: true,     // للسماح بتلوين الصور
-        logging: false
+      const dataUrl = await domtoimage.toPng(cartRef.current, {
+        bgcolor: '#FAF3E0',
+        quality: 1.0,
+        width: cartRef.current.offsetWidth * 2,
+        height: cartRef.current.offsetHeight * 2,
+        style: {
+          transform: 'scale(2)',
+          transformOrigin: 'top left',
+        }
       });
       const link = document.createElement('a');
       link.download = 'lamsa-order.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = dataUrl;
       link.click();
       toast.success('تم حفظ صورة الطلب في المعرض!');
-    } catch (e) { 
+    } catch (e) {
       console.error(e);
-      toast.error('فشل تصوير السلة. تأكد من اتصالك بالإنترنت.'); 
+      toast.error('فشل تصوير السلة. تأكد من اتصالك بالإنترنت.');
     }
   };
 
