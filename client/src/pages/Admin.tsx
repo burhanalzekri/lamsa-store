@@ -42,7 +42,7 @@ export default function Admin({ user }: { user: any }) {
 
       {/* المحتوى الرئيسي */}
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
-        <main className="p-4 lg:p-8 flex-1">
+        <main className="p-3 lg:p-8 flex-1">
           {tab === 'overview' && <OverviewPanel />}
           {tab === 'products' && <ProductsPanel />}
           {tab === 'variants' && <VariantsPanel />}
