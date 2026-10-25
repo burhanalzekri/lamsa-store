@@ -231,7 +231,6 @@ export default function Cart() {
                   >
                     <MessageCircle size={16}/> حفظ وإرسال عبر واتساب
                   </button>
-                  </div>
                 </div>
                 <div className="mt-4 text-center text-[10px] text-gray-400 flex items-center justify-center gap-1">
                   <ShieldCheck size={12}/> الدفع عند الاستلام آمن ومضمون
