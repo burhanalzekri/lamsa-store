@@ -15,6 +15,7 @@ import Track from "./pages/Track";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import About from "./pages/About";
+import FAQ from "./pages/FAQ";
 import { LogOut, Menu, X, ShoppingBag, Home as HomeIcon, Truck, User, LayoutDashboard, Search, Flame, Tag, Clock, Heart, Info, Bell } from "lucide-react";
 
 const Admin = lazy(() => import("./pages/Admin"));
@@ -216,6 +217,7 @@ function AppContent() {
         <Route path="/wishlist" component={Wishlist} />
         <Route path="/profile" component={Profile} />
         <Route path="/about" component={About} />
+        <Route path="/faq" component={FAQ} />
         <Route path="/admin">
           {() => {
             if (!user) { setLocation('/login'); return null; }
