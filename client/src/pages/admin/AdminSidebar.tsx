@@ -24,15 +24,15 @@ export default function AdminSidebar({ tab, setTab, onLogout }: AdminSidebarProp
   ];
 
   return (
-    <aside className="w-64 bg-[#34212a] flex flex-col h-full min-h-screen border-l border-[#C9A84C]/20 z-50">
+    <aside className="w-64 bg-white flex flex-col h-full min-h-screen border-l border-[#E8C87A]/40 shadow-sm z-50">
       {/* رأس القائمة */}
-      <div className="p-5 border-b border-[#C9A84C]/20 bg-[#2a1a21]">
-        <h2 className="text-xl font-bold text-[#C9A84C]">لوحة لمسة</h2>
-        <p className="text-xs text-white/70 mt-1">الإدارة</p>
+      <div className="p-6 border-b border-[#E8C87A]/30 bg-[#FAF3E0]">
+        <h2 className="text-2xl font-bold text-[#482d39]">لوحة لمسة</h2>
+        <p className="text-xs text-[#C9A84C] font-bold mt-1">الإدارة</p>
       </div>
 
       {/* عناصر القائمة */}
-      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = tab === item.id;
@@ -42,11 +42,11 @@ export default function AdminSidebar({ tab, setTab, onLogout }: AdminSidebarProp
               onClick={() => setTab(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all duration-200 text-sm ${
                 isActive 
-                  ? 'bg-gradient-to-r from-[#C9A84C] to-[#E8C87A] text-[#34212a] shadow-md scale-[1.02]' 
-                  : 'text-white hover:bg-[#482d39] hover:text-[#C9A84C]'
+                  ? 'bg-[#482d39] text-white shadow-lg scale-[1.02]' 
+                  : 'text-[#34212a] hover:bg-[#FAF3E0] hover:text-[#482d39]'
               }`}
             >
-              <Icon size={20} className={isActive ? 'text-[#34212a]' : 'text-[#C9A84C]'} />
+              <Icon size={20} className={isActive ? 'text-[#E8C87A]' : 'text-[#C9A84C]'} />
               <span className="text-[15px]">{item.label}</span>
             </button>
           );
@@ -54,13 +54,13 @@ export default function AdminSidebar({ tab, setTab, onLogout }: AdminSidebarProp
       </div>
 
       {/* زر تسجيل الخروج */}
-      <div className="p-4 border-t border-[#C9A84C]/20 bg-[#2a1a21]">
+      <div className="p-4 border-t border-[#E8C87A]/30 bg-[#FAF3E0]">
         <button
           onClick={() => {
             onLogout();
             setLocation('/');
           }}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-red-400 hover:text-white hover:bg-red-500/20 transition-all border border-red-500/20 hover:border-red-500/50"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-[#d93844] hover:bg-[#d93844] hover:text-white transition-all border border-[#d93844]/30"
         >
           <LogOut size={20} />
           <span>تسجيل الخروج</span>

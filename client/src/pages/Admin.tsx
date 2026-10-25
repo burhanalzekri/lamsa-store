@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { Package, AlertTriangle, Menu, X } from 'lucide-react';
+import { AlertTriangle, Menu, X } from 'lucide-react';
 import ProductsPanel from './admin/ProductsPanel';
 import CouponsPanel from './admin/CouponsPanel';
 import SettingsPanel from './admin/SettingsPanel';
@@ -22,7 +22,6 @@ export default function Admin({ user }: { user: any }) {
     window.location.href = '/'; 
   };
 
-  // التحقق من صلاحية المستخدم (اختياري)
   if (!user || user.role !== 'admin') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAF3E0]">
@@ -47,14 +46,16 @@ export default function Admin({ user }: { user: any }) {
       {/* القائمة الجانبية للجوال */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={() => setIsMobileMenuOpen(false)} />
-          <div className="relative w-64 h-full bg-[#34212a] shadow-2xl">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="relative w-64 h-full bg-white shadow-2xl ml-auto flex flex-col">
             <div className="absolute top-4 left-4 z-10">
-              <button onClick={() => setIsMobileMenuOpen(false)} className="text-[#C9A84C] hover:text-white bg-white/10 p-2 rounded-full">
+              <button onClick={() => setIsMobileMenuOpen(false)} className="text-[#482d39] hover:text-[#C9A84C] bg-[#FAF3E0] p-2 rounded-full transition">
                 <X size={20} />
               </button>
             </div>
-            <AdminSidebar tab={tab} setTab={(t) => { setTab(t); setIsMobileMenuOpen(false); }} onLogout={handleLogout} />
+            <div className="flex-1 overflow-y-auto">
+              <AdminSidebar tab={tab} setTab={(t) => { setTab(t); setIsMobileMenuOpen(false); }} onLogout={handleLogout} />
+            </div>
           </div>
         </div>
       )}
