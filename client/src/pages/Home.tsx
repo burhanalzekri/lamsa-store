@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Phone, Mail, Heart, Menu, Minus, Plus, Search, ShoppingBag, Sparkles, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import HeroSlider from "../components/HeroSlider";
+import MiniCart from "../components/MiniCart";
 import { useLocation } from "wouter";
 
 const CART_KEY = "lamsa-cart-v2";
@@ -15,6 +16,7 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState("الكل");
   const [query, setQuery] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
+  const [miniCartOpen, setMiniCartOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/products').then(res => res.json()).then(data => {
@@ -90,11 +92,14 @@ export default function Home() {
               <Search className="absolute right-3 top-2.5 text-gray-400" size={18} />
               <input value={query} onChange={e => setQuery(e.target.value)} placeholder="ابحثي عن قطعة أو لون" className="w-48 lg:w-64 bg-gray-50 border border-gray-200 rounded-full py-2 pr-10 pl-4 text-sm outline-none focus:border-[#34212a]" />
             </div>
-            <button onClick={() => setLocation("/cart")} className="relative flex items-center gap-2 text-[#34212a] font-bold text-sm">
-              <ShoppingBag size={22} />
-              <span className="hidden sm:inline">حقيبتي</span>
-              {cartCount > 0 && <span className="absolute -top-2 -right-2 bg-[#d93844] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">{cartCount}</span>}
-            </button>
+            <div className="relative" onMouseEnter={() => setMiniCartOpen(true)} onMouseLeave={() => setMiniCartOpen(false)}>
+              <button onClick={() => setLocation("/cart")} className="relative flex items-center gap-2 text-[#34212a] font-bold text-sm">
+                <ShoppingBag size={22} />
+                <span className="hidden sm:inline">حقيبتي</span>
+                {cartCount > 0 && <span className="absolute -top-2 -right-2 bg-[#d93844] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">{cartCount}</span>}
+              </button>
+              <MiniCart isOpen={miniCartOpen} onClose={() => setMiniCartOpen(false)} />
+            </div>
           </div>
         </div>
       </header>
@@ -102,6 +107,28 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4">
         {/* السلايدر الجديد (بدلاً من الهيرو القديم) */}
         <HeroSlider products={products} />
+        
+        {/* قسم الأكثر مبيعاً */}
+        <section className="py-8">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="text-2xl">🏆</span>
+            <h2 className="text-2xl font-bold text-[#34212a]">الأكثر مبيعاً</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {products.filter(p => p.badge?.includes('مبيع')).slice(0, 4).map(product => (
+              <div key={product.id} onClick={() => setLocation(`/product/${product.id}`)} className="bg-white rounded-xl shadow-sm border overflow-hidden cursor-pointer hover:shadow-lg transition">
+                <div className="relative aspect-[3/4] bg-gray-100">
+                  <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                  <span className="absolute top-2 right-2 bg-[#f59e0b] text-white text-xs font-bold px-2 py-1 rounded">الأكثر مبيعاً</span>
+                </div>
+                <div className="p-2 text-center">
+                  <p className="font-bold text-sm truncate">{product.name}</p>
+                  <p className="text-[#d93844] font-bold">{product.price} ر.ي</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* شريط المزايا */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 py-8 border-y border-gray-200 my-8">

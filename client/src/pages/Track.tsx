@@ -147,37 +147,19 @@ export default function Track() {
                     </div>
 
                     <div className="p-6">
-                      <div className="flex items-center justify-between relative">
-                        <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200 -z-0"></div>
-                        <div className="absolute top-5 right-0 h-1 bg-[#d93844] -z-0 transition-all duration-500" style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}></div>
+                      <div className="flex items-start justify-between relative mt-6">
+                        <div className="absolute top-5 right-0 left-0 h-1 bg-gray-200 -z-0"></div>
+                        <div className="absolute top-5 right-0 h-1 bg-[#d93844] -z-0 transition-all duration-700" style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}></div>
+                        
                         {steps.map((step, i) => (
-                          <div key={step.key} className="relative z-10 flex flex-col items-center gap-2">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-4 border-white shadow-sm transition ${i <= currentStep ? 'bg-[#d93844] text-white scale-110' : 'bg-gray-100 text-gray-400'}`}>
+                          <div key={step.key} className="relative z-10 flex flex-col items-center gap-2" style={{ width: '25%' }}>
+                            <div className={`w-11 h-11 rounded-full flex items-center justify-center border-4 border-white shadow-lg transition-all duration-500 ${i <= currentStep ? 'bg-[#d93844] text-white scale-110' : 'bg-gray-200 text-gray-400'}`}>
                               {step.icon}
                             </div>
                             <span className={`text-[11px] font-bold text-center ${i <= currentStep ? 'text-[#34212a]' : 'text-gray-400'}`}>{step.label}</span>
                           </div>
                         ))}
                       </div>
-                    </div>
-
-                    <div className="p-4 bg-gray-50 border-t">
-                      <h3 className="font-bold text-sm text-gray-700 mb-2">المنتجات:</h3>
-                      <div className="space-y-2">
-                        {items?.map((item: any, idx: number) => (
-                          <div key={idx} className="flex justify-between text-sm">
-                            <span className="text-gray-600">{item.name || item.title}</span>
-                            <span className="font-bold">x{item.quantity}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="border-t mt-2 pt-2 text-sm text-gray-600 space-y-1">
-                        <p><b>الاسم:</b> {order.customerName}</p>
-                        <p><b>الهاتف:</b> {order.phone}</p>
-                        <p><b>العنوان:</b> {order.address}</p>
-                      </div>
-                    </div>
-                  </div>
                 );
               })}
             </div>
