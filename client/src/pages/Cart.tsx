@@ -81,22 +81,30 @@ export default function Cart() {
     if (!cartRef.current) return;
     try {
       toast.info('جارٍ تجهيز الصورة...');
-      const dataUrl = await domtoimage.toPng(cartRef.current, {
-        bgcolor: '#FAF3E0',
-        quality: 1.0,
-        width: cartRef.current.offsetWidth * 2,
-        height: cartRef.current.offsetHeight * 2,
-        style: {
-          transform: 'scale(2)',
-          transformOrigin: 'top left',
-        }
+      
+      // إخفاء الصور مؤقتاً لتجنب مشكلة CORS
+      const images = cartRef.current.querySelectorAll('img');
+      images.forEach(img => img.style.display = 'none');
+      
+      // استخدام html2canvas (موجودة أصلاً)
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(cartRef.current, { 
+        scale: 2, 
+        backgroundColor: '#FAF3E0',
+        useCORS: true,
+        allowTaint: true,
+        logging: false
       });
+      
+      // استعادة الصور
+      images.forEach(img => img.style.display = '');
+      
       const link = document.createElement('a');
       link.download = 'lamsa-order.png';
-      link.href = dataUrl;
+      link.href = canvas.toDataURL('image/png');
       link.click();
       toast.success('تم حفظ صورة الطلب في المعرض!');
-    } catch (e) {
+    } catch (e) { 
       console.error(e);
       toast.error('فشل تصوير السلة. تأكد من اتصالك بالإنترنت.');
     }
