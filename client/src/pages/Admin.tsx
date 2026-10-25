@@ -9,10 +9,10 @@ import VariantsPanel from './admin/VariantsPanel';
 import { toast } from 'sonner';
 import AdminSidebar from './admin/AdminSidebar';
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const handleLogout = () => { localStorage.removeItem('lamsa_user'); localStorage.removeItem('lamsa_token'); window.location.href = '/'; };
 export default function Admin({ user }: { user: any }) {
   const [tab, setTab] = useState<'overview'|'products'|'orders'|'users'|'coupons'|'settings'|'reports'|'variants'>('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const handleLogout = () => { localStorage.removeItem('lamsa_user'); localStorage.removeItem('lamsa_token'); window.location.href = '/'; };
   const [stats, setStats] = useState<any>({ products: 0, orders: 0, revenue: 0, lowStock: 0, pendingOrders: 0 });
   const [orders, setOrders] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
