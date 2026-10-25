@@ -17,15 +17,27 @@ import crypto from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "lamsa_secret_2026";
 const getConn = async () => {
+    // إذا كان DATABASE_URL موجوداً، استخدمه
     if (process.env.DATABASE_URL) {
-      // إزالة أي إعدادات SSL موجودة في الرابط لتجنب التعارض
-      const url = process.env.DATABASE_URL.split('?')[0];
+      const url = new URL(process.env.DATABASE_URL);
       return mysql.createConnection({
-        uri: url,
+        host: url.hostname,
+        port: Number(url.port) || 4000,
+        user: url.username,
+        password: url.password,
+        database: url.pathname.replace('/', ''),
         ssl: { rejectUnauthorized: true }
       });
     }
-    return mysql.createConnection({ host: '127.0.0.1', user: 'root', password: '', database: 'lamsa', port: 3306 });
+    // وإلا، استخدم بيانات TiDB مباشرة (للتجربة على Render)
+    return mysql.createConnection({
+      host: 'gateway01.ap-northeast-1.prod.aws.tidbcloud.com',
+      port: 4000,
+      user: 'qEkQbPj3pswiuoL.root',
+      password: 'hGzZRFxVarakZ9yz',
+      database: 'lamsa',
+      ssl: { rejectUnauthorized: true }
+    });
   };
 
 const requireAdmin = async (req: any, res: any, next: any) => {
