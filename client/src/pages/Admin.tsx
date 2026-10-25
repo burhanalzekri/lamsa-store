@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { AlertTriangle, Menu, X } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import ProductsPanel from './admin/ProductsPanel';
 import CouponsPanel from './admin/CouponsPanel';
 import SettingsPanel from './admin/SettingsPanel';
@@ -13,7 +13,6 @@ import AdminSidebar from './admin/AdminSidebar';
 
 export default function Admin({ user }: { user: any }) {
   const [tab, setTab] = useState<'overview'|'products'|'orders'|'users'|'coupons'|'settings'|'reports'|'variants'>('overview');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [, setLocation] = useLocation();
 
   const handleLogout = () => { 
@@ -38,37 +37,11 @@ export default function Admin({ user }: { user: any }) {
   return (
     <div className="flex min-h-screen bg-[#FAF3E0]" dir="rtl" style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}>
       
-      {/* القائمة الجانبية للكمبيوتر */}
-      <div className="hidden lg:block">
-        <AdminSidebar tab={tab} setTab={setTab} onLogout={handleLogout} />
-      </div>
-
-      {/* القائمة الجانبية للجوال */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden">
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
-          <div className="relative w-64 h-full bg-white shadow-2xl ml-auto flex flex-col">
-            <div className="absolute top-4 left-4 z-10">
-              <button onClick={() => setIsMobileMenuOpen(false)} className="text-[#482d39] hover:text-[#C9A84C] bg-[#FAF3E0] p-2 rounded-full transition">
-                <X size={20} />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              <AdminSidebar tab={tab} setTab={(t) => { setTab(t); setIsMobileMenuOpen(false); }} onLogout={handleLogout} />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* القائمة الجانبية الثابتة */}
+      <AdminSidebar tab={tab} setTab={setTab} onLogout={handleLogout} />
 
       {/* المحتوى الرئيسي */}
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
-        <div className="lg:hidden bg-white p-4 flex items-center justify-between border-b shadow-sm sticky top-0 z-30">
-          <h1 className="font-bold text-[#482d39] text-lg">لوحة لمسة</h1>
-          <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-[#FAF3E0] text-[#482d39] rounded-lg">
-            <Menu size={24} />
-          </button>
-        </div>
-
         <main className="p-4 lg:p-8 flex-1">
           {tab === 'overview' && <OverviewPanel />}
           {tab === 'products' && <ProductsPanel />}
