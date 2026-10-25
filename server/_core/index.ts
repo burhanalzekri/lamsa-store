@@ -43,6 +43,18 @@ const requireAdmin = async (req: any, res: any, next: any) => {
 
 async function startServer() {
   const app = express();
+
+  app.get('/api/admin/orders-simple', async (req, res) => {
+    try {
+      const conn = await getConn();
+      const [rows] = await conn.execute('SELECT * FROM orders ORDER BY id DESC');
+      await conn.end();
+      res.json(rows);
+    } catch (e) {
+      console.error('orders-simple error:', e);
+      res.json([]);
+    }
+  });
   app.get("/api/admin/users-simple", async (req, res) => {
     try {
       const conn = await getConn();

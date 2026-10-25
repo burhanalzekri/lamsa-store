@@ -2,10 +2,10 @@ import { useMemo, useState } from "react";
 import { ClipboardList, Search, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/catalog";
-import { trpc, type RouterOutputs } from "@/lib/trpc";
+
 import orderStatusLabel from "@/pages/Admin";
 
-type Order = RouterOutputs["admin"]["orders"]["list"][number];
+type Order = any;
 type Status = Order["status"];
 const statuses: Array<{ id: Status | "all"; label: string }> = [
   { id: "all", label: "الكل" }, { id: "pending", label: "جديدة" }, { id: "processing", label: "قيد التجهيز" },
@@ -13,16 +13,17 @@ const statuses: Array<{ id: Status | "all"; label: string }> = [
 ];
 
 export default function AdminOrders() {
-  const utils = trpc.useUtils();
-  const query = trpc.admin.orders.list.useQuery();
-  const setStatus = trpc.admin.orders.setStatus.useMutation({
-    onSuccess: async () => { await Promise.all([utils.admin.orders.list.invalidate(), utils.admin.overview.invalidate(), utils.admin.products.invalidate(), utils.store.products.invalidate()]); toast.success("تم تحديث حالة الطلب والمخزون."); },
-    onError: error => toast.error(error.message || "تعذر تحديث حالة الطلب."),
+  const utils = { admin: { orders: { list: { invalidate: () => {} } }, overview: { invalidate: () => {} }, products: { invalidate: () => {} } }, store: { products: { invalidate: () => {} } } };
+  const [query, setQuery] = useState({ data: [], isLoading: true, error: null });
+  const setStatus = { mutate: async ({ orderId, status }: { orderId: number, status: string }) => { try { const res = await fetch("/api/admin/orders/" + orderId + "/status", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) }); if (res.ok) { setQuery(prev => ({ ...prev, data: prev.data.map(o => o.id === orderId ? { ...o, status } : o) })); toast.success("تم تحديث الحالة"); } } catch(e) { toast.error("فشل"); } }, isPending: false };
+    
+    
   });
-  const setPayment = trpc.admin.orders.setPaymentStatus.useMutation({
-    onSuccess: async () => { await Promise.all([utils.admin.orders.list.invalidate(), utils.admin.overview.invalidate(), utils.admin.reports.monthly.invalidate()]); toast.success("تم تحديث حالة الدفع." ); },
-    onError: error => toast.error(error.message || "تعذر تحديث الدفع."),
+  const setPayment = { mutate: async ({ orderId, paymentStatus }: { orderId: number, paymentStatus: string }) => { try { const res = await fetch("/api/admin/orders/" + orderId + "/payment", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ paymentStatus }) }); if (res.ok) { setQuery(prev => ({ ...prev, data: prev.data.map(o => o.id === orderId ? { ...o, paymentStatus } : o) })); toast.success("تم تحديث الدفع"); } } catch(e) { toast.error("فشل"); } }, isPending: false };
+    
+    
   });
+  useEffect(() => { fetch("/api/admin/orders-simple").then(r => r.json()).then(data => { if (Array.isArray(data)) setQuery({ data, isLoading: false, error: null }); else setQuery({ data: [], isLoading: false, error: "Invalid data" }); }).catch(e => setQuery({ data: [], isLoading: false, error: e.message })); }, []);
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [search, setSearch] = useState("");
   const rows = useMemo(() => (query.data ?? []).filter(order =>
