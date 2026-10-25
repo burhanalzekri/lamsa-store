@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Package, Tag, Camera, MessageCircle, Share2 } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Tag, Camera, MessageCircle, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
-import html2canvas from 'html2canvas';
 
 const CART_KEY = "lamsa-cart-v2";
 
@@ -13,7 +12,6 @@ export default function Cart() {
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [couponMsg, setCouponMsg] = useState({ text: '', type: '' });
-  const cartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('lamsa_user');
@@ -76,48 +74,120 @@ export default function Cart() {
     } catch (e) { setCouponMsg({ text: 'خطأ في الاتصال', type: 'error' }); }
   };
 
-  // دالة التصوير (تخفي الصور مؤقتاً + تحافظ على الألوان)
-  const captureCart = async (): Promise<HTMLCanvasElement | null> => {
-    if (!cartRef.current) return null;
+  // دالة رسم الصورة برمجياً (بدون صور - مضمونة 100%)
+  const generateReceiptImage = (): string => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return '';
+
+    // إعدادات الصورة
+    const width = 800;
+    const lineHeight = 40;
+    const padding = 40;
+    const headerHeight = 120;
+    const footerHeight = 120;
+    const itemsHeight = cart.length * (lineHeight * 2 + 20);
+    const height = headerHeight + itemsHeight + footerHeight + padding * 2;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    // الخلفية
+    ctx.fillStyle = '#FAF3E0';
+    ctx.fillRect(0, 0, width, height);
+
+    // الترويسة
+    ctx.fillStyle = '#482d39';
+    ctx.fillRect(0, 0, width, headerHeight);
     
-    // إخفاء الصور (لأنها سبب المشكلة)
-    const images = cartRef.current.querySelectorAll('img');
-    images.forEach((img: any) => { img.style.visibility = 'hidden'; });
-    await new Promise(r => setTimeout(r, 200));
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 40px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('متجر لمسة - Lamsa Store', width / 2, 60);
     
-    try {
-      const canvas = await html2canvas(cartRef.current, { 
-        scale: 2, 
-        backgroundColor: '#FAF3E0',
-        useCORS: false,
-        allowTaint: false,
-        logging: false,
-        onclone: (clonedDoc: any) => {
-          // ضمان ظهور الألوان في النسخة المنسوخة
-          const style = clonedDoc.createElement('style');
-          style.innerHTML = '* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }';
-          clonedDoc.head.appendChild(style);
-        }
-      });
+    ctx.font = '20px Arial';
+    ctx.fillText('تفاصيل الطلب', width / 2, 95);
+
+    // المنتجات
+    ctx.textAlign = 'right';
+    let y = headerHeight + padding + 30;
+    ctx.fillStyle = '#2C3E50';
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText('المنتجات:', width - padding, y);
+    y += 30;
+
+    ctx.font = '20px Arial';
+    cart.forEach((item, index) => {
+      ctx.fillStyle = '#2C3E50';
+      ctx.fillText(`${index + 1}. ${item.name}`, width - padding, y);
       
-      // استعادة الصور
-      images.forEach((img: any) => { img.style.visibility = 'visible'; });
-      return canvas;
-    } catch (e) {
-      images.forEach((img: any) => { img.style.visibility = 'visible'; });
-      throw e;
+      ctx.fillStyle = '#d93844';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${item.price * item.quantity} ر.ي`, padding, y);
+      ctx.textAlign = 'right';
+      
+      y += 25;
+      ctx.fillStyle = '#888';
+      ctx.font = '16px Arial';
+      ctx.fillText(`المقاس: ${item.size || '-'} | اللون: ${item.color || '-'} | الكمية: ${item.quantity}`, width - padding, y);
+      ctx.font = '20px Arial';
+      y += 40;
+    });
+
+    // خط فاصل
+    y += 20;
+    ctx.strokeStyle = '#ccc';
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(width - padding, y);
+    ctx.stroke();
+    y += 40;
+
+    // المجاميع
+    ctx.fillStyle = '#2C3E50';
+    ctx.font = '22px Arial';
+    ctx.fillText('المجموع:', width - padding, y);
+    ctx.textAlign = 'left';
+    ctx.fillText(`${subtotal} ر.ي`, padding, y);
+    ctx.textAlign = 'right';
+    y += 35;
+
+    if (discount > 0) {
+      ctx.fillStyle = '#16a34a';
+      ctx.fillText(`الخصم (${discount}%):`, width - padding, y);
+      ctx.textAlign = 'left';
+      ctx.fillText(`-${discountAmount} ر.ي`, padding, y);
+      ctx.textAlign = 'right';
+      y += 35;
     }
+
+    // الإجمالي
+    ctx.fillStyle = '#482d39';
+    ctx.font = 'bold 28px Arial';
+    ctx.fillText('الإجمالي:', width - padding, y);
+    ctx.textAlign = 'left';
+    ctx.fillText(`${total} ر.ي`, padding, y);
+    y += 50;
+
+    // معلومات العميل
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#888';
+    ctx.font = '18px Arial';
+    ctx.fillText(`العميل: ${user?.name || 'زائر'} | البريد: ${user?.email || 'غير مسجل'}`, width / 2, y);
+    y += 30;
+    ctx.fillText(`للاستفسار: +967775799926`, width / 2, y);
+
+    return canvas.toDataURL('image/png');
   };
 
   // حفظ الصورة
-  const saveImage = async () => {
+  const saveImage = () => {
     try {
-      toast.info('جارٍ تجهيز الصورة...');
-      const canvas = await captureCart();
-      if (!canvas) return;
+      const dataUrl = generateReceiptImage();
+      if (!dataUrl) return toast.error('فشل إنشاء الصورة');
       const link = document.createElement('a');
       link.download = 'lamsa-order-' + Date.now() + '.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = dataUrl;
       link.click();
       toast.success('تم حفظ الصورة في المعرض!');
     } catch (e) {
@@ -130,14 +200,13 @@ export default function Cart() {
   const shareImage = async () => {
     try {
       toast.info('جارٍ تجهيز الصورة للمشاركة...');
-      const canvas = await captureCart();
-      if (!canvas) return;
-      
-      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
-      if (!blob) throw new Error('فشل إنشاء الصورة');
-      
+      const dataUrl = generateReceiptImage();
+      if (!dataUrl) return;
+
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
       const file = new File([blob], 'lamsa-order.png', { type: 'image/png' });
-      
+
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
@@ -146,10 +215,10 @@ export default function Cart() {
         });
         toast.success('تم تجهيز الطلب للمشاركة!');
       } else {
-        // بديل: حفظ الصورة إذا لم يدعم المتصفح المشاركة
+        // بديل: حفظ الصورة
         const link = document.createElement('a');
         link.download = 'lamsa-order.png';
-        link.href = canvas.toDataURL('image/png');
+        link.href = dataUrl;
         link.click();
         toast.success('تم حفظ الصورة (متصفحك لا يدعم المشاركة المباشرة)');
       }
@@ -159,7 +228,7 @@ export default function Cart() {
     }
   };
 
-  // إرسال الطلب عبر واتساب
+  // إرسال واتساب
   const sendWhatsApp = () => {
     if (cart.length === 0) return toast.error('السلة فارغة');
     let message = '🛍️ *طلب جديد من متجر لمسة*\n\n';
@@ -205,7 +274,7 @@ export default function Cart() {
               </div>
             </div>
 
-            <div ref={cartRef} className="bg-white p-4 md:p-6 rounded-xl shadow-sm border space-y-4">
+            <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border space-y-4">
               <div className="flex justify-between items-center border-b pb-2">
                 <h2 className="text-lg font-bold text-[#482d39]">تفاصيل الطلب</h2>
                 <span className="text-xs text-gray-400">لمسة - Lamsa Store</span>
@@ -249,9 +318,9 @@ export default function Cart() {
             <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl text-sm">
               <p className="font-bold mb-1">📋 كيفية إرسال الطلب:</p>
               <ol className="list-decimal list-inside space-y-1 text-xs">
-                <li>اضغط على <b>"مشاركة"</b> لفتح قائمة تطبيقات الهاتف وإرسال الصورة مباشرة.</li>
+                <li>اضغط على <b>"حفظ"</b> لحفظ صورة الطلب في المعرض.</li>
+                <li>أو اضغط على <b>"مشاركة"</b> لفتح قائمة التطبيقات وإرسال الصورة.</li>
                 <li>أو اضغط على <b>"واتساب"</b> لإرسال تفاصيل الطلب كنص.</li>
-                <li>أو اضغط على <b>"حفظ"</b> لحفظ الصورة في المعرض.</li>
               </ol>
             </div>
 
