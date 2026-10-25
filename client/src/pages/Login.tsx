@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowLeft, Sparkles } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 export default function Login({ onLogin, goToRegister }: { onLogin: (user: any, token: string) => void, goToRegister: () => void }) {
@@ -30,25 +30,26 @@ export default function Login({ onLogin, goToRegister }: { onLogin: (user: any, 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FAF3E0] via-[#F5E6D8] to-[#FAF0E6] flex items-center justify-center p-4 relative overflow-hidden" dir="rtl" style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}>
-      {/* زخارف خلفية */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#C9A84C]/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-[#FAF3E0] via-[#F5E6D8] to-[#FAF0E6]" dir="rtl" style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}>
+      
+      {/* زخارف خلفية ناعمة */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[#C9A84C]/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#482d39]/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
 
       <div className="w-full max-w-md relative z-10">
-        {/* الشعار */}
+        {/* الشعار (متناسق مع لون الخط) */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#482d39] shadow-lg shadow-[#482d39]/30 mb-4 relative">
-            <Sparkles className="text-white" size={32} />
-            <div className="absolute inset-0 rounded-full border-2 border-[#C9A84C]/40"></div>
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#482d39] shadow-xl mb-4 relative border-4 border-[#C9A84C]/30">
+            <Sparkles className="text-[#E8C87A]" size={32} />
           </div>
           <h1 className="text-3xl font-bold text-[#482d39] mb-2">مرحباً بعودتك</h1>
           <p className="text-[#777] text-sm">سجلي الدخول لمتابعة تسوقك في متجر لمسة</p>
         </div>
 
-        {/* بطاقة تسجيل الدخول */}
-        <div className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-[#C9A84C]/20">
+        {/* بطاقة تسجيل الدخول الزجاجية */}
+        <div className="bg-white/70 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/50">
           <form onSubmit={handleSubmit} className="space-y-5">
+            
             {/* حقل البريد */}
             <div>
               <label className="block text-sm font-bold text-[#482d39] mb-2">البريد الإلكتروني</label>
@@ -60,7 +61,7 @@ export default function Login({ onLogin, goToRegister }: { onLogin: (user: any, 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="example@email.com"
-                  className="w-full pr-12 pl-4 py-3.5 bg-[#FAF3E0]/50 border border-[#C9A84C]/30 rounded-xl text-[#34212a] placeholder-[#999] focus:border-[#482d39] focus:bg-white outline-none transition-all"
+                  className="w-full pr-12 pl-4 py-3.5 bg-white/50 border border-[#C9A84C]/30 rounded-xl text-[#34212a] placeholder-[#999] focus:border-[#482d39] focus:bg-white focus:ring-2 focus:ring-[#482d39]/20 outline-none transition-all"
                   disabled={loading}
                   dir="ltr"
                 />
@@ -78,7 +79,7 @@ export default function Login({ onLogin, goToRegister }: { onLogin: (user: any, 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pr-12 pl-12 py-3.5 bg-[#FAF3E0]/50 border border-[#C9A84C]/30 rounded-xl text-[#34212a] placeholder-[#999] focus:border-[#482d39] focus:bg-white outline-none transition-all"
+                  className="w-full pr-12 pl-12 py-3.5 bg-white/50 border border-[#C9A84C]/30 rounded-xl text-[#34212a] placeholder-[#999] focus:border-[#482d39] focus:bg-white focus:ring-2 focus:ring-[#482d39]/20 outline-none transition-all"
                   disabled={loading}
                   dir="ltr"
                 />
@@ -96,10 +97,10 @@ export default function Login({ onLogin, goToRegister }: { onLogin: (user: any, 
             <button
               disabled={loading}
               type="submit"
-              className="w-full bg-gradient-to-r from-[#482d39] to-[#6b4560] text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#482d39]/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+              className="w-full bg-gradient-to-r from-[#482d39] to-[#6b4560] text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#482d39]/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
             >
               {loading ? 'جارٍ تسجيل الدخول...' : 'تسجيل الدخول'}
-              {!loading && <ArrowRight size={20} />}
+              {!loading && <ArrowLeft size={20} />}
             </button>
           </form>
 
@@ -109,7 +110,7 @@ export default function Login({ onLogin, goToRegister }: { onLogin: (user: any, 
               ليس لديك حساب؟{' '}
               <button
                 onClick={goToRegister}
-                className="font-bold text-[#482d39] hover:text-[#C9A84C] transition underline underline-offset-4"
+                className="font-bold text-[#482d39] hover:text-[#C9A84C] transition underline underline-offset-4 decoration-[#C9A84C]/50 hover:decoration-[#C9A84C]"
               >
                 إنشاء حساب جديد
               </button>
@@ -118,12 +119,13 @@ export default function Login({ onLogin, goToRegister }: { onLogin: (user: any, 
         </div>
 
         {/* العودة للمتجر */}
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center">
           <button
             onClick={() => setLocation('/')}
-            className="text-sm text-[#777] hover:text-[#482d39] transition inline-flex items-center gap-1"
+            className="text-sm font-bold text-[#777] hover:text-[#482d39] transition inline-flex items-center gap-2 group"
           >
-            ← العودة للمتجر
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+            العودة للمتجر
           </button>
         </div>
       </div>
