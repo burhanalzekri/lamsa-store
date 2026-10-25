@@ -4,8 +4,6 @@ import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Packag
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 
-import domtoimage from 'dom-to-image';
-
 const CART_KEY = "lamsa-cart-v2";
 
 export default function Cart() {
@@ -78,64 +76,16 @@ export default function Cart() {
     } catch (e) { setCouponMsg({ text: 'خطأ في الاتصال', type: 'error' }); }
   };
 
-  // تصوير السلة أولاً
-  const captureCart = async () => {
-    if (!cartRef.current) return;
+  // دالة التصوير (تخفي الصور أولاً لتجنب CORS)
+  const captureCart = async (): Promise<HTMLCanvasElement | null> => {
+    if (!cartRef.current) return null;
+    
+    // إخفاء الصور مؤقتاً
+    const images = cartRef.current.querySelectorAll('img');
+    images.forEach((img: any) => { img.style.visibility = 'hidden'; });
+    await new Promise(r => setTimeout(r, 200));
+    
     try {
-      toast.info('جارٍ تجهيز الصورة...');
-      
-      // 1. إخفاء جميع الصور مؤقتاً (لتجنب CORS)
-      const images = cartRef.current.querySelectorAll('img');
-      images.forEach((img: any) => {
-        img.style.visibility = 'hidden';
-      });
-      
-      // 2. الانتظار قليلاً
-      await new Promise(r => setTimeout(r, 200));
-      
-      // 3. تصوير العنصر (بدون صور)
-      const canvas = await html2canvas(cartRef.current, {
-        scale: 2,
-        backgroundColor: '#FAF3E0',
-        useCORS: false,
-        allowTaint: false,
-        logging: false
-      });
-      
-      // 4. استعادة الصور
-      images.forEach((img: any) => {
-        img.style.visibility = 'visible';
-      });
-      
-      // 5. تنزيل الصورة
-      const link = document.createElement('a');
-      link.download = 'lamsa-order-' + Date.now() + '.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      toast.success('تم حفظ صورة الطلب!');
-    } catch (e) {
-      console.error(e);
-      // في حالة الفشل، استعادة الصور
-      try {
-        const images = cartRef.current.querySelectorAll('img');
-        images.forEach((img: any) => { img.style.visibility = 'visible'; });
-      } catch (err) {}
-      toast.error('حدث خطأ، جرب مرة أخرى.');
-    }
-  };
-
-  // مشاركة صورة السلة عبر التطبيقات (واتساب، تيليجرام، إلخ)
-  const shareCart = async () => {
-    if (!cartRef.current) return;
-    try {
-      toast.info('جارٍ تجهيز الصورة للمشاركة...');
-      
-      // إخفاء الصور مؤقتاً
-      const images = cartRef.current.querySelectorAll('img');
-      images.forEach((img: any) => { img.style.visibility = 'hidden'; });
-      await new Promise(r => setTimeout(r, 200));
-      
-      // تصوير السلة
       const canvas = await html2canvas(cartRef.current, { 
         scale: 2, 
         backgroundColor: '#FAF3E0',
@@ -146,12 +96,41 @@ export default function Cart() {
       
       // استعادة الصور
       images.forEach((img: any) => { img.style.visibility = 'visible'; });
+      return canvas;
+    } catch (e) {
+      // استعادة الصور في حالة الخطأ
+      images.forEach((img: any) => { img.style.visibility = 'visible'; });
+      throw e;
+    }
+  };
+
+  // حفظ الصورة
+  const saveImage = async () => {
+    try {
+      toast.info('جارٍ تجهيز الصورة...');
+      const canvas = await captureCart();
+      if (!canvas) return;
+      const link = document.createElement('a');
+      link.download = 'lamsa-order-' + Date.now() + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      toast.success('تم حفظ الصورة في المعرض!');
+    } catch (e) {
+      console.error(e);
+      toast.error('فشل حفظ الصورة.');
+    }
+  };
+
+  // مشاركة الصورة عبر تطبيقات الهاتف
+  const shareImage = async () => {
+    try {
+      toast.info('جارٍ تجهيز الصورة للمشاركة...');
+      const canvas = await captureCart();
+      if (!canvas) return;
       
-      // تحويل الصورة إلى Blob
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
       if (!blob) throw new Error('فشل إنشاء الصورة');
       
-      // استخدام Web Share API للمشاركة
       const file = new File([blob], 'lamsa-order.png', { type: 'image/png' });
       
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -162,7 +141,7 @@ export default function Cart() {
         });
         toast.success('تم تجهيز الطلب للمشاركة!');
       } else {
-        // fallback: إذا لم يدعم المتصفح المشاركة، قم بتنزيل الصورة
+        // fallback: تنزيل الصورة إذا لم يدعم المتصفح المشاركة
         const link = document.createElement('a');
         link.download = 'lamsa-order.png';
         link.href = canvas.toDataURL('image/png');
@@ -171,17 +150,12 @@ export default function Cart() {
       }
     } catch (e) {
       console.error(e);
-      // استعادة الصور
-      try {
-        const images = cartRef.current.querySelectorAll('img');
-        images.forEach((img: any) => { img.style.visibility = 'visible'; });
-      } catch (err) {}
-      toast.error('فشل مشاركة السلة.');
+      toast.error('فشل مشاركة الصورة.');
     }
   };
 
-  // إرسال الطلب عبر الواتساب (نص فقط)
-  const sendOrderViaWhatsApp = () => {
+  // إرسال الطلب عبر واتساب (نص فقط)
+  const sendWhatsApp = () => {
     if (cart.length === 0) return toast.error('السلة فارغة');
     
     let message = '🛍️ *طلب جديد من متجر لمسة*\n\n';
@@ -223,7 +197,7 @@ export default function Cart() {
         ) : (
           <div className="space-y-6">
             
-            {/* شريط تقدم الشحن */}
+            {/* شريط تقدم الشحن المجاني */}
             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
               <p className="text-sm text-center mb-2 font-bold text-[#482d39]">
                 {remainingForFreeShipping > 0 
@@ -235,7 +209,7 @@ export default function Cart() {
               </div>
             </div>
 
-            {/* محتوى السلة (للتصوير) */}
+            {/* السلة (للتصوير) */}
             <div ref={cartRef} className="bg-white p-4 md:p-6 rounded-xl shadow-sm border space-y-4">
               <div className="flex justify-between items-center border-b pb-2">
                 <h2 className="text-lg font-bold text-[#482d39]">تفاصيل الطلب</h2>
@@ -283,34 +257,25 @@ export default function Cart() {
             <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl text-sm">
               <p className="font-bold mb-1">📋 كيفية إرسال الطلب:</p>
               <ol className="list-decimal list-inside space-y-1 text-xs">
-                <li>اضغط على <b>"حفظ صورة الطلب"</b> (سيتم حفظ الصورة في معرض هاتفك).</li>
-                <li>اضغط على <b>"إرسال الطلب عبر واتساب"</b> (سيتم فتح واتساب بالرسالة).</li>
-                <li>قم بإرفاق الصورة التي حفظتها من المعرض في محادثة واتساب.</li>
-                <li>أرسل الرسالة، وسيتواصل معك فريقنا فوراً.</li>
+                <li>اضغط على <b>"حفظ الصورة"</b> (اختياري - يمكنك إرسال الصورة عبر زر المشاركة).</li>
+                <li>اضغط على <b>"مشاركة"</b> لفتح قائمة تطبيقات الهاتف وإرسال الصورة مباشرة.</li>
+                <li>أو اضغط على <b>"واتساب"</b> لإرسال تفاصيل الطلب كنص.</li>
               </ol>
             </div>
 
-            {/* أزرار الطلب */}
-            <div className="grid md:grid-cols-3 gap-3">
-              <button 
-                onClick={sendOrderViaWhatsApp}
-                className="w-full bg-[#25D366] text-white py-4 rounded-xl font-bold text-sm hover:bg-[#1DA851] transition flex justify-center items-center gap-2 shadow-lg"
-              >
-                <MessageCircle size={20}/> واتساب
+            {/* الأزرار */}
+            <div className="grid grid-cols-3 gap-2">
+              <button onClick={sendWhatsApp} className="bg-[#25D366] text-white py-4 rounded-xl font-bold text-sm hover:bg-[#1DA851] transition flex flex-col justify-center items-center gap-1 shadow-lg">
+                <MessageCircle size={22}/> واتساب
               </button>
-              <button 
-                onClick={shareCart}
-                className="w-full bg-[#4A235A] text-white py-4 rounded-xl font-bold text-sm hover:bg-[#381a45] transition flex justify-center items-center gap-2 shadow-lg"
-              >
-                <Share2 size={20}/> مشاركة
+              <button onClick={shareImage} className="bg-[#482d39] text-white py-4 rounded-xl font-bold text-sm hover:bg-[#654151] transition flex flex-col justify-center items-center gap-1 shadow-lg">
+                <Share2 size={22}/> مشاركة
               </button>
-              <button 
-                onClick={captureCart}
-                className="w-full bg-[#34212a] text-white py-4 rounded-xl font-bold text-sm hover:bg-black transition flex justify-center items-center gap-2 shadow-lg"
-              >
-                <Camera size={20}/> حفظ
+              <button onClick={saveImage} className="bg-[#34212a] text-white py-4 rounded-xl font-bold text-sm hover:bg-black transition flex flex-col justify-center items-center gap-1 shadow-lg">
+                <Camera size={22}/> حفظ
               </button>
             </div>
+
             <div className="text-center text-xs text-green-600 font-bold flex items-center justify-center gap-1 mt-2">
               <ShieldCheck size={14}/> إرسال آمن ومباشر
             </div>
