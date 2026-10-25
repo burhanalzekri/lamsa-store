@@ -25,7 +25,7 @@ const getConn = async () => {
         user: url.username,
         password: url.password,
         database: url.pathname.replace('/', ''),
-        ssl: { rejectUnauthorized: true }
+        ssl: { rejectUnauthorized: false }
       });
     }
     return mysql.createConnection({ host: '127.0.0.1', user: 'root', password: '', database: 'lamsa', port: 3306 });
