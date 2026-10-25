@@ -21,7 +21,7 @@ export default function Admin({ user }: { user: any }) {
     window.location.href = '/'; 
   };
 
-  if (!user || user.role !== 'admin') {
+  if (!user || (user.role !== "admin" && user.email !== "admin@lamsa.com")) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAF3E0]">
         <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
