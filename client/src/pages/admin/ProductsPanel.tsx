@@ -79,7 +79,39 @@ const handleDelete = async (id: string) => {
           <select value={form.category} onChange={e=>setForm({...form, category: e.target.value})} className="border p-2 rounded">
             <option value="فساتين">فساتين</option><option value="عبايات">عبايات</option><option value="حقائب">حقائب</option><option value="أحذية">أحذية</option>
           </select>
-          <input placeholder="رابط الصورة" value={form.image} onChange={e=>setForm({...form, image: e.target.value})} className="border p-2 rounded" dir="ltr" />
+          <div className="flex flex-col gap-2 col-span-full">
+  <input placeholder="رابط الصورة" value={form.image} onChange={e=>setForm({...form, image: e.target.value})} className="border p-2 rounded" dir="ltr" />
+  <div className="flex gap-2 items-center">
+    <input
+      type="file"
+      accept="image/*"
+      id="product-image-upload"
+      className="hidden"
+      onChange={async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append("image", file);
+        try {
+          const res = await fetch("/api/upload", { method: "POST", body: formData });
+          if (!res.ok) throw new Error("فشل رفع الصورة");
+          const data = await res.json();
+          setForm({...form, image: data.url});
+          alert("✅ تم رفع الصورة بنجاح");
+        } catch (err) {
+          alert("❌ حدث خطأ أثناء رفع الصورة");
+          console.error(err);
+        }
+      }}
+    />
+    <label htmlFor="product-image-upload" className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm flex-1 text-center font-bold">
+      📸 رفع صورة من الجهاز
+    </label>
+    {form.image && (
+      <img src={form.image} alt="معاينة" className="w-12 h-12 object-cover rounded border" />
+    )}
+  </div>
+</div>
           <button type="submit" className="bg-green-600 text-white p-2 rounded font-bold col-span-full">حفظ</button>
         </form>
       )}
