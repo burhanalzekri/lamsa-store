@@ -28,22 +28,6 @@ const getConn = async () => {
         ssl: { rejectUnauthorized: true }
       });
     }
-
-  app.get('/api/admin/users-simple', async (req, res) => {
-    try {
-      const conn = await getConn();
-      const [rows] = await conn.execute('SELECT id, name, email, role FROM users ORDER BY id DESC');
-      await conn.end();
-      res.json(rows);
-    } catch (e) {
-      console.error('users-simple error:', e);
-      res.json([
-        { id: 1, name: 'مدير المتجر', email: 'admin@lamsa.com', role: 'admin' },
-        { id: 2, name: 'مستخدم تجريبي', email: 'user@test.com', role: 'user' }
-      ]);
-    }
-  });
-
     return mysql.createConnection({ host: '127.0.0.1', user: 'root', password: '', database: 'lamsa', port: 3306 });
   };
 
@@ -59,6 +43,20 @@ const requireAdmin = async (req: any, res: any, next: any) => {
 
 async function startServer() {
   const app = express();
+  app.get("/api/admin/users-simple", async (req, res) => {
+    try {
+      const conn = await getConn();
+      const [rows] = await conn.execute("SELECT id, name, email, role FROM users ORDER BY id DESC");
+      await conn.end();
+      res.json(rows);
+    } catch (e) {
+      console.error("users-simple error:", e);
+      res.json([
+        { id: 1, name: "مدير المتجر", email: "admin@lamsa.com", role: "admin" },
+        { id: 2, name: "مستخدم تجريبي", email: "user@test.com", role: "user" }
+      ]);
+    }
+  });
   const server = createServer(app);
   app.use(express.json({ limit: "50mb" }));
 
