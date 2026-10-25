@@ -43,7 +43,7 @@ export default function AdminSidebar({ tab, setTab, onLogout }: AdminSidebarProp
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-bold transition-all duration-200 text-sm ${
                 isActive 
                   ? 'bg-gradient-to-r from-[#C9A84C] to-[#E8C87A] text-[#34212a] shadow-md' 
-                  : 'text-[#d4c5b0] hover:bg-[#482d39] hover:text-white'
+                  : 'text-white hover:bg-[#C9A84C] hover:text-[#34212a]'
               }`}
             >
               <Icon size={18} className={isActive ? 'text-[#34212a]' : 'text-[#C9A84C]'} />

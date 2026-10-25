@@ -47,7 +47,7 @@ export default function Admin({ user }: { user: any }) {
       {/* القائمة الجانبية للجوال */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={() => setIsMobileMenuOpen(false)} />
           <div className="relative w-64 h-full bg-[#34212a] shadow-2xl">
             <div className="absolute top-4 left-4 z-10">
               <button onClick={() => setIsMobileMenuOpen(false)} className="text-[#C9A84C] hover:text-white bg-white/10 p-2 rounded-full">
