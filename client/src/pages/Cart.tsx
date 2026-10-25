@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Package, Tag, Camera, MessageCircle, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { toPng } from 'html-to-image';
+import html2canvas from 'html2canvas';
+
 import domtoimage from 'dom-to-image';
 
 const CART_KEY = "lamsa-cart-v2";
@@ -83,30 +84,43 @@ export default function Cart() {
     try {
       toast.info('جارٍ تجهيز الصورة...');
       
-      // إخفاء الصور مؤقتاً لتجنب CORS
+      // 1. إخفاء جميع الصور مؤقتاً (لتجنب CORS)
       const images = cartRef.current.querySelectorAll('img');
-      images.forEach((img: any) => img.style.display = 'none');
-      
-      // الانتظار قليلاً لضمان تطبيق التغييرات
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      const dataUrl = await toPng(cartRef.current, { 
-        cacheBust: true,
-        backgroundColor: '#FAF3E0',
-        pixelRatio: 2
+      images.forEach((img: any) => {
+        img.style.visibility = 'hidden';
       });
       
-      // استعادة الصور
-      images.forEach((img: any) => img.style.display = '');
+      // 2. الانتظار قليلاً
+      await new Promise(r => setTimeout(r, 200));
       
+      // 3. تصوير العنصر (بدون صور)
+      const canvas = await html2canvas(cartRef.current, {
+        scale: 2,
+        backgroundColor: '#FAF3E0',
+        useCORS: false,
+        allowTaint: false,
+        logging: false
+      });
+      
+      // 4. استعادة الصور
+      images.forEach((img: any) => {
+        img.style.visibility = 'visible';
+      });
+      
+      // 5. تنزيل الصورة
       const link = document.createElement('a');
-      link.download = 'lamsa-order.png';
-      link.href = dataUrl;
+      link.download = 'lamsa-order-' + Date.now() + '.png';
+      link.href = canvas.toDataURL('image/png');
       link.click();
-      toast.success('تم حفظ صورة الطلب في المعرض!');
-    } catch (e) { 
+      toast.success('تم حفظ صورة الطلب!');
+    } catch (e) {
       console.error(e);
-      toast.error('فشل تصوير السلة.');
+      // في حالة الفشل، استعادة الصور
+      try {
+        const images = cartRef.current.querySelectorAll('img');
+        images.forEach((img: any) => { img.style.visibility = 'visible'; });
+      } catch (err) {}
+      toast.error('حدث خطأ، جرب مرة أخرى.');
     }
   };
 
