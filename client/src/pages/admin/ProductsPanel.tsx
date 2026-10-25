@@ -6,7 +6,7 @@ export default function ProductsPanel() {
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [isAdding, setIsAdding] = useState(false);
-  const [form, setForm] = useState({ name: '', price: '', costPrice: '', category: 'فساتين', image: '', description: '', stock: 10 });
+  const [form, setForm] = useState({ name: '', price: '', costPrice: '', category: 'فساتين', image: '', description: '', stock: '10' });
 
   const fetchProducts = async () => {
     try {
