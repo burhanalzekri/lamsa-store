@@ -17,16 +17,8 @@ import crypto from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "lamsa_secret_2026";
 const getConn = async () => {
-    // قراءة رابط قاعدة البيانات من متغيرات البيئة (Render)
-    const dbUrl = process.env.DATABASE_URL;
-    if (!dbUrl) {
-      console.error("⚠️ DATABASE_URL غير موجود! استخدام قاعدة البيانات المحلية.");
-      return mysql.createConnection({ host: '127.0.0.1', user: 'root', password: '', database: 'lamsa', port: 3306 });
-    }
-
-    try {
-      // تحليل الرابط يدوياً لضمان التوافق
-      const url = new URL(dbUrl);
+    if (process.env.DATABASE_URL) {
+      const url = new URL(process.env.DATABASE_URL);
       return mysql.createConnection({
         host: url.hostname,
         port: Number(url.port) || 4000,
@@ -35,10 +27,8 @@ const getConn = async () => {
         database: url.pathname.replace('/', ''),
         ssl: { rejectUnauthorized: true }
       });
-    } catch (e) {
-      console.error("⚠️ خطأ في قراءة DATABASE_URL:", e);
-      return mysql.createConnection({ host: '127.0.0.1', user: 'root', password: '', database: 'lamsa', port: 3306 });
     }
+    return mysql.createConnection({ host: '127.0.0.1', user: 'root', password: '', database: 'lamsa', port: 3306 });
   };
 
 const requireAdmin = async (req: any, res: any, next: any) => {
