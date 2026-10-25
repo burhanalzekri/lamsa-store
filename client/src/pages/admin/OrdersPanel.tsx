@@ -3,7 +3,7 @@ import { ClipboardList, Search, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/catalog";
 import { trpc, type RouterOutputs } from "@/lib/trpc";
-import { orderStatusLabel } from "@/pages/Admin";
+import orderStatusLabel from "@/pages/Admin";
 
 type Order = RouterOutputs["admin"]["orders"]["list"][number];
 type Status = Order["status"];

@@ -212,7 +212,7 @@ export default function ProductDetails() {
             </div>
             {productImages.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-2">
-                {productImages.map((img, i) => (
+                {productImages.map((img: any, i: number) => (
                   <img key={i} src={img} onClick={() => setMainImage(img)} className={`w-20 h-24 object-cover rounded-lg cursor-pointer border-2 transition ${mainImage === img ? 'border-[#482d39]' : 'border-gray-200'}`} />
                 ))}
               </div>

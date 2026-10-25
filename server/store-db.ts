@@ -90,8 +90,6 @@ export async function createProduct(input: ProductWrite & { colors: VariantWrite
       imageUrl: input.imageUrl.trim() || null,
       badge: input.badge.trim() || null,
       priceHalalas: toHalalas(input.price),
-      compareAtHalalas: input.compareAtPrice ? toHalalas(input.compareAtPrice) : null,
-      badge: input.badge || null,
       costHalalas: toHalalas(input.costPrice),
       active: true,
     });

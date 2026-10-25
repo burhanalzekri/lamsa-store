@@ -386,7 +386,7 @@ function drawShadowBox(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
 
 // دعم roundRect
 if (!CanvasRenderingContext2D.prototype.roundRect) {
-  CanvasRenderingContext2D.prototype.roundRect = function (x: number, y: number, w: number, h: number, r: number) {
+  CanvasRenderingContext2D.prototype.roundRect = function (this: any, x: number, y: number, w: number, h: number, r: number) {
     if (w < 2 * r) r = w / 2;
     if (h < 2 * r) r = h / 2;
     this.beginPath();
