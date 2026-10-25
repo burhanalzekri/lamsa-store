@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
+import ThankYou from "./pages/ThankYou";
 import ProductDetails from "./pages/ProductDetails";
 import Track from "./pages/Track";
 import Wishlist from "./pages/Wishlist";
