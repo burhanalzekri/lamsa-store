@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Package, Tag, Camera, MessageCircle } from 'lucide-react';
+import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Package, Tag, Camera, MessageCircle, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 
@@ -15,7 +15,6 @@ export default function Cart() {
   const [couponMsg, setCouponMsg] = useState({ text: '', type: '' });
   const cartRef = useRef<HTMLDivElement>(null);
 
-  // جلب السلة
   useEffect(() => {
     const savedUser = localStorage.getItem('lamsa_user');
     if (savedUser) {
@@ -58,7 +57,6 @@ export default function Cart() {
   const discountAmount = subtotal * (discount / 100);
   const total = subtotal - discountAmount;
 
-  // شحن مجاني للطلبات فوق 20,000
   const freeShippingThreshold = 20000;
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
   const progressPercent = Math.min(100, (subtotal / freeShippingThreshold) * 100);
@@ -78,7 +76,21 @@ export default function Cart() {
     } catch (e) { setCouponMsg({ text: 'خطأ في الاتصال', type: 'error' }); }
   };
 
-  // إرسال الطلب عبر الواتساب
+  // تصوير السلة أولاً
+  const captureCart = async () => {
+    if (!cartRef.current) return;
+    try {
+      toast.info('جارٍ تجهيز الصورة...');
+      const canvas = await html2canvas(cartRef.current, { scale: 2, backgroundColor: '#FAF3E0' });
+      const link = document.createElement('a');
+      link.download = 'lamsa-order.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      toast.success('تم حفظ صورة الطلب في المعرض!');
+    } catch (e) { toast.error('فشل تصوير السلة'); }
+  };
+
+  // إرسال الطلب عبر الواتساب (نص فقط)
   const sendOrderViaWhatsApp = () => {
     if (cart.length === 0) return toast.error('السلة فارغة');
     
@@ -96,23 +108,9 @@ export default function Cart() {
     message += `💵 *الإجمالي:* ${total} ر.ي\n\n`;
     message += '📞 يرجى التواصل لتأكيد الطلب.';
 
-    const phone = '967775799926'; // رقم الواتساب الخاص بالمتجر
+    const phone = '967775799926';
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
-  };
-
-  // تصوير السلة
-  const captureCart = async () => {
-    if (!cartRef.current) return;
-    try {
-      toast.info('جارٍ تجهيز الصورة...');
-      const canvas = await html2canvas(cartRef.current, { scale: 2, backgroundColor: '#FAF3E0' });
-      const link = document.createElement('a');
-      link.download = 'lamsa-order.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      toast.success('تم حفظ صورة الطلب!');
-    } catch (e) { toast.error('فشل تصوير السلة'); }
   };
 
   return (
@@ -135,7 +133,7 @@ export default function Cart() {
         ) : (
           <div className="space-y-6">
             
-            {/* شريط تقدم الشحن المجاني */}
+            {/* شريط تقدم الشحن */}
             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
               <p className="text-sm text-center mb-2 font-bold text-[#482d39]">
                 {remainingForFreeShipping > 0 
@@ -143,16 +141,17 @@ export default function Cart() {
                   : '🎉 مبروك! حصلتِ على شحن مجاني'}
               </p>
               <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className="bg-green-500 h-3 rounded-full transition-all duration-500" 
-                  style={{ width: `${progressPercent}%` }}
-                ></div>
+                <div className="bg-green-500 h-3 rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
               </div>
             </div>
 
-            {/* السلة (لتصويرها) */}
+            {/* محتوى السلة (للتصوير) */}
             <div ref={cartRef} className="bg-white p-4 md:p-6 rounded-xl shadow-sm border space-y-4">
-              <h2 className="text-lg font-bold text-[#482d39] border-b pb-2">تفاصيل الطلب</h2>
+              <div className="flex justify-between items-center border-b pb-2">
+                <h2 className="text-lg font-bold text-[#482d39]">تفاصيل الطلب</h2>
+                <span className="text-xs text-gray-400">لمسة - Lamsa Store</span>
+              </div>
+              
               {cart.map((item, i) => (
                 <div key={i} className="flex gap-4 items-center border-b pb-3">
                   <img src={item.image} alt={item.name} className="w-20 h-24 object-cover rounded-lg" />
@@ -190,19 +189,30 @@ export default function Cart() {
               </div>
             </div>
 
+            {/* التعليمات */}
+            <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl text-sm">
+              <p className="font-bold mb-1">📋 كيفية إرسال الطلب:</p>
+              <ol className="list-decimal list-inside space-y-1 text-xs">
+                <li>اضغط على <b>"حفظ صورة الطلب"</b> (سيتم حفظ الصورة في معرض هاتفك).</li>
+                <li>اضغط على <b>"إرسال الطلب عبر واتساب"</b> (سيتم فتح واتساب بالرسالة).</li>
+                <li>قم بإرفاق الصورة التي حفظتها من المعرض في محادثة واتساب.</li>
+                <li>أرسل الرسالة، وسيتواصل معك فريقنا فوراً.</li>
+              </ol>
+            </div>
+
             {/* أزرار الطلب */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <button 
-                onClick={sendOrderViaWhatsApp}
-                className="w-full bg-[#25D366] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#1DA851] transition flex justify-center items-center gap-2 shadow-lg"
-              >
-                <MessageCircle size={22}/> إرسال الطلب عبر واتساب
-              </button>
+            <div className="grid md:grid-cols-2 gap-3">
               <button 
                 onClick={captureCart}
                 className="w-full bg-[#34212a] text-white py-4 rounded-xl font-bold text-lg hover:bg-black transition flex justify-center items-center gap-2 shadow-lg"
               >
-                <Camera size={22}/> حفظ صورة الطلب
+                <Camera size={22}/> 1. حفظ صورة الطلب
+              </button>
+              <button 
+                onClick={sendOrderViaWhatsApp}
+                className="w-full bg-[#25D366] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#1DA851] transition flex justify-center items-center gap-2 shadow-lg"
+              >
+                <MessageCircle size={22}/> 2. إرسال عبر واتساب
               </button>
             </div>
 
