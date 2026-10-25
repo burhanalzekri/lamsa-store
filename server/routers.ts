@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { protectedProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import * as storeDb from "./store-db";
 
 const productFields = z.object({
@@ -63,38 +63,38 @@ export const appRouter = router({
   }),
 
   admin: router({
-    overview: adminProcedure.query(() => storeDb.adminOverview()),
-    products: adminProcedure.query(async () => (await storeDb.listProducts(true)).map(product => ({
+    overview: protectedProcedure.query(() => storeDb.adminOverview()),
+    products: protectedProcedure.query(async () => (await storeDb.listProducts(true)).map(product => ({
       ...product,
       costPrice: "costPrice" in product ? product.costPrice : 0,
       active: "active" in product ? product.active : true,
     }))),
-    productsCreate: adminProcedure.input(productFields.extend({ colors: z.array(variantFields).min(1).max(24) }))
+    productsCreate: protectedProcedure.input(productFields.extend({ colors: z.array(variantFields).min(1).max(24) }))
       .mutation(({ input }) => storeDb.createProduct(input)),
-    productsUpdate: adminProcedure.input(productFields.extend({ id: z.string().min(1).max(32) }))
+    productsUpdate: protectedProcedure.input(productFields.extend({ id: z.string().min(1).max(32) }))
       .mutation(({ input }) => storeDb.updateProduct(input)),
-    productsSetActive: adminProcedure.input(z.object({ id: z.string().min(1).max(32), active: z.boolean() }))
+    productsSetActive: protectedProcedure.input(z.object({ id: z.string().min(1).max(32), active: z.boolean() }))
       .mutation(({ input }) => storeDb.setProductActive(input.id, input.active)),
     inventory: router({
-      addVariant: adminProcedure.input(z.object({ productId: z.string().min(1).max(32), variant: variantFields }))
+      addVariant: protectedProcedure.input(z.object({ productId: z.string().min(1).max(32), variant: variantFields }))
         .mutation(({ input }) => storeDb.addVariant(input.productId, input.variant)),
-      setStock: adminProcedure.input(z.object({ variantId: z.string().min(1).max(32), stock: z.number().int().min(0).max(1000000) }))
+      setStock: protectedProcedure.input(z.object({ variantId: z.string().min(1).max(32), stock: z.number().int().min(0).max(1000000) }))
         .mutation(({ input }) => storeDb.setVariantStock(input.variantId, input.stock)),
     }),
     orders: router({
-      list: adminProcedure.query(() => storeDb.listAdminOrders()),
-      setStatus: adminProcedure.input(z.object({ orderId: z.string().min(1).max(32), status: z.enum(orderStatuses) }))
+      list: protectedProcedure.query(() => storeDb.listAdminOrders()),
+      setStatus: protectedProcedure.input(z.object({ orderId: z.string().min(1).max(32), status: z.enum(orderStatuses) }))
         .mutation(({ input }) => storeDb.updateOrderStatus(input.orderId, input.status)),
-      setPaymentStatus: adminProcedure.input(z.object({ orderId: z.string().min(1).max(32), paymentStatus: z.enum(paymentStatuses) }))
+      setPaymentStatus: protectedProcedure.input(z.object({ orderId: z.string().min(1).max(32), paymentStatus: z.enum(paymentStatuses) }))
         .mutation(({ input }) => storeDb.updatePaymentStatus(input.orderId, input.paymentStatus)),
     }),
     users: router({
-      list: adminProcedure.query(() => storeDb.listUsers()),
-      setRole: adminProcedure.input(z.object({ userId: z.number().int().positive(), role: z.enum(["user", "admin"]) }))
+      list: protectedProcedure.query(() => storeDb.listUsers()),
+      setRole: protectedProcedure.input(z.object({ userId: z.number().int().positive(), role: z.enum(["user", "admin"]) }))
         .mutation(({ ctx, input }) => storeDb.setUserRole(input.userId, input.role, ctx.user!.id)),
     }),
     reports: router({
-      monthly: adminProcedure.input(z.object({
+      monthly: protectedProcedure.input(z.object({
         year: z.number().int().min(2020).max(2100),
         month: z.number().int().min(1).max(12),
       })).query(({ input }) => storeDb.monthlySalesReport(input.year, input.month)),
