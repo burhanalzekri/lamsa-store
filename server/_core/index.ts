@@ -349,21 +349,28 @@ const upload = multer({ storage });
 
 // مسار رفع الصورة
 app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
-    if (!req.file) return res.status(400).json({ error: "لم يتم إرسال ملف" });
+    if (!req.file) {
+      console.error("❌ [UPLOAD] req.file = null");
+      return res.status(400).json({ error: "لم يتم إرسال ملف" });
+    }
+    console.log("📤 [UPLOAD] الملف مستلم:", { size: req.file.size, mimetype: req.file.mimetype, hasBuffer: !!req.file.buffer });
     
     // رفع الملف إلى Cloudinary من الذاكرة (بدون حفظ محلي)
+    console.log("🔄 [UPLOAD] جاري الرفع إلى Cloudinary...");
     const uploadStream = cloudinary.uploader.upload_stream(
       { folder: "lamsa-products" },
       (error: any, result: any) => {
         if (error) {
-          console.error("Cloudinary upload error:", error);
-          return res.status(500).json({ error: "فشل رفع الصورة" });
+          console.error("❌ [UPLOAD] Cloudinary error:", error.message, error.http_code);
+          return res.status(500).json({ error: "فشل رفع الصورة: " + error.message });
         }
+        console.log("✅ [UPLOAD] نجح الرفع! الرابط:", result.secure_url);
         res.json({ url: result.secure_url });
       }
     );
     
     // إرسال الملف إلى Cloudinary
+    console.log("📤 [UPLOAD] إرسال الملف للـ stream، حجم:", req.file.buffer.length);
     uploadStream.end(req.file.buffer);
   });
 
