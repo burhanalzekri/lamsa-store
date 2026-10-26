@@ -12,7 +12,7 @@ export default function ReportsPanel() {
   const fetchReports = () => {
     setLoading(true);
     setError(null);
-    fetch(`/api/admin/reports?days=${days}`)
+    fetch(`/api/admin/reports?days=${days}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } })
       .then(async r => {
         if (!r.ok) {
           const err = await r.json().catch(() => ({}));

@@ -17,8 +17,8 @@ export default function CouponsPanel() {
     setLoading(true);
     try {
       const [cRes, hRes] = await Promise.all([
-        fetch('/api/admin/coupons').then(r => r.json()),
-        fetch('/api/admin/coupons/history').then(r => r.json())
+        fetch('/api/admin/coupons', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } }).then(r => r.json()),
+        fetch('/api/admin/coupons/history', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } }).then(r => r.json())
       ]);
       setCoupons(Array.isArray(cRes) ? cRes : []);
       setHistory(Array.isArray(hRes) ? hRes : []);

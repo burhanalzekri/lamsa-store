@@ -18,7 +18,7 @@ export default function ProductsPanel() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/admin/all-products?t=' + Date.now());
+      const res = await fetch('/api/admin/all-products?t=' + Date.now(), { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } });
       const data = await res.json();
       const mapped = (Array.isArray(data) ? data : (data.rows || [])).map((p: any) => ({
         ...p,
@@ -33,7 +33,7 @@ export default function ProductsPanel() {
 
   useEffect(() => { 
     fetchProducts(); 
-    fetch('/api/categories').then(r => r.json()).then(data => setCategories(Array.isArray(data) ? data : [])).catch(console.error);
+    fetch('/api/categories', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } }).then(r => r.json()).then(data => setCategories(Array.isArray(data) ? data : [])).catch(console.error);
   }, []);
 
   const filteredAll = products.filter(p => p.name?.includes(search));

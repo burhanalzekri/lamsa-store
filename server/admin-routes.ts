@@ -1,9 +1,31 @@
+import jwt from 'jsonwebtoken';
 import express from "express";
 
 export function registerAdminRoutes(app: express.Express, getConn: () => Promise<any>) {
+  // Middleware: التحقق من أن المستخدم مدير
+  const requireAdmin = (req: any, res: any, next: any) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'مطلوب تسجيل الدخول' });
+      }
+      const token = authHeader.split(' ')[1];
+      const secret = process.env.JWT_SECRET || "lamsa_secret_2026";
+      const decoded: any = jwt.verify(token, secret);
+      
+      // نتحقق من الدور (admin) أو من بريد الأدمن
+      if (decoded.role !== 'admin' && decoded.email !== 'admin@lamsa.com') {
+        return res.status(403).json({ error: 'غير مصرح لك بالوصول' });
+      }
+      next();
+    } catch (err) {
+      return res.status(401).json({ error: 'رمز الدخول غير صالح' });
+    }
+  };
+
   // 1. جلب المنتجات
   
-  app.put("/api/admin/settings", express.json(), async (req, res) => {
+  app.put("/api/admin/settings", express.json(), requireAdmin, async (req, res) => {
     try {
       const { storeName, currency, phone, email, address, facebook, instagram } = req.body;
       const conn = await getConn();
@@ -29,7 +51,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   
   
   // إضافة فئة
-  app.post("/api/admin/categories/new", express.json(), async (req: any, res: any) => {
+  app.post("/api/admin/categories/new", express.json(), requireAdmin, async (req: any, res: any) => {
     try {
       const { name } = req.body;
       const conn = await getConn();
@@ -40,7 +62,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // تعديل فئة
-  app.put("/api/admin/categories/:id/update", express.json(), async (req: any, res: any) => {
+  app.put("/api/admin/categories/:id/update", express.json(), requireAdmin, async (req: any, res: any) => {
     try {
       const { name } = req.body;
       const conn = await getConn();
@@ -51,7 +73,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // حذف فئة
-  app.delete("/api/admin/categories/:id/delete", async (req: any, res: any) => {
+  app.delete("/api/admin/categories/:id/delete", requireAdmin, async (req: any, res: any) => {
     try {
       const conn = await getConn();
       await conn.execute("DELETE FROM categories WHERE id=?", [req.params.id]);
@@ -71,7 +93,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
 
   
   // تقارير حقيقية
-  app.get("/api/admin/reports", async (req: any, res: any) => {
+  app.get("/api/admin/reports", requireAdmin, async (req: any, res: any) => {
     try {
       const conn = await getConn();
       const days = Number(req.query.days) || 30;
@@ -228,7 +250,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
 
   
   // جلب كل الكوبونات
-  app.get("/api/admin/coupons", async (req: any, res: any) => {
+  app.get("/api/admin/coupons", requireAdmin, async (req: any, res: any) => {
     try {
       const conn = await getConn();
       const [rows]: any = await conn.query("SELECT * FROM coupons ORDER BY createdAt DESC");
@@ -238,7 +260,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // إضافة كوبون
-  app.post("/api/admin/coupons/new", express.json(), async (req: any, res: any) => {
+  app.post("/api/admin/coupons/new", express.json(), requireAdmin, async (req: any, res: any) => {
     try {
       const { code, discountPercent, active } = req.body;
       const conn = await getConn();
@@ -249,7 +271,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // تعديل كوبون
-  app.put("/api/admin/coupons/:id/update", express.json(), async (req: any, res: any) => {
+  app.put("/api/admin/coupons/:id/update", express.json(), requireAdmin, async (req: any, res: any) => {
     try {
       const { code, discountPercent, active } = req.body;
       const conn = await getConn();
@@ -260,7 +282,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // حذف كوبون
-  app.delete("/api/admin/coupons/:id/delete", async (req: any, res: any) => {
+  app.delete("/api/admin/coupons/:id/delete", requireAdmin, async (req: any, res: any) => {
     try {
       const conn = await getConn();
       await conn.execute("DELETE FROM coupons WHERE id=?", [req.params.id]);
@@ -270,7 +292,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // سجل استخدام الكوبونات (من الطلبات)
-  app.get("/api/admin/coupons/history", async (req: any, res: any) => {
+  app.get("/api/admin/coupons/history", requireAdmin, async (req: any, res: any) => {
     try {
       const conn = await getConn();
       const [rows]: any = await conn.query(`
@@ -294,7 +316,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // 2. إضافة منتج
-  app.post("/api/admin/products/new", express.json(), async (req, res) => {
+  app.post("/api/admin/products/new", express.json(), requireAdmin, async (req, res) => {
     try {
       const { name, price, compareAtPrice, stock, category, imageUrl, images, badge, description, material } = req.body;
       const id = "p_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
@@ -311,7 +333,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // 3. تعديل منتج
-  app.put("/api/admin/products/:id/update", express.json(), async (req, res) => {
+  app.put("/api/admin/products/:id/update", express.json(), requireAdmin, async (req, res) => {
     try {
       const { name, price, compareAtPrice, stock, category, imageUrl, images, badge, description, material } = req.body;
       const conn = await getConn();
@@ -327,7 +349,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // 4. حذف منتج
-  app.delete("/api/admin/products/:id/delete", async (req, res) => {
+  app.delete("/api/admin/products/:id/delete", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       await conn.execute("DELETE FROM store_products WHERE id=?", [req.params.id]);
@@ -337,7 +359,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // 5. جلب الطلبات
-  app.get("/api/admin/all-orders", async (req, res) => {
+  app.get("/api/admin/all-orders", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       const [rows]: any = await conn.query("SELECT * FROM store_orders ORDER BY createdAt DESC LIMIT 100");
@@ -347,7 +369,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // 6. تحديث حالة الطلب
-  app.put("/api/admin/orders/:id/status", express.json(), async (req, res) => {
+  app.put("/api/admin/orders/:id/status", express.json(), requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       await conn.execute("UPDATE store_orders SET status=? WHERE id=?", [req.body.status, req.params.id]);
@@ -357,7 +379,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // 7. جلب المستخدمين
-  app.get("/api/admin/all-users", async (req, res) => {
+  app.get("/api/admin/all-users", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       const [rows]: any = await conn.query("SELECT id, name, email, role, createdAt FROM users ORDER BY createdAt DESC");
@@ -367,7 +389,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // 8. الإحصائيات
-  app.get("/api/admin/stats-new", async (req, res) => {
+  app.get("/api/admin/stats-new", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       const [products]: any = await conn.query("SELECT COUNT(*) as c FROM store_products WHERE active=1");

@@ -15,8 +15,8 @@ export default function OverviewPanel({ setTab }: { setTab?: (t: any) => void })
 
   const fetchData = () => {
     Promise.all([
-      fetch('/api/admin/stats-new').then(r => r.json()),
-      fetch('/api/admin/all-orders').then(r => r.json()),
+      fetch('/api/admin/stats-new', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } }).then(r => r.json()),
+      fetch('/api/admin/all-orders', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } }).then(r => r.json()),
       fetch('/api/admin/reports?days=7').then(r => r.json()).catch(() => ({ dailySales: [] }))
     ]).then(([statsData, ordersData, reportsData]) => {
       setStats(statsData);

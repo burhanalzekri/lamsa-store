@@ -13,7 +13,7 @@ export default function OrdersPanel() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/all-orders');
+      const res = await fetch('/api/admin/all-orders', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } });
       const data = await res.json();
       setOrders(Array.isArray(data) ? data : (data.rows || []));
     } catch { toast.error("فشل جلب الطلبات"); } finally { setLoading(false); }

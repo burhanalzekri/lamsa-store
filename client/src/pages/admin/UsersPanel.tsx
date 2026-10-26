@@ -10,7 +10,7 @@ export default function UsersPanel() {
   const itemsPerPage = 50;
 
   useEffect(() => {
-    fetch('/api/admin/all-users').then(r => r.json()).then(d => { setUsers(Array.isArray(d) ? d : (d.rows || [])); setLoading(false); }).catch(() => { toast.error("فشل جلب المستخدمين"); setLoading(false); });
+    fetch('/api/admin/all-users', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } }).then(r => r.json()).then(d => { setUsers(Array.isArray(d) ? d : (d.rows || [])); setLoading(false); }).catch(() => { toast.error("فشل جلب المستخدمين"); setLoading(false); });
   }, []);
 
   const filteredAll = users.filter(u => !search || u.name?.includes(search) || u.email?.includes(search));
