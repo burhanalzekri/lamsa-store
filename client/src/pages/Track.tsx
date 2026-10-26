@@ -100,7 +100,7 @@ export default function Track() {
 
           <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
             <input required value={query} onChange={e => setQuery(e.target.value)} placeholder={searchType === 'id' ? "LMS-123456" : "05xxxxxxxx"} className="flex-grow border p-3 rounded-lg outline-none focus:border-[#482d39]" dir="ltr" />
-            <button disabled={loading} type="submit" className="bg-[#482d39] text-white px-6 rounded-lg font-bold hover:bg-[#654151] transition disabled:opacity-50">
+            <button disabled={loading} type="submit" className="bg-[#C9A84C] text-white px-6 rounded-lg font-bold hover:bg-[#b8952f] transition disabled:opacity-50">
               {loading ? '...' : 'بحث'}
             </button>
           </form>
@@ -131,11 +131,11 @@ export default function Track() {
                     <div className="p-6">
                       <div className="flex items-start justify-between relative mt-6">
                         <div className="absolute top-5 right-0 left-0 h-1 bg-gray-200 -z-0"></div>
-                        <div className="absolute top-5 right-0 h-1 bg-[#d93844] -z-0" style={{ width: `${(Math.max(0, currentStep) / (steps.length - 1)) * 100}%` }}></div>
+                        <div className="absolute top-5 right-0 h-1 bg-[#C9A84C] -z-0" style={{ width: `${(Math.max(0, currentStep) / (steps.length - 1)) * 100}%` }}></div>
                         
                         {steps.map((step, i) => (
                           <div key={step.key} className="relative z-10 flex flex-col items-center gap-2" style={{ width: '25%' }}>
-                            <div className={`w-11 h-11 rounded-full flex items-center justify-center border-4 border-white shadow-lg ${i <= currentStep ? 'bg-[#d93844] text-white scale-110' : 'bg-gray-200 text-gray-400'}`}>
+                            <div className={`w-11 h-11 rounded-full flex items-center justify-center border-4 border-white shadow-lg ${i <= currentStep ? 'bg-[#C9A84C] text-white scale-110' : 'bg-gray-200 text-gray-400'}`}>
                               {step.icon}
                             </div>
                             <span className={`text-[11px] font-bold text-center ${i <= currentStep ? 'text-[#34212a]' : 'text-gray-400'}`}>

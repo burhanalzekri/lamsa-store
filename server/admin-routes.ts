@@ -306,6 +306,22 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
     } catch (err: any) { res.status(500).json({ error: err.message }); }
   });
 
+  
+  // جلب طلبات المستخدم الحالي (حسب البريد أو الهاتف)
+  app.get("/api/my-orders", async (req: any, res: any) => {
+    try {
+      const email = req.query.email;
+      if (!email) return res.status(400).json({ error: "البريد مطلوب" });
+      const conn = await getConn();
+      const [rows]: any = await conn.query(
+        'SELECT * FROM store_orders WHERE customerEmail = ? ORDER BY createdAt DESC',
+        [email]
+      );
+      await conn.end();
+      res.json(Array.isArray(rows) ? rows : []);
+    } catch (err: any) { res.status(500).json({ error: err.message }); }
+  });
+
   app.get("/api/admin/all-products", async (req, res) => {
     try {
       const conn = await getConn();
