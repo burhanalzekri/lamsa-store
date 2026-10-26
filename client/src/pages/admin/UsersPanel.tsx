@@ -7,7 +7,7 @@ export default function UsersPanel() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 50;
 
   useEffect(() => {
     fetch('/api/admin/all-users').then(r => r.json()).then(d => { setUsers(Array.isArray(d) ? d : (d.rows || [])); setLoading(false); }).catch(() => { toast.error("فشل جلب المستخدمين"); setLoading(false); });
@@ -41,7 +41,7 @@ export default function UsersPanel() {
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[700px] overflow-y-auto border rounded-lg">
+      <div className="overflow-x-auto max-h-[calc(100vh-250px)] overflow-y-auto border rounded-lg">
         <table className="w-full text-right text-sm">
           <thead className="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm">
             <tr><th className="p-3">الاسم</th><th className="p-3">البريد</th><th className="p-3">الدور</th><th className="p-3">تاريخ التسجيل</th></tr>

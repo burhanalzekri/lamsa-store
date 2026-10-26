@@ -37,7 +37,7 @@ export default function ProductsPanel() {
   }, []);
 
   const filteredAll = products.filter(p => p.name?.includes(search));
-  const itemsPerPage = 20;
+  const itemsPerPage = 50;
   const totalPages = Math.ceil(filteredAll.length / itemsPerPage) || 1;
   const filtered = filteredAll.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
@@ -169,7 +169,7 @@ export default function ProductsPanel() {
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[700px] overflow-y-auto border rounded-lg">
+      <div className="overflow-x-auto max-h-[calc(100vh-250px)] overflow-y-auto border rounded-lg">
         <table className="w-full text-right text-sm">
           <thead className="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm">
             <tr><th className="p-2">المنتج</th><th className="p-2">السعر</th><th className="p-2">الشارة</th><th className="p-2">المخزون</th><th className="p-2">إجراء</th></tr>

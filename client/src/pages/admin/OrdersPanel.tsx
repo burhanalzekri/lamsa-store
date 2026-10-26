@@ -8,7 +8,7 @@ export default function OrdersPanel() {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [page, setPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 50;
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -67,7 +67,7 @@ export default function OrdersPanel() {
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[700px] overflow-y-auto border rounded-lg">
+      <div className="overflow-x-auto max-h-[calc(100vh-250px)] overflow-y-auto border rounded-lg">
         <table className="w-full text-right text-sm">
           <thead className="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm">
             <tr><th className="p-3">رقم الطلب</th><th className="p-3">العميل</th><th className="p-3">الهاتف</th><th className="p-3">الإجمالي</th><th className="p-3">الحالة</th><th className="p-3">تحديث</th></tr>

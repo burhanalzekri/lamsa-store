@@ -11,7 +11,7 @@ export default function CouponsPanel() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 50;
 
   const fetchData = async () => {
     setLoading(true);
@@ -103,7 +103,7 @@ export default function CouponsPanel() {
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[700px] overflow-y-auto border rounded-lg">
+      <div className="overflow-x-auto max-h-[calc(100vh-250px)] overflow-y-auto border rounded-lg">
         <table className="w-full text-right text-sm">
           <thead className="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm">
             {tab === 'active' ? (
