@@ -17,7 +17,7 @@ import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
-import { LogOut, Menu, X, ShoppingBag, Home as HomeIcon, Truck, User, LayoutDashboard, Search, Flame, Tag, Clock, Heart, Info, Bell } from "lucide-react";
+import { LogOut, Menu, X, ShoppingBag, Home as HomeIcon, Truck, User, LayoutDashboard, Search, Flame, Tag, Clock, Heart, Info, Bell, Sun, Moon } from "lucide-react";
 import LuxuryLogo from './components/LuxuryLogo';
 import Checkout from './pages/Checkout';
 
@@ -31,6 +31,18 @@ function AppContent() {
       return saved ? JSON.parse(saved) : null;
     } catch { return null; }
   });
+
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('lamsa-theme') === 'dark');
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('lamsa-theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('lamsa-theme', 'light');
+    }
+  }, [darkMode]);
+
   const [location, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
@@ -87,6 +99,9 @@ function AppContent() {
         <button onClick={() => setMenuOpen(true)} className="p-2 text-[#482d39]"><Menu size={24}/></button>
         <div className="cursor-pointer scale-90" onClick={() => setLocation('/')}><LuxuryLogo size="sm" /></div>
         <div className="flex items-center gap-1">
+          <button onClick={() => setDarkMode(!darkMode)} className="p-2 text-[#482d39] dark:text-[#C9A84C]" title="تبديل الوضع">
+            {darkMode ? <Sun size={22}/> : <Moon size={22}/>}
+          </button>
           <button onClick={() => setShowNotif(!showNotif)} className="relative p-2 text-[#482d39]">
             <Bell size={24} />
             {notifications.length > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">{notifications.length}</span>}

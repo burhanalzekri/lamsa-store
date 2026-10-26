@@ -745,3 +745,24 @@ button.bg-\[\#482d39\], button.bg-\[\#34212a\], button.bg-\[\#d93844\] {
   box-shadow: 0 8px 20px rgba(42, 26, 33, 0.4);
   background: linear-gradient(135deg, #2a1a21 0%, #482d39 100%);
 }
+
+@variant dark (&:where(.dark, .dark *));
+
+.dark, .dark body { background-color: #0f0f0f !important; color: #e5e5e5 !important; }
+.dark header, .dark nav, .dark .bg-white, .dark .bg-gray-50 { background-color: #1a1a1a !important; border-color: #2a2a2a !important; color: #e5e5e5 !important; }
+.dark .bg-\[\#FAF3E0\], .dark .bg-\[\#FDF6ED\] { background-color: #121212 !important; }
+.dark .bg-gray-100, .dark .bg-gray-200 { background-color: #2a2a2a !important; }
+.dark .text-\[\#2a1a21\], .dark .text-\[\#482d39\], .dark .text-\[\#34212a\], .dark .text-gray-700, .dark .text-gray-600, .dark .text-gray-800 { color: #e5e5e5 !important; }
+.dark .text-gray-500, .dark .text-gray-400 { color: #a0a0a0 !important; }
+.dark .border-gray-100, .dark .border-gray-200, .dark .border-gray-300 { border-color: #2a2a2a !important; }
+.dark input, .dark textarea, .dark select { background-color: #2a2a2a !important; color: #fff !important; border-color: #444 !important; }
+.dark .shadow-sm, .dark .shadow-md, .dark .shadow-lg { box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important; }
+.dark .luxury-banner { background: linear-gradient(135deg, #1f1f1f, #2a2a2a, #1f1f1f) !important; }
+.dark .luxury-footer { background: linear-gradient(180deg, #0a0a0a, #1a1a1a) !important; }
+.dark .luxury-footer a, .dark .luxury-footer p { color: #b0b0b0 !important; }
+.dark .luxury-footer a:hover { color: #C9A84C !important; }
+.dark .luxury-hero-slider { background: linear-gradient(135deg, #1a1a1a, #2a2a2a) !important; }
+.dark .luxury-hero-slider h1 { color: #fff !important; }
+.dark .luxury-hero-slider p { color: #b0b0b0 !important; }
+.dark .bg-red-50, .dark .bg-green-50, .dark .bg-blue-50, .dark .bg-purple-50 { background-color: #1a1a1a !important; }
+
