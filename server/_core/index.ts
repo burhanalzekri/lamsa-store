@@ -1,3 +1,4 @@
+import { v2 as cloudinary } from "cloudinary";
 import "dotenv/config";
 import { registerAdminRoutes } from "../admin-routes";
 import express from "express";
@@ -41,6 +42,12 @@ const requireAdmin = async (req: any, res: any, next: any) => {
     next();
   } catch (e) { res.status(401).json({ error: "جلسة منتهية" }); }
 };
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 async function startServer() {
   const app = express();
@@ -337,70 +344,28 @@ const uploadDir = path.resolve(process.cwd(), "client/public/uploads");
   }, express.static(uploadDir));
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, 'img-' + Date.now() + ext);
-  }
-});
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // مسار رفع الصورة
 app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
-  if (!req.file) return res.status(400).json({ error: "لم يتم استلام الملف" });
-  res.json({ url: "/uploads/" + req.file.filename });
-
-  // ==================== Product CRUD (REST) ====================
-  app.post("/api/products", async (req, res) => {
-    try {
-      const { name, category, description, imageUrl, price, costPrice, stock } = req.body;
-      const id = "p_" + Date.now().toString() + "_" + Math.floor(Math.random() * 1000);
-      const conn = await getConn();
-      await conn.execute(
-        `INSERT INTO store_products (id, name, category, description, imageUrl, priceHalalas, costHalalas, stock, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-        [id, name || 'بدون اسم', category || 'عام', description || null, imageUrl || null, Math.round(Number(price) || 0), Math.round(Number(costPrice) || 0), Number(stock) || 0]
-      );
-      await conn.end();
-      res.json({ id, success: true });
-    } catch (err: any) {
-      console.error("❌ POST /api/products error:", err);
-      res.status(500).json({ error: err.message });
-    }
+    if (!req.file) return res.status(400).json({ error: "لم يتم إرسال ملف" });
+    
+    // رفع الملف إلى Cloudinary من الذاكرة (بدون حفظ محلي)
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "lamsa-products" },
+      (error: any, result: any) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          return res.status(500).json({ error: "فشل رفع الصورة" });
+        }
+        res.json({ url: result.secure_url });
+      }
+    );
+    
+    // إرسال الملف إلى Cloudinary
+    uploadStream.end(req.file.buffer);
   });
-
-  app.put("/api/products/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { name, category, description, imageUrl, price, costPrice, stock } = req.body;
-      const conn = await getConn();
-      await conn.execute(
-        `UPDATE store_products SET name=?, category=?, description=?, imageUrl=?, priceHalalas=?, costHalalas=?, stock=? WHERE id=?`,
-        [name, category, description || null, imageUrl || null, Math.round(Number(price) || 0), Math.round(Number(costPrice) || 0), Number(stock) || 0, id]
-      );
-      await conn.end();
-      res.json({ success: true });
-    } catch (err: any) {
-      console.error("❌ PUT /api/products error:", err);
-      res.status(500).json({ error: err.message });
-    }
-  });
-
-  app.delete("/api/products/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const conn = await getConn();
-      await conn.execute("DELETE FROM store_products WHERE id=?", [id]);
-      await conn.end();
-      res.json({ success: true });
-    } catch (err: any) {
-      console.error("DELETE /api/products error:", err);
-      res.status(500).json({ error: err.message });
-    }
-  });
-  // ============================================================
-
-});
 
   
   // بيانات الرسم البياني (آخر 7 أيام)

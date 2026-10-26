@@ -146,8 +146,8 @@ export default function ProductsPanel() {
                     current.push(data.url);
                     setForm({...form, images: current.join(", ")});
                   }
-                  alert("✅ تم رفع الصورة");
-                } catch (err) { alert("❌ خطأ"); }
+                  toast.success("تم رفع الصورة بنجاح");
+                } catch (err) { toast.error("فشل رفع الصورة"); }
               }} />
               <label htmlFor="product-image-upload" className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm flex-1 text-center font-bold">📸 رفع صورة</label>
               {form.imageUrl && <img src={form.imageUrl} alt="معاينة" className="w-12 h-12 object-cover rounded border" />}
