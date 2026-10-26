@@ -19,6 +19,7 @@ import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import { LogOut, Menu, X, ShoppingBag, Home as HomeIcon, Truck, User, LayoutDashboard, Search, Flame, Tag, Clock, Heart, Info, Bell } from "lucide-react";
 import LuxuryLogo from './components/LuxuryLogo';
+import Checkout from './pages/Checkout';
 
 const Admin = lazy(() => import("./pages/Admin"));
 const CART_KEY = "lamsa-cart-v2";
@@ -219,6 +220,7 @@ function AppContent() {
         <Route path="/login"><Login onLogin={(u:any,t:string)=>{setUser(u);localStorage.setItem('lamsa_user',JSON.stringify(u));localStorage.setItem('lamsa_token',t);setLocation(u?.role === 'admin' || u?.email === 'admin@lamsa.com' ? '/admin' : '/');}} goToRegister={() => setLocation('/register')} /></Route>
         <Route path="/register"><Register onLogin={(u:any,t:string)=>{setUser(u);localStorage.setItem('lamsa_user',JSON.stringify(u));localStorage.setItem('lamsa_token',t);setLocation('/');}} goToLogin={() => setLocation('/login')} /></Route>
         <Route path="/cart" component={Cart} />
+        <Route path="/checkout" component={Checkout} />
         <Route path="/thank-you" component={ThankYou} />
         <Route path="/product/:id" component={ProductDetails} />
         <Route path="/track" component={Track} />
