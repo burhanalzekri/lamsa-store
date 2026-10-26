@@ -181,36 +181,46 @@ async function startServer() {
   app.post("/api/orders", async (req, res) => {
     try {
       const { customerName, phone, address, items, totalAmount, customerEmail } = req.body;
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ error: "لا توجد منتجات في الطلب" });
+      }
+
       const conn = await getConn();
       const id = 'LMS-' + Date.now().toString().slice(-6);
 
-      console.log('🛒 [ORDER] Creating order:', { customerName, phone, itemsCount: items?.length, totalAmount });
-      console.log('🛒 [ORDER] Items:', JSON.stringify(items));
+      // 1. التحقق من المخزون أولاً
+      for (const item of items) {
+        if (!item.id) continue;
+        const [rows]: any = await conn.execute('SELECT name, stock FROM store_products WHERE id = ?', [item.id]);
+        const product = rows[0];
+        
+        if (!product) {
+          await conn.end();
+          return res.status(400).json({ error: `المنتج ${item.name} غير موجود` });
+        }
+        
+        if (product.stock < item.quantity) {
+          await conn.end();
+          return res.status(400).json({ 
+            error: `عذراً، "${product.name}" غير متوفر بالكمية المطلوبة. المتوفر: ${product.stock} قطعة فقط.` 
+          });
+        }
+      }
 
-      // حفظ الطلب
+      // 2. حفظ الطلب
       await conn.execute(
         'INSERT INTO store_orders (id, orderNumber, userId, customerName, phone, address, city, items, totalAmount, subtotalHalalas, totalHalalas, customerEmail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [id, id, null, customerName, phone, address, null, JSON.stringify(items), totalAmount, 0, totalAmount * 100, customerEmail || null]
       );
-      console.log('✅ [ORDER] Order saved:', id);
 
-      // خصم المخزون
-      if (items && Array.isArray(items)) {
-        for (const item of items) {
-          if (!item.id) continue;
-          const [before] = await conn.execute('SELECT name, stock FROM store_products WHERE id = ?', [item.id]);
-          const beforeRow = Array.isArray(before) ? before[0] : null;
-          console.log(`📦 [STOCK] Before: ${item.name || beforeRow?.name} | Qty: ${item.quantity} | Stock: ${beforeRow?.stock}`);
-          
-          await conn.execute(
-            'UPDATE store_products SET stock = GREATEST(0, stock - ?) WHERE id = ?', 
-            [item.quantity || 1, item.id]
-          );
-          
-          const [after] = await conn.execute('SELECT name, stock FROM store_products WHERE id = ?', [item.id]);
-          const afterRow = Array.isArray(after) ? after[0] : null;
-          console.log(`📦 [STOCK] After: ${afterRow?.name} | New Stock: ${afterRow?.stock}`);
-        }
+      // 3. خصم المخزون
+      for (const item of items) {
+        if (!item.id) continue;
+        await conn.execute(
+          'UPDATE store_products SET stock = GREATEST(0, stock - ?) WHERE id = ?', 
+          [item.quantity || 1, item.id]
+        );
+        console.log(`📦 [STOCK] خصم ${item.quantity} من ${item.name} (ID: ${item.id})`);
       }
 
       await conn.end();

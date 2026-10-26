@@ -110,6 +110,7 @@ export default function ProductDetails() {
 
   const sizes = ["S", "M", "L", "XL"];
   const colors = ["أحمر", "أسود", "أبيض"];
+  const stock = product.stock || 0;
   const avgRating = reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : (product.rating || 4.5);
 
   return (
@@ -179,6 +180,16 @@ export default function ProductDetails() {
               )}
             </div>
 
+            {stock === 0 && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm font-bold">
+                ❌ نفد المخزون - غير متوفر حالياً
+              </div>
+            )}
+            {stock > 0 && stock <= 5 && (
+              <div className="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-2 rounded-lg mb-4 text-sm font-bold">
+                ⚠️ باقي {stock} قطع فقط!
+              </div>
+            )}
             <p className="text-gray-600 leading-relaxed mb-6">{product.description}</p>
 
             <div className="grid grid-cols-2 gap-4 mb-6 p-3 bg-[#FAF3E0] rounded-lg border border-[#F0E6D2] text-xs">
