@@ -327,6 +327,11 @@ async function startServer() {
   
 // إعداد رفع الصور
 const uploadDir = path.resolve(process.cwd(), "client/public/uploads");
+  app.use("/uploads", (req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  }, express.static(uploadDir));
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({
@@ -342,6 +347,56 @@ const upload = multer({ storage });
 app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
   if (!req.file) return res.status(400).json({ error: "لم يتم استلام الملف" });
   res.json({ url: "/uploads/" + req.file.filename });
+
+  // ==================== Product CRUD (REST) ====================
+  app.post("/api/products", async (req, res) => {
+    try {
+      const { name, category, description, imageUrl, price, costPrice, stock } = req.body;
+      const id = "p_" + Date.now().toString() + "_" + Math.floor(Math.random() * 1000);
+      const conn = await getConn();
+      await conn.execute(
+        `INSERT INTO store_products (id, name, category, description, imageUrl, priceHalalas, costHalalas, stock, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+        [id, name || 'بدون اسم', category || 'عام', description || null, imageUrl || null, Math.round(Number(price) || 0), Math.round(Number(costPrice) || 0), Number(stock) || 0]
+      );
+      await conn.end();
+      res.json({ id, success: true });
+    } catch (err: any) {
+      console.error("❌ POST /api/products error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.put("/api/products/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, category, description, imageUrl, price, costPrice, stock } = req.body;
+      const conn = await getConn();
+      await conn.execute(
+        `UPDATE store_products SET name=?, category=?, description=?, imageUrl=?, priceHalalas=?, costHalalas=?, stock=? WHERE id=?`,
+        [name, category, description || null, imageUrl || null, Math.round(Number(price) || 0), Math.round(Number(costPrice) || 0), Number(stock) || 0, id]
+      );
+      await conn.end();
+      res.json({ success: true });
+    } catch (err: any) {
+      console.error("❌ PUT /api/products error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.delete("/api/products/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const conn = await getConn();
+      await conn.execute("DELETE FROM store_products WHERE id=?", [id]);
+      await conn.end();
+      res.json({ success: true });
+    } catch (err: any) {
+      console.error("DELETE /api/products error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+  // ============================================================
+
 });
 
   

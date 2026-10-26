@@ -6,7 +6,7 @@ export default function ProductsPanel() {
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [isAdding, setIsAdding] = useState(false);
-  const [form, setForm] = useState({ name: '', price: '', costPrice: '', category: 'فساتين', image: '', description: '', stock: '10' });
+  const [form, setForm] = useState({ name: '', price: '', costPrice: '', category: 'فساتين', imageUrl: '', description: '', stock: '10' });
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchProducts = async () => {
@@ -23,16 +23,45 @@ export default function ProductsPanel() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('lamsa_token');
-      // نستخدم مسار إضافة منتج (يفترض وجوده في الخادم)
-      const res = await fetch('/api/products', { 
-        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, 
-        body: JSON.stringify({ ...form, price: Number(form.price), costPrice: Number(form.costPrice), stock: Number(form.stock) }) 
+      const isEditing = !!editingId;
+      const url = isEditing ? `/api/products/${editingId}` : '/api/products';
+      const method = isEditing ? 'PUT' : 'POST';
+      
+      const payload = {
+        name: form.name,
+        category: form.category,
+        description: form.description,
+        imageUrl: form.imageUrl,
+        price: Number(form.price),
+        costPrice: Number(form.costPrice || 0),
+        stock: Number(form.stock || 0)
+      };
+
+      const res = await fetch(url, {
+        method: method, 
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload)
       });
+      
       if (res.ok) {
-        toast.success("تمت إضافة المنتج");
-        setIsAdding(false); fetchProducts();
-      } else { toast.error("فشل الحفظ"); }
-    } catch (e) { toast.error("خطأ في الاتصال"); }
+        toast.success(isEditing ? "تم تعديل المنتج" : "تمت إضافة المنتج");
+        setIsAdding(false); setEditingId(null); 
+        setForm({ name: '', price: '', costPrice: '', category: 'فساتين', imageUrl: '', description: '', stock: '10' });
+        
+        // تحديث فوري للجدول بالبيانات الجديدة
+        if (isEditing) {
+           setProducts(prev => prev.map(p => p.id === editingId ? { ...p, ...payload, price: payload.price } : p));
+        } else {
+           await fetchProducts(); // إذا كانت إضافة، نجلب القائمة كاملة
+        }
+      } else { 
+        const err = await res.json().catch(() => ({}));
+        toast.error("فشل الحفظ: " + (err.error || "خطأ في الخادم")); 
+      }
+    } catch (e) { 
+      toast.error("خطأ في الاتصال"); 
+      console.error(e);
+    }
   };
 
   
@@ -42,7 +71,7 @@ export default function ProductsPanel() {
       price: String(product.price),
       costPrice: String(product.costPrice || ''),
       category: product.category,
-      image: product.image || '',
+      imageUrl: product.imageUrl || product.image || '',
       description: product.description || '',
       stock: String(product.stock || '0')
     });
@@ -80,7 +109,7 @@ const handleDelete = async (id: string) => {
             <option value="فساتين">فساتين</option><option value="عبايات">عبايات</option><option value="حقائب">حقائب</option><option value="أحذية">أحذية</option>
           </select>
           <div className="flex flex-col gap-2 col-span-full">
-  <input placeholder="رابط الصورة" value={form.image} onChange={e=>setForm({...form, image: e.target.value})} className="border p-2 rounded" dir="ltr" />
+  <input placeholder="رابط الصورة" value={form.imageUrl} onChange={e=>setForm({...form, imageUrl: e.target.value})} className="border p-2 rounded" dir="ltr" />
   <div className="flex gap-2 items-center">
     <input
       type="file"
@@ -96,7 +125,7 @@ const handleDelete = async (id: string) => {
           const res = await fetch("/api/upload", { method: "POST", body: formData });
           if (!res.ok) throw new Error("فشل رفع الصورة");
           const data = await res.json();
-          setForm({...form, image: data.url});
+          setForm({...form, imageUrl: data.url});
           alert("✅ تم رفع الصورة بنجاح");
         } catch (err) {
           alert("❌ حدث خطأ أثناء رفع الصورة");
@@ -107,8 +136,8 @@ const handleDelete = async (id: string) => {
     <label htmlFor="product-image-upload" className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm flex-1 text-center font-bold">
       📸 رفع صورة من الجهاز
     </label>
-    {form.image && (
-      <img src={form.image} alt="معاينة" className="w-12 h-12 object-cover rounded border" />
+    {form.imageUrl && (
+      <img src={form.imageUrl + (form.imageUrl.includes("?") ? "&" : "?") + "t=" + Date.now()} alt="معاينة" className="w-12 h-12 object-cover rounded border" />
     )}
   </div>
 </div>
@@ -126,7 +155,7 @@ const handleDelete = async (id: string) => {
           <tbody>
             {filtered.map(p => (
               <tr key={p.id} className="border-b">
-                <td className="p-2 flex items-center gap-2"><img src={p.image} className="w-8 h-10 object-cover rounded"/>{p.name}</td>
+                <td className="p-2 flex items-center gap-2"><img src={p.image + (p.image.includes("?") ? "&" : "?") + "t=" + Date.now()} className="w-8 h-10 object-cover rounded"/>{p.name}</td>
                 <td className="p-2">{p.price} ر.ي</td>
                 <td className="p-2">{p.stock || 0}</td>
                 <td className="p-2">{p.category}</td>
