@@ -115,3 +115,9 @@ client/public/__manus__/version.json
 # Uploads (ignore images, keep folder)
 client/public/uploads/*
 !client/public/uploads/.gitkeep
+
+# Sensitive files
+*.sql
+*.cjs
+test_*.js
+test_*.cjs
