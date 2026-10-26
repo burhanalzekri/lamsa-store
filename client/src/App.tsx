@@ -1,5 +1,4 @@
 import { lazy, Suspense, useState, useEffect } from "react";
-import AdminNew from "./pages/AdminNew";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -226,8 +225,7 @@ function AppContent() {
         <Route path="/profile" component={Profile} />
         <Route path="/about" component={About} />
         <Route path="/faq" component={FAQ} />
-        <Route path="/admin-new" component={AdminNew} />
-      <Route path="/admin">
+              <Route path="/admin">
           {() => {
             if (!user) { setLocation('/login'); return null; }
             if (user.role !== 'admin') return <div className="p-10 text-center font-bold text-red-600" dir="rtl">⛔ غير مصرح لك بالدخول إلى لوحة الإدارة.</div>;
