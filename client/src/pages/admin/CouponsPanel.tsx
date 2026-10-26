@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit, Check, X, Tag, History, Printer, Download, Search } from 'lucide-react';
+import { Plus, Trash2, Edit, Check, X, Search, Printer, Download } from 'lucide-react';
 import { toast } from 'sonner';
+import ConfirmModal from '../../components/ConfirmModal';
 
 export default function CouponsPanel() {
   const [coupons, setCoupons] = useState<any[]>([]);
@@ -11,14 +12,16 @@ export default function CouponsPanel() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [confirmState, setConfirmState] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
   const itemsPerPage = 50;
 
   const fetchData = async () => {
     setLoading(true);
     try {
+      const headers = { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` };
       const [cRes, hRes] = await Promise.all([
-        fetch('/api/admin/coupons', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } }).then(r => r.json()),
-        fetch('/api/admin/coupons/history', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } }).then(r => r.json())
+        fetch('/api/admin/coupons', { headers }).then(r => r.json()),
+        fetch('/api/admin/coupons/history', { headers }).then(r => r.json())
       ]);
       setCoupons(Array.isArray(cRes) ? cRes : []);
       setHistory(Array.isArray(hRes) ? hRes : []);
@@ -31,9 +34,10 @@ export default function CouponsPanel() {
     e.preventDefault();
     if (!form.code || !form.discountPercent) return toast.error("الكود ونسبة الخصم مطلوبان");
     try {
+      const token = localStorage.getItem('lamsa_token');
       const url = editingId ? `/api/admin/coupons/${editingId}/update` : '/api/admin/coupons/new';
       const method = editingId ? 'PUT' : 'POST';
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, discountPercent: Number(form.discountPercent) }) });
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ ...form, discountPercent: Number(form.discountPercent) }) });
       if (res.ok) {
         toast.success(editingId ? "تم التعديل" : "تمت الإضافة");
         setForm({ code: '', discountPercent: '', active: true }); setEditingId(null); fetchData();
@@ -43,12 +47,17 @@ export default function CouponsPanel() {
 
   const handleEdit = (c: any) => { setForm({ code: c.code, discountPercent: String(c.discountPercent), active: c.active === 1 }); setEditingId(c.id); };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('تأكيد الحذف؟')) return;
-    try {
-      const res = await fetch(`/api/admin/coupons/${id}/delete`, { method: 'DELETE' });
-      if (res.ok) { toast.success("تم الحذف"); fetchData(); } else { toast.error("فشل الحذف"); }
-    } catch { toast.error("خطأ"); }
+  const handleDeleteClick = (id: number) => {
+    setConfirmState({
+      isOpen: true, message: 'هل أنت متأكد من حذف هذا الكوبون؟',
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('lamsa_token');
+          const res = await fetch(`/api/admin/coupons/${id}/delete`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+          if (res.ok) { toast.success("تم الحذف"); fetchData(); } else { toast.error("فشل الحذف"); }
+        } catch { toast.error("خطأ"); }
+      }
+    });
   };
 
   const filteredAll = tab === 'active' 
@@ -118,7 +127,7 @@ export default function CouponsPanel() {
                 <td className="p-3 font-mono font-bold text-[#482d39]">{c.code}</td>
                 <td className="p-3 text-green-600 font-bold">{c.discountPercent}%</td>
                 <td className="p-3"><span className={`px-2 py-1 rounded text-xs font-bold ${c.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{c.active ? 'نشط' : 'معطل'}</span></td>
-                <td className="p-3 flex gap-2"><button onClick={() => handleEdit(c)} className="text-blue-500 p-1"><Edit size={16}/></button><button onClick={() => handleDelete(c.id)} className="text-red-500 p-1"><Trash2 size={16}/></button></td>
+                <td className="p-3 flex gap-2"><button onClick={() => handleEdit(c)} className="text-blue-500 p-1"><Edit size={16}/></button><button onClick={() => handleDeleteClick(c.id)} className="text-red-500 p-1"><Trash2 size={16}/></button></td>
               </tr>
             )) : filtered.map((h: any) => (
               <tr key={h.id} className="border-t hover:bg-gray-50">
@@ -141,6 +150,13 @@ export default function CouponsPanel() {
           <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">التالي</button>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        message={confirmState.message}
+        onConfirm={() => { confirmState.onConfirm(); setConfirmState({...confirmState, isOpen: false}); }}
+        onCancel={() => setConfirmState({...confirmState, isOpen: false})}
+      />
     </div>
   );
 }

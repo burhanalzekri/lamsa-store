@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Package, Trash2, Plus, Search, Edit, Printer, Download } from "lucide-react";
 import { toast } from 'sonner';
 import { useSettings } from '../../hooks/useSettings';
+import ConfirmModal from '../../components/ConfirmModal';
 
 export default function ProductsPanel() {
   const { currency } = useSettings();
@@ -9,23 +10,19 @@ export default function ProductsPanel() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
-  const [form, setForm] = useState({ 
-    name: '', price: '', compareAtPrice: '', costPrice: '', category: 'فساتين', 
-    imageUrl: '', images: '', badge: '', material: '', description: '', stock: '10' 
-  });
+  const [form, setForm] = useState({ name: '', price: '', compareAtPrice: '', costPrice: '', category: 'فساتين', imageUrl: '', images: '', badge: '', material: '', description: '', stock: '10' });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
+  const [confirmState, setConfirmState] = useState<{isOpen: boolean, id: string, message: string, onConfirm: () => void}>({isOpen: false, id: '', message: '', onConfirm: () => {}});
 
   const fetchProducts = async () => {
     try {
       const res = await fetch('/api/admin/all-products?t=' + Date.now(), { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } });
       const data = await res.json();
       const mapped = (Array.isArray(data) ? data : (data.rows || [])).map((p: any) => ({
-        ...p,
-        price: p.priceHalalas ? p.priceHalalas / 100 : (p.price || 0),
+        ...p, price: p.priceHalalas ? p.priceHalalas / 100 : (p.price || 0),
         compareAtPrice: p.compareAtHalalas ? p.compareAtHalalas / 100 : 0,
-        image: p.imageUrl || p.image || '',
-        stock: p.stock || 0
+        image: p.imageUrl || p.image || '', stock: p.stock || 0
       }));
       setProducts(mapped);
     } catch (e) { toast.error("فشل جلب المنتجات"); }
@@ -49,15 +46,11 @@ export default function ProductsPanel() {
       const url = isEditing ? `/api/admin/products/${editingId}/update` : '/api/admin/products/new';
       const method = isEditing ? 'PUT' : 'POST';
       const payload = {
-        name: form.name, category: form.category, description: form.description,
-        imageUrl: form.imageUrl, images: form.images, price: Number(form.price),
-        compareAtPrice: Number(form.compareAtPrice || 0), costPrice: Number(form.costPrice || 0),
-        stock: Number(form.stock || 0), badge: form.badge, material: form.material
+        name: form.name, category: form.category, description: form.description, imageUrl: form.imageUrl,
+        images: form.images, price: Number(form.price), compareAtPrice: Number(form.compareAtPrice || 0),
+        costPrice: Number(form.costPrice || 0), stock: Number(form.stock || 0), badge: form.badge, material: form.material
       };
-      const res = await fetch(url, {
-        method: method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(payload)
-      });
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) });
       if (res.ok) {
         toast.success(isEditing ? "تم تعديل المنتج" : "تمت إضافة المنتج");
         setIsAdding(false); setEditingId(null);
@@ -81,14 +74,20 @@ export default function ProductsPanel() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDelete = async (id: string) => {
-    if(!confirm('هل أنت متأكد من الحذف؟')) return;
-    setProducts(prev => prev.filter(p => p.id !== id));
-    try {
-      const res = await fetch(`/api/admin/products/${id}/delete`, { method: 'DELETE' });
-      if (res.ok) { toast.success("تم الحذف"); }
-      else { toast.error("فشل الحذف"); fetchProducts(); }
-    } catch (e) { toast.error("خطأ"); fetchProducts(); }
+  const handleDeleteClick = (id: string) => {
+    setConfirmState({
+      isOpen: true, id,
+      message: 'هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.',
+      onConfirm: async () => {
+        setProducts(prev => prev.filter(p => p.id !== id));
+        try {
+          const token = localStorage.getItem('lamsa_token');
+          const res = await fetch(`/api/admin/products/${id}/delete`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+          if (res.ok) { toast.success("تم الحذف"); }
+          else { toast.error("فشل الحذف"); fetchProducts(); }
+        } catch (e) { toast.error("خطأ"); fetchProducts(); }
+      }
+    });
   };
 
   const exportCSV = () => {
@@ -97,8 +96,6 @@ export default function ProductsPanel() {
     const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "products.csv"; link.click();
   };
-
-  const handlePrint = () => window.print();
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -122,11 +119,7 @@ export default function ProductsPanel() {
             {categories.map((c: any) => <option key={c.id} value={c.name}>{c.name}</option>)}
           </select>
           <select value={form.badge} onChange={e=>setForm({...form, badge: e.target.value})} className="border p-2 rounded">
-            <option value="">بدون شارة</option>
-            <option value="جديد">جديد</option>
-            <option value="الأكثر مبيعاً">الأكثر مبيعاً</option>
-            <option value="خصم خاص">خصم خاص</option>
-            <option value="مميز">مميز</option>
+            <option value="">بدون شارة</option><option value="جديد">جديد</option><option value="الأكثر مبيعاً">الأكثر مبيعاً</option><option value="خصم خاص">خصم خاص</option><option value="مميز">مميز</option>
           </select>
           <input placeholder="نوع القماش (اختياري)" value={form.material} onChange={e=>setForm({...form, material: e.target.value})} className="border p-2 rounded" />
           <div className="flex flex-col gap-2 col-span-full">
@@ -164,7 +157,7 @@ export default function ProductsPanel() {
       <div className="flex justify-between items-center mb-4">
         <input placeholder="ابحث..." value={search} onChange={e=>{setSearch(e.target.value); setPage(1);}} className="w-full md:w-1/3 border p-2 rounded" />
         <div className="flex gap-2">
-          <button onClick={handlePrint} className="bg-white border text-gray-700 px-3 py-1.5 rounded text-sm hover:bg-gray-50 flex items-center gap-1"><Printer size={14}/> طباعة</button>
+          <button onClick={() => window.print()} className="bg-white border text-gray-700 px-3 py-1.5 rounded text-sm hover:bg-gray-50 flex items-center gap-1"><Printer size={14}/> طباعة</button>
           <button onClick={exportCSV} className="bg-white border text-gray-700 px-3 py-1.5 rounded text-sm hover:bg-gray-50 flex items-center gap-1"><Download size={14}/> Excel</button>
         </div>
       </div>
@@ -188,7 +181,7 @@ export default function ProductsPanel() {
                 <td className="p-2"><span className={`px-2 py-1 rounded text-xs font-bold ${p.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{p.stock}</span></td>
                 <td className="p-2 flex gap-2">
                   <button onClick={() => handleEdit(p)} className="text-blue-500 p-1"><Edit size={16}/></button>
-                  <button onClick={() => handleDelete(p.id)} className="text-red-500 p-1"><Trash2 size={16}/></button>
+                  <button onClick={() => handleDeleteClick(p.id)} className="text-red-500 p-1"><Trash2 size={16}/></button>
                 </td>
               </tr>
             ))}
@@ -197,7 +190,6 @@ export default function ProductsPanel() {
         </table>
       </div>
 
-      {/* الترقيم */}
       <div className="flex justify-between items-center mt-4">
         <span className="text-sm text-gray-500">عرض {filtered.length} من {filteredAll.length} منتج</span>
         <div className="flex gap-1">
@@ -206,6 +198,14 @@ export default function ProductsPanel() {
           <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">التالي</button>
         </div>
       </div>
+
+      {/* نافذة التأكيد المخصصة */}
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        message={confirmState.message}
+        onConfirm={() => { confirmState.onConfirm(); setConfirmState({...confirmState, isOpen: false}); }}
+        onCancel={() => setConfirmState({...confirmState, isOpen: false})}
+      />
     </div>
   );
 }

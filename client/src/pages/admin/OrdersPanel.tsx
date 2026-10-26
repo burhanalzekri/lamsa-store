@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Printer, Download, Search } from 'lucide-react';
+import ConfirmModal from '../../components/ConfirmModal';
 
 export default function OrdersPanel() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -8,6 +9,7 @@ export default function OrdersPanel() {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [page, setPage] = useState(1);
+  const [confirmState, setConfirmState] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
   const itemsPerPage = 50;
 
   const fetchOrders = async () => {
@@ -21,12 +23,23 @@ export default function OrdersPanel() {
 
   useEffect(() => { fetchOrders(); }, []);
 
-  const updateStatus = async (id: string, status: string) => {
-    try {
-      await fetch(`/api/admin/orders/${id}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
-      toast.success("تم تحديث الحالة");
-      setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-    } catch { toast.error("فشل التحديث"); }
+  const handleUpdateStatus = (id: string, status: string) => {
+    setConfirmState({
+      isOpen: true,
+      message: `هل تريد تغيير حالة الطلب إلى "${statusLabel[status]}"؟`,
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('lamsa_token');
+          await fetch(`/api/admin/orders/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ status })
+          });
+          toast.success("تم تحديث الحالة");
+          setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+        } catch { toast.error("فشل التحديث"); }
+      }
+    });
   };
 
   const filteredAll = orders.filter(o => {
@@ -81,7 +94,7 @@ export default function OrdersPanel() {
                 <td className="p-3 font-bold">{Number(o.totalAmount).toLocaleString()} ر.ي</td>
                 <td className="p-3"><span className={`px-2 py-1 rounded text-xs font-bold ${statusColor[o.status] || 'bg-gray-100'}`}>{statusLabel[o.status] || o.status}</span></td>
                 <td className="p-3">
-                  <select value={o.status || 'pending'} onChange={e => updateStatus(o.id, e.target.value)} className="border p-1 rounded text-xs">
+                  <select value={o.status || 'pending'} onChange={e => handleUpdateStatus(o.id, e.target.value)} className="border p-1 rounded text-xs">
                     <option value="pending">قيد الانتظار</option><option value="processing">قيد التجهيز</option><option value="shipped">تم الشحن</option><option value="completed">مكتمل</option><option value="cancelled">ملغي</option>
                   </select>
                 </td>
@@ -100,6 +113,13 @@ export default function OrdersPanel() {
           <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">التالي</button>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        message={confirmState.message}
+        onConfirm={() => { confirmState.onConfirm(); setConfirmState({...confirmState, isOpen: false}); }}
+        onCancel={() => setConfirmState({...confirmState, isOpen: false})}
+      />
     </div>
   );
 }

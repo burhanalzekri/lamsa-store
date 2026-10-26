@@ -10,7 +10,10 @@ export default function UsersPanel() {
   const itemsPerPage = 50;
 
   useEffect(() => {
-    fetch('/api/admin/all-users', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } }).then(r => r.json()).then(d => { setUsers(Array.isArray(d) ? d : (d.rows || [])); setLoading(false); }).catch(() => { toast.error("فشل جلب المستخدمين"); setLoading(false); });
+    fetch('/api/admin/all-users', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } })
+      .then(r => r.json())
+      .then(d => { setUsers(Array.isArray(d) ? d : (d.rows || [])); setLoading(false); })
+      .catch(() => { toast.error("فشل جلب المستخدمين"); setLoading(false); });
   }, []);
 
   const filteredAll = users.filter(u => !search || u.name?.includes(search) || u.email?.includes(search));
@@ -51,11 +54,7 @@ export default function UsersPanel() {
               <tr key={u.id} className="border-t hover:bg-gray-50">
                 <td className="p-3 font-medium">{u.name}</td>
                 <td className="p-3 text-xs" dir="ltr">{u.email}</td>
-                <td className="p-3">
-                  <span className={`px-2 py-1 rounded text-xs font-bold ${u.role === 'admin' ? 'bg-[#C9A84C] text-white' : 'bg-gray-100 text-gray-700'}`}>
-                    {u.role === 'admin' ? 'مدير' : 'عميل'}
-                  </span>
-                </td>
+                <td className="p-3"><span className={`px-2 py-1 rounded text-xs font-bold ${u.role === 'admin' ? 'bg-[#C9A84C] text-white' : 'bg-gray-100 text-gray-700'}`}>{u.role === 'admin' ? 'مدير' : 'عميل'}</span></td>
                 <td className="p-3 text-xs text-gray-500">{new Date(u.createdAt).toLocaleDateString('ar')}</td>
               </tr>
             ))}
