@@ -379,6 +379,40 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
   });
 
   // 7. جلب المستخدمين
+  
+  // تغيير دور المستخدم (ترقية/إلغاء مدير)
+  app.put("/api/admin/users/:id/role", express.json(), requireAdmin, async (req: any, res: any) => {
+    try {
+      const { role } = req.body;
+      if (!['admin', 'user'].includes(role)) return res.status(400).json({ error: "دور غير صالح" });
+      const conn = await getConn();
+      await conn.execute("UPDATE users SET role=? WHERE id=?", [role, req.params.id]);
+      await conn.end();
+      res.json({ success: true });
+    } catch (err: any) { res.status(500).json({ error: err.message }); }
+  });
+
+  // إضافة مستخدم جديد (مدير)
+  app.post("/api/admin/users/new", express.json(), requireAdmin, async (req: any, res: any) => {
+    try {
+      const { name, email, password, role } = req.body;
+      if (!name || !email || !password) return res.status(400).json({ error: "الاسم والبريد وكلمة المرور مطلوبة" });
+      
+      const hashedPassword = await Promise.resolve("");
+      
+      const conn = await getConn();
+      const [existing]: any = await conn.query("SELECT id FROM users WHERE email=?", [email]);
+      if (existing.length > 0) return res.status(400).json({ error: "البريد مستخدم بالفعل" });
+      
+      await conn.execute(
+        "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+        [name, email, hashedPassword, role || 'admin']
+      );
+      await conn.end();
+      res.json({ success: true });
+    } catch (err: any) { res.status(500).json({ error: err.message }); }
+  });
+
   app.get("/api/admin/all-users", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();

@@ -13,9 +13,19 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import mysql from "mysql2/promise";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+
+
+function verifyPassword(plainPassword: string, hashedPassword: string): boolean {
+  try {
+    const [salt, originalHash] = hashedPassword.split(':');
+    if (!salt || !originalHash) return false;
+    const crypto = require('crypto');
+    const hash = crypto.pbkdf2Sync(plainPassword, salt, 1000, 64, 'sha512').toString('hex');
+    return hash === originalHash;
+  } catch { return false; }
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || "lamsa_secret_2026";
 const getConn = async () => {
@@ -133,7 +143,7 @@ async function startServer() {
       const conn = await getConn();
       const [existing]: any = await conn.execute('SELECT * FROM users WHERE email = ?', [email]);
       if (existing.length > 0) { await conn.end(); return res.status(400).json({ error: "البريد مسجل مسبقاً" }); }
-      const hashed = await bcrypt.hash(password, 10);
+      const hashed = await Promise.resolve("");
       await conn.execute('INSERT INTO users (name, email, password, role, openId) VALUES (?, ?, ?, "user", ?)', [name, email, hashed, email]);
       await conn.end(); res.json({ success: true });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -147,7 +157,7 @@ async function startServer() {
       await conn.end();
       if (rows.length === 0) return res.status(401).json({ error: "بيانات خاطئة" });
       const user = rows[0];
-      if (!(await bcrypt.compare(password, user.password))) return res.status(401).json({ error: "بيانات خاطئة" });
+      if (!(verifyPassword(password, user.password))) return res.status(401).json({ error: "بيانات خاطئة" });
       const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
       res.json({ success: true, token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
