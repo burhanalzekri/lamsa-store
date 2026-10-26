@@ -29,13 +29,13 @@ export default function HeroSlider({ products }: { products: any[] }) {
   const current = sliderProducts[index];
 
   return (
-    <section className="bg-gradient-to-br from-[#FDF6ED] to-[#f4ece1] rounded-3xl shadow-lg my-6 overflow-hidden grid md:grid-cols-2 gap-0 relative border border-[#f0e6d8]">
+    <section className="luxury-hero-slider bg-gradient-to-br from-[#FDF6ED] to-[#f4ece1] rounded-3xl my-6 overflow-hidden grid md:grid-cols-2 gap-0 relative border border-[#e0d0b8]">
       {/* النصوص */}
       <div className="order-2 md:order-1 p-8 md:p-12 flex flex-col justify-center z-10">
         <span className="inline-flex items-center gap-1 bg-[#d93844] text-white text-xs px-3 py-1 rounded-full mb-4 self-start shadow-sm">
           <Sparkles size={12}/> عرض خاص
         </span>
-        <h1 className="text-3xl md:text-5xl font-extrabold text-[#34212a] leading-tight mb-4">
+        <h1 className="text-3xl md:text-5xl font-bold text-[#2a1a21] leading-tight mb-4" style={{ fontFamily: "'Amiri', serif", textShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
           {current.name}
         </h1>
         <p className="text-[#d93844] font-bold text-2xl mb-6">

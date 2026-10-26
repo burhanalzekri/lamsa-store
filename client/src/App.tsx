@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import { LogOut, Menu, X, ShoppingBag, Home as HomeIcon, Truck, User, LayoutDashboard, Search, Flame, Tag, Clock, Heart, Info, Bell } from "lucide-react";
+import LuxuryLogo from './components/LuxuryLogo';
 
 const Admin = lazy(() => import("./pages/Admin"));
 const CART_KEY = "lamsa-cart-v2";
@@ -83,7 +84,7 @@ function AppContent() {
     <>
       <nav className="bg-white border-b shadow-sm p-3 flex justify-between items-center sticky top-0 z-[60]" dir="rtl">
         <button onClick={() => setMenuOpen(true)} className="p-2 text-[#482d39]"><Menu size={24}/></button>
-        <span className="font-bold text-lg text-[#482d39] cursor-pointer" onClick={() => setLocation('/')}>لمسة</span>
+        <div className="cursor-pointer scale-90" onClick={() => setLocation('/')}><LuxuryLogo size="sm" /></div>
         <div className="flex items-center gap-1">
           <button onClick={() => setShowNotif(!showNotif)} className="relative p-2 text-[#482d39]">
             <Bell size={24} />

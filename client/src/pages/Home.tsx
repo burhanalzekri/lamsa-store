@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Phone, Mail, Heart, Menu, Minus, Plus, Search, ShoppingBag, Sparkles, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import HeroSlider from "../components/HeroSlider";
+import LuxuryLogo from "../components/LuxuryLogo";
 import MiniCart from "../components/MiniCart";
 import { useLocation } from "wouter";
 
@@ -80,7 +81,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <button className="md:hidden"><Menu size={24} /></button>
-            <a href="#" className="text-3xl font-extrabold text-[#34212a] tracking-tighter">لمسة</a>
+            <a href="#" className="block"><LuxuryLogo size="sm" /></a>
           </div>
           <nav className="hidden md:flex gap-8 text-sm font-bold text-gray-600">
             <a href="#" className="hover:text-[#34212a] transition">تسوقي الآن</a>
@@ -164,30 +165,39 @@ export default function Home() {
           </div>
 
           {/* شبكة المنتجات */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {filteredProducts.map(product => {
-              const discount = product.compareAtHalalas ? Math.round((1 - product.price / (product.compareAtHalalas / 100)) * 100) : 0;
+              const price = product.price || (product.priceHalalas ? product.priceHalalas / 100 : 0);
+              const compareAtPrice = product.compareAtPrice || (product.compareAtHalalas ? product.compareAtHalalas / 100 : 0);
+              const discount = compareAtPrice > price ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100) : 0;
+              const image = product.image || product.imageUrl;
               return (
-                <div key={product.id} onClick={() => setLocation(`/product/${product.id}`)} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border border-gray-100 cursor-pointer product-card-animated">
-                  <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 product-image-wrapper">
-                    <img src={product.image || "https://placehold.co/400x500"} alt={product.name} className="w-full h-full object-cover" />
-                    {discount > 0 && <span className="absolute top-2 right-2 bg-[#d93844] text-white text-xs font-bold px-2 py-1 rounded shadow-sm">-{discount}%</span>}
-                    {product.badge && <span className="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-2 py-1 rounded backdrop-blur-sm">{product.badge}</span>}
-                    <button onClick={() => setLocation(`/product/${product.id}`)} className="absolute bottom-2 left-2 bg-white/90 backdrop-blur p-2.5 rounded-full shadow-md text-[#34212a] hover:bg-[#34212a] hover:text-white transition-all transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
-                      <Plus size={18}/>
-                    </button>
+                <div key={product.id} onClick={() => setLocation(`/product/${product.id}`)} className="group relative bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg cursor-pointer">
+                  <div className="relative aspect-square overflow-hidden bg-gray-100">
+                    <img src={image || "https://placehold.co/400x400"} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                    {discount > 0 && <span className="absolute top-2 right-2 bg-[#d93844] text-white text-xs font-bold px-2 py-1 rounded z-10">-{discount}%</span>}
+                    {product.badge && <span className={`absolute ${discount > 0 ? 'top-2 left-2' : 'top-2 right-2'} bg-[#C9A84C] text-white text-[10px] font-bold px-2 py-1 rounded z-10`}>{product.badge}</span>}
                   </div>
-                  <div className="p-3">
-                    <h3 className="text-sm font-bold text-gray-800 line-clamp-1 mb-1">{product.name}</h3>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-extrabold text-lg text-[#34212a]">{product.price} ر.ي</span>
-                      {product.compareAtHalalas && <span className="text-xs text-gray-400 line-through">{product.compareAtHalalas / 100} ر.ي</span>}
+                  <div className="p-3 text-right" dir="rtl">
+                    <h3 className="text-sm text-gray-700 font-medium line-clamp-2 min-h-[40px] leading-5">{product.name}</h3>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-lg font-bold text-[#34212a]">{Number(price).toLocaleString()} ر.ي</span>
+                      {discount > 0 && <span className="text-xs text-gray-400 line-through">{Number(compareAtPrice).toLocaleString()}</span>}
                     </div>
-                    <div className="flex items-center gap-1">
-                      <div className="flex text-amber-400">{Array.from({length: 5}).map((_, i) => <Star key={i} size={12} fill={i < Math.floor(product.rating || 4.5) ? "currentColor" : "none"} className={i < Math.floor(product.rating || 4.5) ? "text-amber-400" : "text-gray-300"} />)}</div>
-                      <span className="text-xs text-gray-500">({product.rating || 4.5})</span>
-                    </div>
+                    {product.rating && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <div className="flex text-[#C9A84C]">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} size={10} fill={i < Math.round(Number(product.rating)) ? "currentColor" : "none"} />
+                          ))}
+                        </div>
+                        <span className="text-xs text-gray-500">({product.rating})</span>
+                      </div>
+                    )}
                   </div>
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(product); }} className="absolute bottom-16 left-3 bg-[#34212a] text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg hover:bg-[#C9A84C] z-20" title="أضف للسلة">
+                    <ShoppingBag size={16} />
+                  </button>
                 </div>
               );
             })}
@@ -195,22 +205,22 @@ export default function Home() {
         </section>
 
         {/* بانر الأسطورة */}
-        <section className="my-16 bg-[#f4f2f1] rounded-2xl p-8 md:p-12 relative overflow-hidden text-center md:text-right">
+        <section className="my-16 luxury-banner rounded-3xl p-8 md:p-12 relative overflow-hidden text-center md:text-right">
           <div className="max-w-lg relative z-10">
-            <p className="text-[#d93844] text-sm font-bold mb-2">من دفتر لمسة</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-[#34212a] leading-tight mb-4">الأسلوب ليس ما ترتدينه،<br/><span className="text-[#d93844]">بل كيف تشعرين فيه.</span></h2>
-            <p className="text-gray-600 mb-6">نؤمن أن القطعة الجميلة هي التي تمنحك مساحة لتكوني أنتِ.</p>
-            <button className="text-sm font-bold border-b border-[#34212a] pb-1">اختاري إطلالتك ←</button>
+            <p className="text-[#C9A84C] text-sm font-bold mb-2 tracking-widest" style={{ fontFamily: "'Reem Kufi', sans-serif" }}>من دفتر لمسة</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#2a1a21] leading-tight mb-4" style={{ fontFamily: "'Amiri', serif" }}>الأسلوب ليس ما ترتدينه،<br/><span className="text-[#C9A84C]">بل كيف تشعرين فيه.</span></h2>
+            <p className="text-[#6b5a4a] mb-6 leading-relaxed">نؤمن أن القطعة الجميلة هي التي تمنحك مساحة لتكوني أنتِ.</p>
+            <button className="text-sm font-bold border-b-2 border-[#C9A84C] text-[#2a1a21] pb-1 hover:text-[#C9A84C] transition-colors">اختاري إطلالتك ←</button>
           </div>
           <div className="absolute -left-10 top-1/2 -translate-y-1/2 text-[#d93844] opacity-10 text-[200px] font-serif pointer-events-none select-none">✳</div>
         </section>
       </main>
 
       {/* الفوتر */}
-      <footer className="bg-white border-t border-gray-100 py-12 mt-12 text-center md:text-right">
+      <footer className="luxury-footer py-16 mt-12 text-center md:text-right rounded-t-3xl">
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
-            <a href="#" className="text-2xl font-extrabold text-[#34212a]">لمسة</a>
+            <h3 className="text-3xl font-extrabold text-[#C9A84C] mb-4" style={{ fontFamily: "'Reem Kufi', sans-serif", textShadow: "0 2px 10px rgba(201,168,76,0.3)" }}>لمسة</h3>
             <p className="text-gray-500 text-sm mt-3 max-w-xs mx-auto md:mx-0">ملابس تحمل لمستك الخاصة. أزياء يومية مختارة بعناية للباحثات عن إطلالة عصرية.</p>
             <div className="mt-4 space-y-2">
               <p className="text-sm text-gray-600 font-bold flex items-center gap-2 justify-center md:justify-start">
@@ -224,18 +234,18 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <h4 className="font-bold text-[#34212a] mb-4">روابط سريعة</h4>
+            <h4 className="font-bold text-[#C9A84C] mb-4 text-lg">روابط سريعة</h4>
             <ul className="space-y-2 text-sm text-gray-500">
               <li><a href="/about" className="hover:text-[#34212a]">من نحن / اتصل بنا</a></li>
               <li><a href="#" className="hover:text-[#34212a]">سياسة الاستبدال</a></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-bold text-[#34212a] mb-4">تابعينا</h4>
-            <div className="flex gap-4 justify-center md:justify-start">
-              <span className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 cursor-pointer hover:bg-[#482d39] hover:text-white transition">f</span>
-              <span className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 cursor-pointer hover:bg-[#482d39] hover:text-white transition">in</span>
-              <span className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 cursor-pointer hover:bg-[#482d39] hover:text-white transition">ig</span>
+            <h4 className="font-bold text-[#C9A84C] mb-4 text-lg">تابعينا</h4>
+            <div className="flex gap-3 justify-center md:justify-start">
+              <span className="luxury-social-icon">f</span>
+              <span className="luxury-social-icon">in</span>
+              <span className="luxury-social-icon">ig</span>
             </div>
           </div>
         </div>
