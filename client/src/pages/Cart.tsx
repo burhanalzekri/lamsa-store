@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Tag, Camera, MessageCircle, Share2 } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Tag, Camera, MessageCircle, Share2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateReceiptImage } from '../lib/generateReceipt';
+import ConfirmModal from '../components/ConfirmModal';
 
 const CART_KEY = "lamsa-cart-v2";
 
@@ -14,6 +15,7 @@ export default function Cart() {
   const [discount, setDiscount] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [couponMsg, setCouponMsg] = useState({ text: '', type: '' });
+  const [confirmState, setConfirmState] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({isOpen: false, message: '', onConfirm: () => {}});
 
   useEffect(() => {
     const savedUser = localStorage.getItem('lamsa_user');
@@ -41,16 +43,22 @@ export default function Cart() {
     }
   };
 
-  const removeItem = async (index: number) => {
-    const item = cart[index];
-    const newCart = cart.filter((_, i) => i !== index);
-    setCart(newCart);
-    if (user) {
-      await fetch(`/api/cart/${user.email}/${item.id}`, { method: 'DELETE' });
-    } else {
-      localStorage.setItem(CART_KEY, JSON.stringify(newCart));
-    }
-    toast.success('تم حذف المنتج');
+  const handleDeleteClick = (index: number) => {
+    setConfirmState({
+      isOpen: true,
+      message: 'هل أنت متأكد من حذف هذا المنتج من السلة؟',
+      onConfirm: async () => {
+        const item = cart[index];
+        const newCart = cart.filter((_, i) => i !== index);
+        setCart(newCart);
+        if (user) {
+          await fetch(`/api/cart/${user.email}/${item.id}`, { method: 'DELETE' });
+        } else {
+          localStorage.setItem(CART_KEY, JSON.stringify(newCart));
+        }
+        toast.success('تم حذف المنتج');
+      }
+    });
   };
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -96,140 +104,146 @@ export default function Cart() {
   const shareImage = async () => {
     try {
       setIsGenerating(true);
-      toast.info('جارٍ تجهيز الصورة للمشاركة...');
       const dataUrl = generateReceiptImage(cart, subtotal, discount, discountAmount, total, user);
-      if (!dataUrl) { setIsGenerating(false); return; }
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
+      if (!dataUrl) { setIsGenerating(false); return toast.error('فشل إنشاء الصورة'); }
+      const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], 'lamsa-order.png', { type: 'image/png' });
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'طلب من متجر لمسة', text: 'تفاصيل طلبي من متجر لمسة 🛍️' });
-        toast.success('تم تجهيز الطلب للمشاركة!');
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'طلبي من لمسة', text: 'إليك طلبي' });
       } else {
-        const link = document.createElement('a');
-        link.download = 'lamsa-order.png';
-        link.href = dataUrl;
-        link.click();
-        toast.success('تم حفظ الصورة (متصفحك لا يدعم المشاركة المباشرة)');
+        saveImage();
       }
-    } catch (e) {
-      toast.error('فشل مشاركة الصورة.');
-    } finally {
-      setIsGenerating(false);
-    }
+    } catch (e) { toast.error('فشل المشاركة'); }
+    finally { setIsGenerating(false); }
   };
 
   const sendWhatsApp = () => {
-    if (cart.length === 0) return toast.error('السلة فارغة');
-    let message = '🛍️ *طلب جديد من متجر لمسة*\n\n';
-    message += `👤 *العميل:* ${user?.name || 'زائر'}\n`;
-    message += `📧 *البريد:* ${user?.email || 'غير مسجل'}\n\n`;
-    message += '📦 *المنتجات:*\n';
-    cart.forEach((item, index) => {
-      message += `${index + 1}. ${item.name} (${item.color || '-'} - ${item.size || '-'}) × ${item.quantity} = ${item.price * item.quantity} ر.ي\n`;
-    });
-    message += `\n💰 *المجموع:* ${subtotal} ر.ي\n`;
-    if (discount > 0) message += `🎟️ *الخصم:* ${discount}% (-${discountAmount} ر.ي)\n`;
-    message += `💵 *الإجمالي:* ${total} ر.ي\n\n📞 يرجى التواصل لتأكيد الطلب.`;
+    const message = `🛍️ طلب جديد من متجر لمسة\n\n` +
+      cart.map(i => `• ${i.name} (${i.quantity}x) - ${i.price} ر.ي`).join('\n') +
+      `\n\nالمجموع: ${subtotal} ر.ي` +
+      (discount > 0 ? `\nالخصم: ${discountAmount} ر.ي` : '') +
+      `\nالإجمالي: ${total} ر.ي`;
     window.open(`https://wa.me/967775799926?text=${encodeURIComponent(message)}`, '_blank');
   };
+
+  if (cart.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#FAF3E0] flex items-center justify-center p-4" dir="rtl">
+        <div className="text-center bg-white p-10 rounded-2xl shadow-sm max-w-md w-full">
+          <ShoppingBag size={64} className="mx-auto text-[#C9A84C] mb-4" />
+          <h2 className="text-2xl font-bold text-[#2a1a21] mb-2">سلتك فارغة</h2>
+          <p className="text-gray-500 mb-6">لم تقم بإضافة أي منتجات بعد</p>
+          <button onClick={() => setLocation('/')} className="bg-[#2a1a21] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#482d39] transition">تسوقي الآن</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FAF3E0] py-8" dir="rtl">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
-          <button onClick={() => setLocation('/')} className="flex items-center gap-2 text-[#482d39] font-bold hover:underline">
-            <Home size={20} /> العودة للرئيسية
+          <h1 className="text-3xl font-bold text-[#2a1a21]" style={{ fontFamily: "'Amiri', serif" }}>سلة المشتريات ({cart.length})</h1>
+          <button onClick={() => setLocation('/')} className="text-[#2a1a21] font-bold flex items-center gap-2 hover:text-[#C9A84C] transition">
+            <Home size={18}/> العودة للمتجر
           </button>
-          <h1 className="text-2xl font-bold text-[#34212a] flex items-center gap-2">
-            <ShoppingBag size={24}/> سلة المشتريات
-          </h1>
         </div>
 
-        {cart.length === 0 ? (
-          <div className="bg-white p-12 rounded-2xl shadow-sm text-center">
-            <ShoppingBag size={60} className="text-gray-300 mx-auto mb-4"/>
-            <h2 className="text-2xl font-bold text-[#34212a] mb-2">حقيبتك فارغة</h2>
-            <button onClick={() => setLocation('/')} className="bg-[#482d39] text-white px-8 py-3 rounded-xl font-bold mt-4">تسوقي الآن</button>
+        {/* شريط الشحن المجاني */}
+        <div className="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-100">
+          <p className="text-sm text-center font-bold text-[#2a1a21] mb-2">
+            {remainingForFreeShipping > 0 ? `أضيفي ${remainingForFreeShipping.toLocaleString()} ر.ي للحصول على شحن مجاني 🚚` : '🎉 مبروك! حصلت على شحن مجاني'}
+          </p>
+          <div className="w-full bg-gray-100 rounded-full h-2">
+            <div className="bg-gradient-to-r from-[#C9A84C] to-[#E8C87A] h-2 rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
           </div>
-        ) : (
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <p className="text-sm text-center mb-2 font-bold text-[#482d39]">
-                  {remainingForFreeShipping > 0 
-                    ? `أضيفي ${remainingForFreeShipping.toLocaleString()} ر.ي للحصول على شحن مجاني! 🚚` 
-                    : '🎉 مبروك! حصلتِ على شحن مجاني'}
-                </p>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
-                </div>
-              </div>
+        </div>
 
-              {cart.map((item, i) => (
-                <div key={i} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
-                  <img src={item.image} alt={item.name} className="w-24 h-32 object-cover rounded-lg" />
-                  <div className="flex-grow flex flex-col justify-between">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* المنتجات */}
+          <div className="lg:col-span-2 space-y-4">
+            {cart.map((item, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex gap-4">
+                <img src={item.image || item.imageUrl} className="w-24 h-28 object-cover rounded-lg" />
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
                     <div>
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-bold text-lg text-[#34212a]">{item.name}</h3>
-                        <button onClick={() => removeItem(i)} className="text-gray-300 hover:text-red-500 transition"><Trash2 size={18}/></button>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">المقاس: {item.size || '-'} | اللون: {item.color || '-'}</p>
+                      <h3 className="font-bold text-[#2a1a21] mb-1">{item.name}</h3>
+                      {item.size && <p className="text-xs text-gray-500">المقاس: {item.size}</p>}
+                      {item.color && <p className="text-xs text-gray-500">اللون: {item.color}</p>}
                     </div>
-                    <div className="flex justify-between items-center mt-2">
-                      <div className="flex items-center border border-gray-200 rounded-lg">
-                        <button onClick={() => updateQuantity(i, -1)} className="px-2 py-1 hover:bg-gray-50"><Minus size={14}/></button>
-                        <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(i, 1)} className="px-2 py-1 hover:bg-gray-50"><Plus size={14}/></button>
-                      </div>
-                      <span className="font-bold text-[#d93844] text-lg">{(item.price * item.quantity).toLocaleString()} ر.ي</span>
+                    <button onClick={() => handleDeleteClick(index)} className="text-gray-400 hover:text-red-500 transition"><Trash2 size={18}/></button>
+                  </div>
+                  <div className="flex justify-between items-center mt-4">
+                    <span className="text-lg font-bold text-[#2a1a21]">{item.price.toLocaleString()} ر.ي</span>
+                    <div className="flex items-center border rounded-lg h-10">
+                      <button onClick={() => updateQuantity(index, -1)} className="px-3 h-full hover:bg-gray-100"><Minus size={14}/></button>
+                      <span className="w-10 text-center font-bold">{item.quantity}</span>
+                      <button onClick={() => updateQuantity(index, 1)} className="px-3 h-full hover:bg-gray-100"><Plus size={14}/></button>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
 
-            <div className="lg:col-span-1">
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-24">
-                <h2 className="text-xl font-bold text-[#482d39] mb-4 border-b pb-3">ملخص الطلب</h2>
-                <div className="space-y-3 mb-6 text-sm">
-                  <div className="flex justify-between"><span className="text-gray-600">المجموع الفرعي:</span><span className="font-bold">{subtotal.toLocaleString()} ر.ي</span></div>
-                  <div className="flex justify-between"><span className="text-gray-600">الشحن:</span><span className="text-green-600 font-bold">مجاني</span></div>
-                  {discount > 0 && <div className="flex justify-between text-green-600"><span>الخصم ({discount}%):</span><span className="font-bold">-{discountAmount.toLocaleString()} ر.ي</span></div>}
-                  <div className="border-t pt-3 flex justify-between text-lg font-extrabold text-[#34212a]"><span>الإجمالي:</span><span>{total.toLocaleString()} ر.ي</span></div>
-                </div>
+          {/* ملخص الطلب */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-24">
+              <h2 className="text-xl font-bold text-[#2a1a21] mb-4" style={{ fontFamily: "'Amiri', serif" }}>ملخص الطلب</h2>
+              
+              <div className="space-y-3 mb-4 text-sm">
+                <div className="flex justify-between text-gray-600"><span>المجموع الفرعي:</span><span>{subtotal.toLocaleString()} ر.ي</span></div>
+                {discount > 0 && <div className="flex justify-between text-green-600"><span>الخصم ({discount}%):</span><span>-{discountAmount.toLocaleString()} ر.ي</span></div>}
+                <div className="flex justify-between text-gray-600"><span>الشحن:</span><span className="text-green-600 font-bold">{remainingForFreeShipping === 0 ? 'مجاني' : 'قيد التحديد'}</span></div>
+                <div className="border-t pt-3 flex justify-between text-xl font-bold text-[#2a1a21]"><span>الإجمالي:</span><span>{total.toLocaleString()} ر.ي</span></div>
+              </div>
 
-                <div className="mb-6">
-                  <label className="block text-xs font-bold text-gray-600 mb-2 flex items-center gap-1"><Tag size={14}/> كود الخصم</label>
-                  <div className="relative">
-                    <input value={couponCode} onChange={e => setCouponCode(e.target.value)} placeholder="أدخل الكود" className="w-full border border-gray-300 p-2.5 pl-20 rounded-lg text-sm focus:border-[#482d39] outline-none" />
-                    <button onClick={applyCoupon} className="absolute left-1 top-1 bottom-1 bg-[#34212a] text-white px-4 rounded-md text-xs font-bold hover:bg-black transition">تطبيق</button>
+              {/* كود الخصم */}
+              <div className="mb-4">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Tag className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={16}/>
+                    <input value={couponCode} onChange={e => setCouponCode(e.target.value)} placeholder="كود الخصم" className="w-full border rounded-lg py-2 pr-9 pl-3 text-sm" />
                   </div>
-                  {couponMsg.text && <p className={`text-xs mt-2 font-bold ${couponMsg.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{couponMsg.text}</p>}
+                  <button onClick={applyCoupon} className="bg-[#2a1a21] text-white px-4 rounded-lg text-sm font-bold hover:bg-[#482d39] transition">تطبيق</button>
                 </div>
+                {couponMsg.text && <p className={`text-xs mt-1 ${couponMsg.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{couponMsg.text}</p>}
+              </div>
 
-                <div className="space-y-2">
-                  <button onClick={sendWhatsApp} className="w-full bg-[#25D366] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#1DA851] transition flex justify-center items-center gap-2 shadow-md">
-                    <MessageCircle size={18}/> إرسال عبر واتساب
+              {/* أزرار الإجراءات */}
+              <div className="space-y-2">
+                <button onClick={sendWhatsApp} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition shadow-sm">
+                  <MessageCircle size={18}/> إرسال الطلب عبر واتساب
+                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button onClick={saveImage} disabled={isGenerating} className="bg-white border-2 border-[#2a1a21] text-[#2a1a21] py-2 rounded-xl font-bold text-sm flex items-center justify-center gap-1 hover:bg-[#2a1a21] hover:text-white transition disabled:opacity-50">
+                    <Camera size={16}/> حفظ صورة
                   </button>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button onClick={shareImage} disabled={isGenerating} className="bg-[#482d39] text-white py-2 rounded-xl font-bold text-xs hover:bg-[#654151] transition flex justify-center items-center gap-1 shadow-sm disabled:opacity-50">
-                      <Share2 size={16}/> {isGenerating ? '...' : 'مشاركة'}
-                    </button>
-                    <button onClick={saveImage} disabled={isGenerating} className="bg-[#34212a] text-white py-2 rounded-xl font-bold text-xs hover:bg-black transition flex justify-center items-center gap-1 shadow-sm disabled:opacity-50">
-                      <Camera size={16}/> {isGenerating ? '...' : 'حفظ'}
-                    </button>
-                  </div>
+                  <button onClick={shareImage} disabled={isGenerating} className="bg-white border-2 border-[#2a1a21] text-[#2a1a21] py-2 rounded-xl font-bold text-sm flex items-center justify-center gap-1 hover:bg-[#2a1a21] hover:text-white transition disabled:opacity-50">
+                    <Share2 size={16}/> مشاركة
+                  </button>
                 </div>
-                <div className="mt-4 text-center text-[10px] text-gray-400 flex items-center justify-center gap-1">
-                  <ShieldCheck size={12}/> الدفع عند الاستلام آمن ومضمون
-                </div>
+                <button onClick={() => setLocation('/checkout')} className="w-full bg-[#C9A84C] text-white py-3 rounded-xl font-bold text-lg hover:bg-[#b8952f] transition shadow-lg flex items-center justify-center gap-2">
+                  إتمام الطلب <ArrowRight size={18}/>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center gap-2 mt-4 text-xs text-gray-500">
+                <ShieldCheck size={14}/> ادفع عند الاستلام أو في المتجر
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
+
+      {/* نافذة تأكيد الحذف */}
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        message={confirmState.message}
+        onConfirm={() => { confirmState.onConfirm(); setConfirmState({...confirmState, isOpen: false}); }}
+        onCancel={() => setConfirmState({...confirmState, isOpen: false})}
+      />
     </div>
   );
 }
