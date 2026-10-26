@@ -1,106 +1,76 @@
 import { useState, useEffect } from 'react';
-import { Search, ShieldCheck, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
+import { Printer, Download, Search } from 'lucide-react';
 
-export default function AdminUsers({ currentUserId }: { currentUserId: number }) {
+export default function UsersPanel() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 20;
 
-  const fetchUsers = async () => {
-    try {
-      const res = await fetch('/api/admin/users-simple');
-      const data = await res.json();
-      if (Array.isArray(data)) setUsers(data);
-      else toast.error('فشل تحميل المستخدمين');
-    } catch (e) {
-      toast.error('خطأ في الاتصال');
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    fetch('/api/admin/all-users').then(r => r.json()).then(d => { setUsers(Array.isArray(d) ? d : (d.rows || [])); setLoading(false); }).catch(() => { toast.error("فشل جلب المستخدمين"); setLoading(false); });
+  }, []);
+
+  const filteredAll = users.filter(u => !search || u.name?.includes(search) || u.email?.includes(search));
+  const totalPages = Math.ceil(filteredAll.length / itemsPerPage) || 1;
+  const filtered = filteredAll.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
+  const exportCSV = () => {
+    let csv = "الاسم,البريد,الدور,تاريخ التسجيل\n";
+    filteredAll.forEach(u => { csv += `"${u.name}","${u.email}","${u.role}","${new Date(u.createdAt).toLocaleDateString('ar')}"\n`; });
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "users.csv"; link.click();
   };
 
-  useEffect(() => { fetchUsers(); }, []);
-
-  const changeRole = async (userId: number, newRole: string) => {
-    try {
-      const res = await fetch(`/api/admin/users/${userId}/role`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: newRole })
-      });
-      if (res.ok) {
-        toast.success('تم تحديث الصلاحية');
-        fetchUsers(); // إعادة جلب البيانات
-      } else {
-        toast.error('فشل تحديث الصلاحية');
-      }
-    } catch (e) { toast.error('خطأ في الاتصال'); }
-  };
-
-  const filtered = users.filter(u => 
-    `${u.name || ''} ${u.email || ''}`.toLowerCase().includes(search.toLowerCase())
-  );
-
-  if (loading) return <div className="p-8 text-center">جارٍ تحميل الحسابات…</div>;
+  if (loading) return <div className="text-center py-10">جاري التحميل...</div>;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-[#482d39]">إدارة المستخدمين</h2>
-        <span className="text-sm text-gray-500">{users.length} حساب</span>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h2 className="text-2xl font-bold text-[#482d39] mb-6">إدارة المستخدمين ({users.length})</h2>
+
+      <div className="flex justify-between items-center mb-4 gap-2">
+        <div className="relative w-full md:w-64">
+          <Search size={16} className="absolute right-3 top-2.5 text-gray-400"/>
+          <input placeholder="ابحث..." value={search} onChange={e=>{setSearch(e.target.value); setPage(1);}} className="border p-2 pr-9 rounded w-full text-sm" />
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => window.print()} className="bg-white border text-gray-700 px-3 py-1.5 rounded text-sm hover:bg-gray-50 flex items-center gap-1"><Printer size={14}/> طباعة</button>
+          <button onClick={exportCSV} className="bg-white border text-gray-700 px-3 py-1.5 rounded text-sm hover:bg-gray-50 flex items-center gap-1"><Download size={14}/> Excel</button>
+        </div>
       </div>
 
-      <div className="relative">
-        <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-        <input 
-          value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="ابحث بالاسم أو البريد..."
-          className="w-full pr-10 pl-4 py-2.5 border rounded-xl outline-none focus:border-[#482d39]"
-        />
-      </div>
-
-      <div className="bg-white rounded-xl border overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="p-3 text-right">الحساب</th>
-              <th className="p-3 text-center">الدور</th>
-              <th className="p-3 text-center">إدارة</th>
-            </tr>
+      <div className="overflow-x-auto max-h-[700px] overflow-y-auto border rounded-lg">
+        <table className="w-full text-right text-sm">
+          <thead className="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm">
+            <tr><th className="p-3">الاسم</th><th className="p-3">البريد</th><th className="p-3">الدور</th><th className="p-3">تاريخ التسجيل</th></tr>
           </thead>
           <tbody>
             {filtered.map(u => (
               <tr key={u.id} className="border-t hover:bg-gray-50">
+                <td className="p-3 font-medium">{u.name}</td>
+                <td className="p-3 text-xs" dir="ltr">{u.email}</td>
                 <td className="p-3">
-                  <div className="flex items-center gap-2">
-                    {u.role === 'admin' ? <ShieldCheck size={18} className="text-[#C9A84C]"/> : <UserRound size={18} className="text-gray-400"/>}
-                    <div>
-                      <div className="font-bold">{u.name || 'بدون اسم'}</div>
-                      <div className="text-xs text-gray-500">{u.email}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-3 text-center">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                    {u.role === 'admin' ? 'مشرف' : 'مستخدم'}
+                  <span className={`px-2 py-1 rounded text-xs font-bold ${u.role === 'admin' ? 'bg-[#C9A84C] text-white' : 'bg-gray-100 text-gray-700'}`}>
+                    {u.role === 'admin' ? 'مدير' : 'عميل'}
                   </span>
                 </td>
-                <td className="p-3 text-center">
-                  <select 
-                    value={u.role} 
-                    onChange={e => changeRole(u.id, e.target.value)}
-                    disabled={u.id === currentUserId}
-                    className="border rounded p-1 text-sm disabled:opacity-50"
-                  >
-                    <option value="user">مستخدم</option>
-                    <option value="admin">مشرف</option>
-                  </select>
-                </td>
+                <td className="p-3 text-xs text-gray-500">{new Date(u.createdAt).toLocaleDateString('ar')}</td>
               </tr>
             ))}
+            {filtered.length === 0 && <tr><td colSpan={4} className="p-6 text-center text-gray-500">لا يوجد مستخدمون</td></tr>}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex justify-between items-center mt-4">
+        <span className="text-sm text-gray-500">عرض {filtered.length} من {filteredAll.length}</span>
+        <div className="flex gap-1">
+          <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">السابق</button>
+          <span className="px-3 py-1 bg-[#482d39] text-white rounded text-sm">{page} / {totalPages}</span>
+          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">التالي</button>
+        </div>
       </div>
     </div>
   );

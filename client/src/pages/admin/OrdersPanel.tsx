@@ -1,127 +1,103 @@
 import { useState, useEffect } from 'react';
-import { ClipboardList, Search, ShieldCheck } from 'lucide-react';
-import { formatPrice } from '@/lib/catalog';
+import { toast } from 'sonner';
+import { Printer, Download, Search } from 'lucide-react';
 
-const statuses = [
-  { id: "all", label: "الكل" }, { id: "pending", label: "جديدة" }, { id: "processing", label: "قيد التجهيز" },
-  { id: "shipped", label: "تم الشحن" }, { id: "delivered", label: "مكتملة" }, { id: "cancelled", label: "ملغاة" },
-];
-
-export default function AdminOrders() {
+export default function OrdersPanel() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 20;
 
-  useEffect(() => {
-    fetch('/api/admin/orders-simple')
-      .then(r => r.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setOrders(data);
-        } else {
-          setError('فشل تحميل البيانات');
-        }
-      })
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/all-orders');
+      const data = await res.json();
+      setOrders(Array.isArray(data) ? data : (data.rows || []));
+    } catch { toast.error("فشل جلب الطلبات"); } finally { setLoading(false); }
+  };
 
-  const filteredOrders = orders.filter(order => {
-    const matchStatus = statusFilter === 'all' || order.status === statusFilter;
-    const matchSearch = `${order.orderNumber} ${order.customerName} ${order.phone} ${order.city}`.toLowerCase().includes(search.toLowerCase());
-    return matchStatus && matchSearch;
+  useEffect(() => { fetchOrders(); }, []);
+
+  const updateStatus = async (id: string, status: string) => {
+    try {
+      await fetch(`/api/admin/orders/${id}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+      toast.success("تم تحديث الحالة");
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    } catch { toast.error("فشل التحديث"); }
+  };
+
+  const filteredAll = orders.filter(o => {
+    const matchSearch = !search || (o.customerName?.includes(search)) || (o.phone?.includes(search)) || (o.id?.includes(search));
+    const matchStatus = filterStatus === 'all' || o.status === filterStatus;
+    return matchSearch && matchStatus;
   });
+  const totalPages = Math.ceil(filteredAll.length / itemsPerPage) || 1;
+  const filtered = filteredAll.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
-  if (loading) return <div className="p-8 text-center">جارٍ تحميل الطلبات…</div>;
-  if (error) return <div className="p-8 text-center text-red-500">تعذر تحميل الطلبات: {error}</div>;
+  const exportCSV = () => {
+    let csv = "رقم الطلب,العميل,الهاتف,الإجمالي,الحالة\n";
+    filteredAll.forEach(o => { csv += `"${o.orderNumber || o.id}","${o.customerName}","${o.phone}",${o.totalAmount},"${o.status}"\n`; });
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "orders.csv"; link.click();
+  };
 
-  const unpaid = orders.filter(o => o.paymentStatus === 'unpaid').length;
-  const paidTotal = orders.filter(o => o.paymentStatus === 'paid').reduce((sum, o) => sum + o.total, 0);
+  const statusLabel: any = { pending: "قيد الانتظار", processing: "قيد التجهيز", shipped: "تم الشحن", completed: "مكتمل", cancelled: "ملغي" };
+  const statusColor: any = { pending: "bg-yellow-100 text-yellow-800", processing: "bg-blue-100 text-blue-800", shipped: "bg-purple-100 text-purple-800", completed: "bg-green-100 text-green-800", cancelled: "bg-red-100 text-red-800" };
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-xl border shadow-sm text-center">
-          <span className="text-xs text-gray-500">الطلبات</span>
-          <p className="text-2xl font-bold text-[#482d39]">{orders.length}</p>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h2 className="text-2xl font-bold text-[#482d39] mb-6">إدارة الطلبات ({orders.length})</h2>
+
+      <div className="flex flex-col md:flex-row gap-3 mb-4 justify-between items-center">
+        <div className="flex gap-2 w-full md:w-auto">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute right-3 top-2.5 text-gray-400"/>
+            <input placeholder="ابحث..." value={search} onChange={e=>{setSearch(e.target.value); setPage(1);}} className="border p-2 pr-9 rounded w-full text-sm" />
+          </div>
+          <select value={filterStatus} onChange={e=>{setFilterStatus(e.target.value); setPage(1);}} className="border p-2 rounded text-sm">
+            <option value="all">كل الحالات</option><option value="pending">قيد الانتظار</option><option value="processing">قيد التجهيز</option><option value="shipped">تم الشحن</option><option value="completed">مكتمل</option><option value="cancelled">ملغي</option>
+          </select>
         </div>
-        <div className="bg-white p-4 rounded-xl border shadow-sm text-center">
-          <span className="text-xs text-gray-500">بانتظار الدفع</span>
-          <p className="text-2xl font-bold text-[#482d39]">{unpaid}</p>
-        </div>
-        <div className="bg-white p-4 rounded-xl border shadow-sm text-center">
-          <span className="text-xs text-gray-500">مدفوع مسجل</span>
-          <p className="text-2xl font-bold text-[#482d39]">{formatPrice(paidTotal)}</p>
+        <div className="flex gap-2">
+          <button onClick={() => window.print()} className="bg-white border text-gray-700 px-3 py-1.5 rounded text-sm hover:bg-gray-50 flex items-center gap-1"><Printer size={14}/> طباعة</button>
+          <button onClick={exportCSV} className="bg-white border text-gray-700 px-3 py-1.5 rounded text-sm hover:bg-gray-50 flex items-center gap-1"><Download size={14}/> Excel</button>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-        <div className="p-4 border-b flex items-center justify-between bg-gray-50">
-          <div className="flex items-center gap-2 text-[#C9A84C]">
-            <ShieldCheck size={18} />
-            <span className="text-xs font-bold">البيانات مقصورة على المشرفين</span>
-          </div>
-          <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-            <input 
-              value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="ابحث بالطلب أو العميل..." 
-              className="pr-9 pl-3 py-2 text-sm border rounded-lg outline-none focus:border-[#482d39] w-64" 
-            />
-          </div>
-        </div>
-
-        <div className="p-4 border-b flex gap-2 overflow-x-auto">
-          {statuses.map(s => (
-            <button 
-              key={s.id} onClick={() => setStatusFilter(s.id)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-full whitespace-nowrap transition ${statusFilter === s.id ? 'bg-[#482d39] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-right">
-            <thead className="bg-gray-50 text-gray-500">
-              <tr>
-                <th className="p-3 font-bold">رقم الطلب</th>
-                <th className="p-3 font-bold">العميل</th>
-                <th className="p-3 font-bold">التاريخ</th>
-                <th className="p-3 font-bold">الإجمالي</th>
-                <th className="p-3 font-bold">حالة الطلب</th>
+      <div className="overflow-x-auto max-h-[700px] overflow-y-auto border rounded-lg">
+        <table className="w-full text-right text-sm">
+          <thead className="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm">
+            <tr><th className="p-3">رقم الطلب</th><th className="p-3">العميل</th><th className="p-3">الهاتف</th><th className="p-3">الإجمالي</th><th className="p-3">الحالة</th><th className="p-3">تحديث</th></tr>
+          </thead>
+          <tbody>
+            {filtered.map(o => (
+              <tr key={o.id} className="border-t hover:bg-gray-50">
+                <td className="p-3 font-mono text-xs">{o.orderNumber || o.id.slice(0,8)}</td>
+                <td className="p-3">{o.customerName}</td>
+                <td className="p-3" dir="ltr">{o.phone}</td>
+                <td className="p-3 font-bold">{Number(o.totalAmount).toLocaleString()} ر.ي</td>
+                <td className="p-3"><span className={`px-2 py-1 rounded text-xs font-bold ${statusColor[o.status] || 'bg-gray-100'}`}>{statusLabel[o.status] || o.status}</span></td>
+                <td className="p-3">
+                  <select value={o.status || 'pending'} onChange={e => updateStatus(o.id, e.target.value)} className="border p-1 rounded text-xs">
+                    <option value="pending">قيد الانتظار</option><option value="processing">قيد التجهيز</option><option value="shipped">تم الشحن</option><option value="completed">مكتمل</option><option value="cancelled">ملغي</option>
+                  </select>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.map(order => (
-                <tr key={order.id} className="border-t hover:bg-gray-50">
-                  <td className="p-3 font-bold text-[#482d39]">{order.orderNumber || '#' + order.id}</td>
-                  <td className="p-3">
-                    <div className="font-bold">{order.customerName}</div>
-                    <div className="text-xs text-gray-500">{order.phone}</div>
-                  </td>
-                  <td className="p-3 text-gray-500 text-xs">{order.createdAt ? new Date(order.createdAt).toLocaleDateString('ar-YE') : '-'}</td>
-                  <td className="p-3 font-bold text-[#d93844]">{formatPrice(order.total)}</td>
-                  <td className="p-3">
-                    <span className="px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">
-                      {statuses.find(s => s.id === order.status)?.label || order.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {!filteredOrders.length && (
-                <tr>
-                  <td colSpan={5} className="p-10 text-center text-gray-500">
-                    <ClipboardList size={32} className="mx-auto mb-2 opacity-20" />
-                    <p>لا توجد طلبات محفوظة حتى الآن.</p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+            ))}
+            {filtered.length === 0 && <tr><td colSpan={6} className="p-6 text-center text-gray-500">لا توجد طلبات</td></tr>}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex justify-between items-center mt-4">
+        <span className="text-sm text-gray-500">عرض {filtered.length} من {filteredAll.length}</span>
+        <div className="flex gap-1">
+          <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">السابق</button>
+          <span className="px-3 py-1 bg-[#482d39] text-white rounded text-sm">{page} / {totalPages}</span>
+          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">التالي</button>
         </div>
       </div>
     </div>

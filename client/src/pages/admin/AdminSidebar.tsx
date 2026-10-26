@@ -16,6 +16,7 @@ export default function AdminSidebar({ tab, setTab, onLogout }: AdminSidebarProp
     { id: 'overview', label: 'نظرة عامة', icon: LayoutDashboard },
     { id: 'products', label: 'المنتجات', icon: Package },
     { id: 'variants', label: 'المتغيرات', icon: Tag },
+    { id: 'categories', label: 'الفئات', icon: LayoutDashboard },
     { id: 'orders', label: 'الطلبات', icon: ShoppingCart },
     { id: 'users', label: 'المستخدمون', icon: Users },
     { id: 'coupons', label: 'الكوبونات', icon: Tag },

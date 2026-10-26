@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { registerAdminRoutes } from "../admin-routes";
 import express from "express";
 import multer from "multer";
 import path from "path";
@@ -43,6 +44,8 @@ const requireAdmin = async (req: any, res: any, next: any) => {
 
 async function startServer() {
   const app = express();
+  registerAdminRoutes(app, getConn);
+
 
   app.get('/api/admin/orders-simple', async (req, res) => {
     try {

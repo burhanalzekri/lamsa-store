@@ -9,10 +9,11 @@ import VariantsPanel from './admin/VariantsPanel';
 import OverviewPanel from './admin/OverviewPanel';
 import OrdersPanel from './admin/OrdersPanel';
 import UsersPanel from './admin/UsersPanel';
+import CategoriesPanel from './admin/CategoriesPanel';
 import AdminSidebar from './admin/AdminSidebar';
 
 export default function Admin({ user }: { user: any }) {
-  const [tab, setTab] = useState<'overview'|'products'|'orders'|'users'|'coupons'|'settings'|'reports'|'variants'>('overview');
+  const [tab, setTab] = useState<'overview'|'products'|'orders'|'users'|'coupons'|'settings'|'reports'|'variants'|'categories'>('overview');
   const [, setLocation] = useLocation();
 
   const handleLogout = () => { 
@@ -43,9 +44,10 @@ export default function Admin({ user }: { user: any }) {
       {/* المحتوى الرئيسي */}
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
         <main className="p-3 lg:p-8 flex-1">
-          {tab === 'overview' && <OverviewPanel />}
+          {tab === 'overview' && <OverviewPanel setTab={setTab} />}
           {tab === 'products' && <ProductsPanel />}
           {tab === 'variants' && <VariantsPanel />}
+          {tab === 'categories' && <CategoriesPanel />}
           {tab === 'orders' && <OrdersPanel />}
           {tab === 'users' && <UsersPanel currentUserId={user.id} />}
           {tab === 'coupons' && <CouponsPanel />}

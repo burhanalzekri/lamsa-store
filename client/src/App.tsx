@@ -1,4 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from "react";
+import AdminNew from "./pages/AdminNew";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -23,7 +24,12 @@ const Admin = lazy(() => import("./pages/Admin"));
 const CART_KEY = "lamsa-cart-v2";
 
 function AppContent() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(() => {
+    try {
+      const saved = localStorage.getItem('lamsa_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
   const [location, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
@@ -210,7 +216,7 @@ function AppContent() {
 
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/login"><Login onLogin={(u:any,t:string)=>{setUser(u);localStorage.setItem('lamsa_user',JSON.stringify(u));localStorage.setItem('lamsa_token',t);setLocation('/');}} goToRegister={() => setLocation('/register')} /></Route>
+        <Route path="/login"><Login onLogin={(u:any,t:string)=>{setUser(u);localStorage.setItem('lamsa_user',JSON.stringify(u));localStorage.setItem('lamsa_token',t);setLocation(u?.role === 'admin' || u?.email === 'admin@lamsa.com' ? '/admin' : '/');}} goToRegister={() => setLocation('/register')} /></Route>
         <Route path="/register"><Register onLogin={(u:any,t:string)=>{setUser(u);localStorage.setItem('lamsa_user',JSON.stringify(u));localStorage.setItem('lamsa_token',t);setLocation('/');}} goToLogin={() => setLocation('/login')} /></Route>
         <Route path="/cart" component={Cart} />
         <Route path="/thank-you" component={ThankYou} />
@@ -220,7 +226,8 @@ function AppContent() {
         <Route path="/profile" component={Profile} />
         <Route path="/about" component={About} />
         <Route path="/faq" component={FAQ} />
-        <Route path="/admin">
+        <Route path="/admin-new" component={AdminNew} />
+      <Route path="/admin">
           {() => {
             if (!user) { setLocation('/login'); return null; }
             if (user.role !== 'admin') return <div className="p-10 text-center font-bold text-red-600" dir="rtl">⛔ غير مصرح لك بالدخول إلى لوحة الإدارة.</div>;
