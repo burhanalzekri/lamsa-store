@@ -8,6 +8,7 @@ export default function ProductsPanel() {
   const { currency } = useSettings();
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [dateFilter, setDateFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [form, setForm] = useState({ name: '', price: '', compareAtPrice: '', costPrice: '', category: 'فساتين', imageUrl: '', images: '', badge: '', material: '', description: '', stock: '10' });
@@ -35,7 +36,18 @@ export default function ProductsPanel() {
     fetch('/api/categories', { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } }).then(r => r.json()).then(data => setCategories(Array.isArray(data) ? data : [])).catch(console.error);
   }, []);
 
-  const filteredAll = products.filter(p => p.name?.includes(search));
+  const filteredAll = products.filter(p => {
+    const matchSearch = p.name?.includes(search);
+    if (!matchSearch) return false;
+    if (dateFilter !== 'all' && p.createdAt) {
+      const created = new Date(p.createdAt);
+      const now = new Date();
+      if (dateFilter === 'today') return created.toDateString() === now.toDateString();
+      if (dateFilter === 'week') { const w = new Date(now.getTime() - 7*24*60*60*1000); return created >= w; }
+      if (dateFilter === 'month') return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+    }
+    return true;
+  });
   const itemsPerPage = 50;
   const totalPages = Math.ceil(filteredAll.length / itemsPerPage) || 1;
   const filtered = filteredAll.slice((page - 1) * itemsPerPage, page * itemsPerPage);
@@ -197,7 +209,15 @@ export default function ProductsPanel() {
       )}
 
       <div className="flex justify-between items-center mb-4">
-        <input placeholder="ابحث..." value={search} onChange={e=>{setSearch(e.target.value); setPage(1);}} className="w-full md:w-1/3 border p-2 rounded" />
+        <div className="flex gap-2 w-full md:w-1/2">
+        <input placeholder="ابحث..." value={search} onChange={e=>{setSearch(e.target.value); setPage(1);}} className="flex-1 border p-2 rounded" />
+        <select value={dateFilter} onChange={e=>{setDateFilter(e.target.value); setPage(1);}} className="border p-2 rounded text-sm">
+          <option value="all">كل الإضافات</option>
+          <option value="today">اليوم</option>
+          <option value="week">هذا الأسبوع</option>
+          <option value="month">هذا الشهر</option>
+        </select>
+      </div>
         <div className="flex gap-2">
           <button onClick={() => window.print()} className="bg-white border text-gray-700 px-3 py-1.5 rounded text-sm hover:bg-gray-50 flex items-center gap-1"><Printer size={14}/> طباعة</button>
           <button onClick={exportCSV} className="bg-white border text-gray-700 px-3 py-1.5 rounded text-sm hover:bg-gray-50 flex items-center gap-1"><Download size={14}/> Excel</button>
