@@ -19,6 +19,7 @@ export default function Login({ onLogin, goToRegister }: { onLogin: (user: any, 
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
+      console.log('🔍 [LOGIN] Response:', { status: res.status, data });
       if (data.success) {
         toast.success("مرحباً بعودتك! 💕");
         onLogin(data.user, data.token);

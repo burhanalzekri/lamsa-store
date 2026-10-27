@@ -19,12 +19,26 @@ import crypto from "crypto";
 
 function verifyPassword(plainPassword: string, hashedPassword: string): boolean {
   try {
-    const [salt, originalHash] = hashedPassword.split(':');
-    if (!salt || !originalHash) return false;
-    const crypto = require('crypto');
-    const hash = crypto.pbkdf2Sync(plainPassword, salt, 1000, 64, 'sha512').toString('hex');
+    
+    const parts = hashedPassword.split(':');
+    const salt = parts[0];
+    const originalHash = parts[1];
+    
+    
+    if (!salt || !originalHash) {
+      console.log('❌ [VERIFY] salt أو hash غير موجود');
+      return false;
+    }
+    
+    // crypto imported at top of file
+    const hash = crypto.pbkdf2Sync(plainPassword, salt, 10000, 64, 'sha512').toString('hex');
+    
+    
     return hash === originalHash;
-  } catch { return false; }
+  } catch (e) { 
+    console.log('❌ [VERIFY] خطأ:', e.message);
+    return false; 
+  }
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || "lamsa_secret_2026";
