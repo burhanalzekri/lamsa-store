@@ -200,6 +200,18 @@ async function startServer() {
   app.post("/api/orders", async (req, res) => {
     try {
       const { customerName, phone, address, items, totalAmount, customerEmail } = req.body;
+
+      // ✅ التحقق من صحة المدخلات
+      if (!customerName || customerName.trim().length < 2 || customerName.trim().length > 100) {
+        return res.status(400).json({ error: "الاسم غير صالح (2-100 حرف)" });
+      }
+      const phoneRegex = /^[0-9+ -]{7,15}$/;
+      if (!phone || !phoneRegex.test(phone.trim())) {
+        return res.status(400).json({ error: "رقم الهاتف غير صالح (7-15 رقم)" });
+      }
+      if (!address || address.trim().length < 5 || address.trim().length > 500) {
+        return res.status(400).json({ error: "العنوان غير صالح (5-500 حرف)" });
+      }
       if (!items || !Array.isArray(items) || items.length === 0) {
         return res.status(400).json({ error: "لا توجد منتجات في الطلب" });
       }
