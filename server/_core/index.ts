@@ -114,7 +114,7 @@ async function startServer() {
       await conn.end();
       const formatted = (rows as any[]).map((p: any) => ({
         id: p.id, name: p.name, category: p.category, description: p.description,
-        image: p.imageUrl, images: p.images, price: p.priceHalalas / 100, 
+        image: p.imageUrl, images: p.images, price: p.priceHalalas, 
         compareAtHalalas: p.compareAtHalalas, badge: p.badge, material: p.material, rating: p.rating
       }));
       res.json(formatted);
@@ -130,7 +130,7 @@ async function startServer() {
       const p = rows[0];
       res.json({
         id: p.id, name: p.name, category: p.category, description: p.description,
-        image: p.imageUrl, images: p.images, price: p.priceHalalas / 100, 
+        image: p.imageUrl, images: p.images, price: p.priceHalalas, 
         compareAtHalalas: p.compareAtHalalas, badge: p.badge, material: p.material, rating: p.rating, stock: 20
       });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -144,7 +144,7 @@ async function startServer() {
       const [rows] = await conn.execute('SELECT * FROM store_products WHERE category = ? AND id != ? AND active = 1 LIMIT 4', [prod[0].category, req.params.id]);
       await conn.end();
       const formatted = (rows as any[]).map((p: any) => ({
-        id: p.id, name: p.name, category: p.category, image: p.imageUrl, price: p.priceHalalas / 100, compareAtHalalas: p.compareAtHalalas, rating: p.rating
+        id: p.id, name: p.name, category: p.category, image: p.imageUrl, price: p.priceHalalas, compareAtHalalas: p.compareAtHalalas, rating: p.rating
       }));
       res.json(formatted);
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -614,7 +614,7 @@ app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
       await conn.end();
       const formatted = (rows as any[]).map((p: any) => ({
         id: p.id, name: p.name, category: p.category, description: p.description,
-        image: p.imageUrl, images: p.images, price: p.priceHalalas / 100, 
+        image: p.imageUrl, images: p.images, price: p.priceHalalas, 
         compareAtHalalas: p.compareAtHalalas, badge: p.badge, material: p.material, rating: p.rating,
         active: p.active
       }));
@@ -633,7 +633,7 @@ app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
       );
       await conn.end();
       const formatted = (rows as any[]).map((p: any) => ({
-        id: p.id, name: p.name, category: p.category, image: p.imageUrl, price: p.priceHalalas / 100, compareAtHalalas: p.compareAtHalalas
+        id: p.id, name: p.name, category: p.category, image: p.imageUrl, price: p.priceHalalas, compareAtHalalas: p.compareAtHalalas
       }));
       res.json(formatted);
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -678,7 +678,7 @@ app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
       await conn.end();
       const formatted = (rows as any[]).map((r: any) => ({
         id: r.id, name: r.name, category: r.category, image: r.imageUrl,
-        price: r.priceHalalas / 100, compareAtHalalas: r.compareAtHalalas,
+        price: r.priceHalalas, compareAtHalalas: r.compareAtHalalas,
         quantity: r.quantity, size: r.size, color: r.color
       }));
       res.json(formatted);
