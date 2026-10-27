@@ -23,8 +23,8 @@ export default function ProductsPanel() {
       const res = await fetch('/api/admin/all-products?t=' + Date.now(), { headers: { 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` } });
       const data = await res.json();
       const mapped = (Array.isArray(data) ? data : (data.rows || [])).map((p: any) => ({
-        ...p, price: p.priceHalalas ? p.priceHalalas / 100 : (p.price || 0),
-        compareAtPrice: p.compareAtHalalas ? p.compareAtHalalas / 100 : 0,
+        ...p, price: p.priceHalalas || p.price || 0,
+        compareAtPrice: p.compareAtHalalas || 0,
         image: p.imageUrl || p.image || '', stock: p.stock || 0
       }));
       setProducts(mapped);
