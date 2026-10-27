@@ -5,6 +5,7 @@ import ProductsPanel from './admin/ProductsPanel';
 import CouponsPanel from './admin/CouponsPanel';
 import DiscountsPanel from './admin/DiscountsPanel';
 import SettingsPanel from './admin/SettingsPanel';
+import UserGuide from './admin/UserGuide';
 import ReportsPanel from './admin/ReportsPanel';
 import VariantsPanel from './admin/VariantsPanel';
 import OverviewPanel from './admin/OverviewPanel';
@@ -14,7 +15,7 @@ import CategoriesPanel from './admin/CategoriesPanel';
 import AdminSidebar from './admin/AdminSidebar';
 
 export default function Admin({ user }: { user: any }) {
-  const [tab, setTab] = useState<'overview'|'products'|'orders'|'users'|'coupons'|'settings'|'reports'|'variants'|'categories'|'discounts'>('overview');
+  const [tab, setTab] = useState<'overview'|'products'|'orders'|'users'|'coupons'|'settings'|'reports'|'variants'|'categories'|'discounts'|'guide'>('overview');
   const [, setLocation] = useLocation();
 
   const handleLogout = () => { 
@@ -55,6 +56,7 @@ export default function Admin({ user }: { user: any }) {
           {tab === 'coupons' && <CouponsPanel />}
           {tab === 'reports' && <ReportsPanel />}
           {tab === 'settings' && <SettingsPanel />}
+          {tab === 'guide' && <UserGuide />}
         </main>
       </div>
 

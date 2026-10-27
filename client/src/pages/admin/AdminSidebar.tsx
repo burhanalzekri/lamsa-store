@@ -1,5 +1,5 @@
 import { 
-  LayoutDashboard, Package, ShoppingCart, Users, Tag, BarChart, Settings, LogOut, Percent
+  LayoutDashboard, Package, ShoppingCart, Users, Tag, BarChart, Settings, LogOut, Percent, BookOpen
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 
@@ -23,6 +23,7 @@ export default function AdminSidebar({ tab, setTab, onLogout }: AdminSidebarProp
     { id: 'coupons', label: 'الكوبونات', icon: Tag },
     { id: 'reports', label: 'التقارير', icon: BarChart },
     { id: 'settings', label: 'الإعدادات', icon: Settings },
+    { id: 'guide', label: 'دليل الاستخدام', icon: BookOpen },
   ];
 
   return (

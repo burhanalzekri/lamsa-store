@@ -239,6 +239,7 @@ export default function Home() {
             <h4 className="font-bold text-[#C9A84C] mb-4 text-lg">روابط سريعة</h4>
             <ul className="space-y-2 text-sm text-gray-500">
               <li><a href="/about" className="hover:text-[#34212a]">من نحن / اتصل بنا</a></li>
+              <li><a href="/guide" className="hover:text-[#34212a]">دليل الاستخدام</a></li>
               <li><a href="#" className="hover:text-[#34212a]">سياسة الاستبدال</a></li>
             </ul>
           </div>
