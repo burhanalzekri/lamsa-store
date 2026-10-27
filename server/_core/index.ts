@@ -64,7 +64,7 @@ async function startServer() {
   registerAdminRoutes(app, getConn);
 
 
-  app.get('/api/admin/orders-simple', async (req, res) => {
+  app.get('/api/admin/orders-simple', requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       const [rows] = await conn.execute('SELECT * FROM store_orders ORDER BY createdAt DESC');
@@ -75,7 +75,7 @@ async function startServer() {
       res.json([]);
     }
   });
-  app.get("/api/admin/users-simple", async (req, res) => {
+  app.get("/api/admin/users-simple", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       const [rows] = await conn.execute("SELECT id, name, email, role FROM users ORDER BY id DESC");
@@ -143,7 +143,12 @@ async function startServer() {
       const conn = await getConn();
       const [existing]: any = await conn.execute('SELECT * FROM users WHERE email = ?', [email]);
       if (existing.length > 0) { await conn.end(); return res.status(400).json({ error: "البريد مسجل مسبقاً" }); }
-      const hashed = await Promise.resolve("");
+      // تشفير كلمة المرور باستخدام crypto المدمج
+      const crypto = await import("crypto");
+      const salt = crypto.randomBytes(16).toString('hex');
+      const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+      const hashed = salt + ':' + hash;
+      
       await conn.execute('INSERT INTO users (name, email, password, role, openId) VALUES (?, ?, ?, "user", ?)', [name, email, hashed, email]);
       await conn.end(); res.json({ success: true });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -243,10 +248,24 @@ async function startServer() {
 
   app.get("/api/orders/track-by-phone/:phone", async (req, res) => {
     try {
+      // التحقق من وجود رقم الهاتف فقط (وليس عرض البيانات الكاملة)
       const conn = await getConn();
-      const [rows] = await conn.execute('SELECT * FROM store_orders WHERE phone = ? ORDER BY createdAt DESC', [req.params.phone]);
+      const [rows]: any = await conn.execute(
+        'SELECT id, orderNumber, status, totalAmount, createdAt FROM store_orders WHERE phone = ? ORDER BY createdAt DESC',
+        [req.params.phone]
+      );
       await conn.end();
-      res.json(rows);
+      
+      // إرجاع بيانات محدودة فقط (بدون عنوان أو اسم العميل)
+      const safeRows = rows.map((r: any) => ({
+        id: r.id,
+        orderNumber: r.orderNumber,
+        status: r.status,
+        totalAmount: r.totalAmount,
+        createdAt: r.createdAt
+      }));
+      
+      res.json(safeRows);
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
@@ -417,7 +436,7 @@ app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
 
   
   // بيانات الرسم البياني (آخر 7 أيام)
-  app.get("/api/admin/chart-data", async (req, res) => {
+  app.get("/api/admin/chart-data", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       const [rows] = await conn.execute(`
@@ -433,7 +452,7 @@ app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
   });
 
   // آخر 5 طلبات
-  app.get("/api/admin/recent-orders", async (req, res) => {
+  app.get("/api/admin/recent-orders", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       const [rows] = await conn.execute('SELECT * FROM store_orders ORDER BY createdAt DESC LIMIT 5');
@@ -443,7 +462,7 @@ app.post("/api/upload", upload.single("image"), (req: any, res: any) => {
   });
 
   // المنتجات منخفضة المخزون
-  app.get("/api/admin/low-stock", async (req, res) => {
+  app.get("/api/admin/low-stock", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       const [rows] = await conn.execute('SELECT id, name, stock FROM store_products WHERE stock <= 5 AND active = 1 LIMIT 5');
