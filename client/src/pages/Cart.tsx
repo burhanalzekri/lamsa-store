@@ -3,11 +3,13 @@ import { useLocation } from 'wouter';
 import { Minus, Plus, ShoppingBag, Trash2, ShieldCheck, Home, Tag, Camera, MessageCircle, Share2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateReceiptImage } from '../lib/generateReceipt';
+import { useSettings } from '../hooks/useSettings';
 import ConfirmModal from '../components/ConfirmModal';
 
 const CART_KEY = "lamsa-cart-v2";
 
 export default function Cart() {
+  const { currency } = useSettings();
   const [cart, setCart] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
   const [, setLocation] = useLocation();
@@ -152,7 +154,7 @@ export default function Cart() {
         {/* شريط الشحن المجاني */}
         <div className="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-100">
           <p className="text-sm text-center font-bold text-[#2a1a21] mb-2">
-            {remainingForFreeShipping > 0 ? `أضيفي ${remainingForFreeShipping.toLocaleString()} ر.ي للحصول على شحن مجاني 🚚` : '🎉 مبروك! حصلت على شحن مجاني'}
+            {remainingForFreeShipping > 0 ? `أضيفي ${remainingForFreeShipping.toLocaleString()} {currency} للحصول على شحن مجاني 🚚` : '🎉 مبروك! حصلت على شحن مجاني'}
           </p>
           <div className="w-full bg-gray-100 rounded-full h-2">
             <div className="bg-gradient-to-r from-[#C9A84C] to-[#E8C87A] h-2 rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
@@ -175,7 +177,7 @@ export default function Cart() {
                     <button onClick={() => handleDeleteClick(index)} className="text-gray-400 hover:text-red-500 transition"><Trash2 size={18}/></button>
                   </div>
                   <div className="flex justify-between items-center mt-4">
-                    <span className="text-lg font-bold text-[#2a1a21]">{item.price.toLocaleString()} ر.ي</span>
+                    <span className="text-lg font-bold text-[#2a1a21]">{item.price.toLocaleString()} {currency}</span>
                     <div className="flex items-center border rounded-lg h-10">
                       <button onClick={() => updateQuantity(index, -1)} className="px-3 h-full hover:bg-gray-100"><Minus size={14}/></button>
                       <span className="w-10 text-center font-bold">{item.quantity}</span>
@@ -193,10 +195,10 @@ export default function Cart() {
               <h2 className="text-xl font-bold text-[#2a1a21] mb-4" style={{ fontFamily: "'Amiri', serif" }}>ملخص الطلب</h2>
               
               <div className="space-y-3 mb-4 text-sm">
-                <div className="flex justify-between text-gray-600"><span>المجموع الفرعي:</span><span>{subtotal.toLocaleString()} ر.ي</span></div>
-                {discount > 0 && <div className="flex justify-between text-green-600"><span>الخصم ({discount}%):</span><span>-{discountAmount.toLocaleString()} ر.ي</span></div>}
+                <div className="flex justify-between text-gray-600"><span>المجموع الفرعي:</span><span>{subtotal.toLocaleString()} {currency}</span></div>
+                {discount > 0 && <div className="flex justify-between text-green-600"><span>الخصم ({discount}%):</span><span>-{discountAmount.toLocaleString()} {currency}</span></div>}
                 <div className="flex justify-between text-gray-600"><span>الشحن:</span><span className="text-green-600 font-bold">{remainingForFreeShipping === 0 ? 'مجاني' : 'قيد التحديد'}</span></div>
-                <div className="border-t pt-3 flex justify-between text-xl font-bold text-[#2a1a21]"><span>الإجمالي:</span><span>{total.toLocaleString()} ر.ي</span></div>
+                <div className="border-t pt-3 flex justify-between text-xl font-bold text-[#2a1a21]"><span>الإجمالي:</span><span>{total.toLocaleString()} {currency}</span></div>
               </div>
 
               {/* كود الخصم */}

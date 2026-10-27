@@ -31,7 +31,7 @@ export default function SettingsPanel() {
     try {
       const res = await fetch('/api/admin/settings', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('lamsa_token')}` },
         body: JSON.stringify(form)
       });
       if (res.ok) toast.success("تم حفظ الإعدادات");

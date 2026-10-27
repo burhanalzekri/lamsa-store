@@ -322,6 +322,82 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
     } catch (err: any) { res.status(500).json({ error: err.message }); }
   });
 
+  
+  // تطبيق خصم على منتج
+  app.post("/api/admin/products/:id/discount", express.json(), requireAdmin, async (req: any, res: any) => {
+    try {
+      const { id } = req.params;
+      const { discountPercent, endsAt } = req.body;
+      
+      if (!discountPercent || discountPercent < 1 || discountPercent > 99) {
+        return res.status(400).json({ error: "نسبة الخصم يجب أن تكون بين 1 و 99" });
+      }
+      
+      const conn = await getConn();
+      
+      // جلب السعر الأصلي (قبل الخصم)
+      const [rows]: any = await conn.query('SELECT priceHalalas, compareAtHalalas FROM store_products WHERE id = ?', [id]);
+      if (rows.length === 0) {
+        await conn.end();
+        return res.status(404).json({ error: "المنتج غير موجود" });
+      }
+      
+      const product = rows[0];
+      // السعر الأصلي: إذا كان compareAtHalalas موجوداً، نستخدمه. وإلا نستخدم السعر الحالي.
+      const originalPrice = product.compareAtHalalas > 0 ? product.compareAtHalalas : product.priceHalalas;
+      const newPrice = Math.round(originalPrice * (1 - discountPercent / 100));
+      
+      // تاريخ الانتهاء (إذا لم يُحدد، ينتهي بعد 30 يوم)
+      const endsAtDate = endsAt ? new Date(endsAt) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      
+      await conn.execute(
+        'UPDATE store_products SET priceHalalas = ?, compareAtHalalas = ?, discountEndsAt = ? WHERE id = ?',
+        [newPrice, originalPrice, endsAtDate, id]
+      );
+      
+      await conn.end();
+      res.json({ 
+        success: true, 
+        originalPrice: originalPrice / 100,
+        newPrice: newPrice / 100,
+        discountPercent,
+        endsAt: endsAtDate
+      });
+    } catch (err: any) { 
+      console.error('Discount error:', err);
+      res.status(500).json({ error: err.message }); 
+    }
+  });
+
+  // إزالة الخصم من منتج
+  app.delete("/api/admin/products/:id/discount", requireAdmin, async (req: any, res: any) => {
+    try {
+      const { id } = req.params;
+      const conn = await getConn();
+      await conn.execute(
+        'UPDATE store_products SET priceHalalas = compareAtHalalas, compareAtHalalas = 0, discountEndsAt = NULL WHERE id = ?',
+        [id]
+      );
+      await conn.end();
+      res.json({ success: true });
+    } catch (err: any) { 
+      res.status(500).json({ error: err.message }); 
+    }
+  });
+
+  
+  // جلب المنتجات المخفضة
+  app.get("/api/admin/discounts", requireAdmin, async (req: any, res: any) => {
+    try {
+      const conn = await getConn();
+      const [rows]: any = await conn.query(
+        'SELECT id, name, imageUrl, priceHalalas, compareAtHalalas, discountEndsAt FROM store_products WHERE compareAtHalalas > 0 AND compareAtHalalas > priceHalalas ORDER BY discountEndsAt ASC'
+      );
+      await conn.end();
+      res.json(Array.isArray(rows) ? rows : []);
+    } catch (err: any) { res.status(500).json({ error: err.message }); }
+  });
+
   app.get("/api/admin/all-products", async (req, res) => {
     try {
       const conn = await getConn();

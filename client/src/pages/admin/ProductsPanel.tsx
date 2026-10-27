@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Trash2, Plus, Search, Edit, Printer, Download } from "lucide-react";
+import { Package, Trash2, Plus, Search, Edit, Printer, Download, Percent, X } from "lucide-react";
 import { toast } from 'sonner';
 import { useSettings } from '../../hooks/useSettings';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -13,6 +13,8 @@ export default function ProductsPanel() {
   const [form, setForm] = useState({ name: '', price: '', compareAtPrice: '', costPrice: '', category: 'فساتين', imageUrl: '', images: '', badge: '', material: '', description: '', stock: '10' });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
+  const [discountModal, setDiscountModal] = useState<{isOpen: boolean, product: any}>({isOpen: false, product: null});
+  const [discountForm, setDiscountForm] = useState({percent: '', endsAt: ''});
   const [confirmState, setConfirmState] = useState<{isOpen: boolean, id: string, message: string, onConfirm: () => void}>({isOpen: false, id: '', message: '', onConfirm: () => {}});
 
   const fetchProducts = async () => {
@@ -61,6 +63,46 @@ export default function ProductsPanel() {
         toast.error("فشل الحفظ: " + (err.error || "خطأ"));
       }
     } catch (e) { toast.error("خطأ في الاتصال"); }
+  };
+
+  const handleDiscountClick = (product: any) => {
+    setDiscountModal({ isOpen: true, product });
+    setDiscountForm({ percent: '', endsAt: '' });
+  };
+
+  const handleApplyDiscount = async (e: any) => {
+    e.preventDefault();
+    if (!discountForm.percent) return;
+    try {
+      const token = localStorage.getItem('lamsa_token');
+      const res = await fetch(`/api/admin/products/${discountModal.product.id}/discount`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ discountPercent: Number(discountForm.percent), endsAt: discountForm.endsAt || null })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`تم تطبيق خصم ${data.discountPercent}%`);
+        setDiscountModal({ isOpen: false, product: null });
+        await fetchProducts();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || 'فشل تطبيق الخصم');
+      }
+    } catch { toast.error('خطأ في الاتصال'); }
+  };
+
+  const handleRemoveDiscount = async () => {
+    if (!discountModal.product) return;
+    try {
+      const token = localStorage.getItem('lamsa_token');
+      const res = await fetch(`/api/admin/products/${discountModal.product.id}/discount`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) { toast.success('تم إزالة الخصم'); setDiscountModal({ isOpen: false, product: null }); await fetchProducts(); }
+      else { toast.error('فشل الإزالة'); }
+    } catch { toast.error('خطأ'); }
   };
 
   const handleEdit = (product: any) => {
@@ -180,7 +222,8 @@ export default function ProductsPanel() {
                 <td className="p-2">{p.badge && <span className="bg-[#C9A84C] text-white px-2 py-1 rounded text-xs font-bold">{p.badge}</span>}</td>
                 <td className="p-2"><span className={`px-2 py-1 rounded text-xs font-bold ${p.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{p.stock}</span></td>
                 <td className="p-2 flex gap-2">
-                  <button onClick={() => handleEdit(p)} className="text-blue-500 p-1"><Edit size={16}/></button>
+                  <button onClick={() => handleEdit(p)} className="text-blue-500 p-1" title="تعديل"><Edit size={16}/></button>
+                  <button onClick={() => handleDiscountClick(p)} className="text-[#C9A84C] p-1" title="خصم"><Percent size={16}/></button>
                   <button onClick={() => handleDeleteClick(p.id)} className="text-red-500 p-1"><Trash2 size={16}/></button>
                 </td>
               </tr>
@@ -206,6 +249,38 @@ export default function ProductsPanel() {
         onConfirm={() => { confirmState.onConfirm(); setConfirmState({...confirmState, isOpen: false}); }}
         onCancel={() => setConfirmState({...confirmState, isOpen: false})}
       />
-    </div>
+    
+      {discountModal.isOpen && discountModal.product && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" dir="rtl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-[#2a1a21]">تطبيق خصم</h3>
+              <button onClick={() => setDiscountModal({ isOpen: false, product: null })} className="text-gray-400 hover:text-gray-600"><X size={20}/></button>
+            </div>
+            <div className="bg-[#FAF3E0] p-3 rounded-lg mb-4 flex items-center gap-3">
+              <img src={discountModal.product.image} className="w-12 h-14 object-cover rounded" />
+              <div>
+                <p className="font-bold text-sm">{discountModal.product.name}</p>
+                <p className="text-[#C9A84C] font-bold">{discountModal.product.price} {currency}</p>
+              </div>
+            </div>
+            <form onSubmit={handleApplyDiscount} className="space-y-3">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">نسبة الخصم (%)</label>
+                <input type="number" min="1" max="99" required value={discountForm.percent} onChange={e => setDiscountForm({...discountForm, percent: e.target.value})} placeholder="مثال: 20" className="w-full border p-2 rounded-lg" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">تاريخ الانتهاء (اختياري)</label>
+                <input type="datetime-local" value={discountForm.endsAt} onChange={e => setDiscountForm({...discountForm, endsAt: e.target.value})} className="w-full border p-2 rounded-lg" />
+              </div>
+              <div className="flex gap-2 mt-4">
+                <button type="submit" className="flex-1 bg-[#C9A84C] text-white py-2 rounded-lg font-bold">تطبيق</button>
+                <button type="button" onClick={handleRemoveDiscount} className="px-4 bg-red-100 text-red-600 rounded-lg font-bold">إزالة</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+</div>
   );
 }

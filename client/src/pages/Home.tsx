@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Phone, Mail, Heart, Menu, Minus, Plus, Search, ShoppingBag, Sparkles, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import HeroSlider from "../components/HeroSlider";
+import { useSettings } from '../hooks/useSettings';
 import LuxuryLogo from "../components/LuxuryLogo";
 import MiniCart from "../components/MiniCart";
 import { useLocation } from "wouter";
@@ -9,6 +10,7 @@ import { useLocation } from "wouter";
 const CART_KEY = "lamsa-cart-v2";
 
 export default function Home() {
+  const { currency } = useSettings();
   const [, setLocation] = useLocation();
   const [products, setProducts] = useState<any[]>([]);
   const [cart, setCart] = useState<any[]>(() => {
@@ -67,7 +69,7 @@ export default function Home() {
       {/* شريط التنبيهات المتحرك */}
       <div className="bg-[#34212a] text-white text-xs py-2 overflow-hidden whitespace-nowrap">
         <div className="animate-marquee inline-block">
-          <span className="mx-4">🚚 توصيل مجاني للطلبات فوق 20,000 ر.ي</span>
+          <span className="mx-4">🚚 توصيل مجاني للطلبات فوق 20,000 {currency}</span>
           <span className="mx-4">|</span>
           <span className="mx-4">✨ عروض مختارة على قطع جديدة</span>
           <span className="mx-4">|</span>
@@ -124,7 +126,7 @@ export default function Home() {
                 </div>
                 <div className="p-2 text-center">
                   <p className="font-bold text-sm truncate">{product.name}</p>
-                  <p className="text-[#d93844] font-bold">{product.price} ر.ي</p>
+                  <p className="text-[#d93844] font-bold">{product.price} {currency}</p>
                 </div>
               </div>
             ))}
@@ -181,7 +183,7 @@ export default function Home() {
                   <div className="p-3 text-right" dir="rtl">
                     <h3 className="text-sm text-gray-700 font-medium line-clamp-2 min-h-[40px] leading-5">{product.name}</h3>
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="text-lg font-bold text-[#34212a]">{Number(price).toLocaleString()} ر.ي</span>
+                      <span className="text-lg font-bold text-[#34212a]">{Number(price).toLocaleString()} {currency}</span>
                       {discount > 0 && <span className="text-xs text-gray-400 line-through">{Number(compareAtPrice).toLocaleString()}</span>}
                     </div>
                     {product.rating && (
@@ -271,7 +273,7 @@ export default function Home() {
                     <img src={item.image} className="w-20 h-24 object-cover rounded-lg" />
                     <div className="flex-grow">
                       <h4 className="font-bold text-sm mb-1">{item.name}</h4>
-                      <p className="text-[#34212a] font-bold mb-2">{item.price} ر.ي</p>
+                      <p className="text-[#34212a] font-bold mb-2">{item.price} {currency}</p>
                       <div className="flex items-center gap-3">
                         <div className="flex items-center border rounded">
                           <button onClick={() => changeQuantity(item.id, -1)} className="p-1 hover:bg-gray-50"><Minus size={14}/></button>
@@ -287,7 +289,7 @@ export default function Home() {
             </div>
             {cart.length > 0 && (
               <div className="border-t pt-4 mt-4">
-                <div className="flex justify-between font-extrabold text-xl mb-4 text-[#34212a]"><span>الإجمالي:</span><span>{cartTotal} ر.ي</span></div>
+                <div className="flex justify-between font-extrabold text-xl mb-4 text-[#34212a]"><span>الإجمالي:</span><span>{cartTotal} {currency}</span></div>
                 <button onClick={() => { toast.success("تم إرسال طلبك (تجريبي)"); setCart([]); setCartOpen(false); }} className="w-full bg-[#34212a] text-white py-4 rounded-xl font-bold text-lg hover:bg-black transition">إتمام الطلب</button>
               </div>
             )}

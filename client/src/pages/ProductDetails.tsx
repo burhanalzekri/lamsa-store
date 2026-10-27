@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { ArrowRight, Minus, Plus, ShoppingBag, Star, AlertCircle, Flame, Clock, Heart, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSettings } from '../hooks/useSettings';
 
 const CART_KEY = "lamsa-cart-v2";
 const WISHLIST_KEY = "lamsa-wishlist";
 
 export default function ProductDetails() {
+  const { currency } = useSettings();
   const { id } = useParams();
   const [, setLocation] = useLocation();
 
@@ -171,10 +173,10 @@ export default function ProductDetails() {
             </div>
 
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl font-bold text-[#2a1a21]">{price.toLocaleString()} ر.ي</span>
+              <span className="text-3xl font-bold text-[#2a1a21]">{price.toLocaleString()} {currency}</span>
               {discount > 0 && (
                 <>
-                  <span className="text-lg text-gray-400 line-through">{compareAtPrice.toLocaleString()} ر.ي</span>
+                  <span className="text-lg text-gray-400 line-through">{compareAtPrice.toLocaleString()} {currency}</span>
                   <span className="bg-[#d93844] text-white text-xs font-bold px-2 py-1 rounded">وفري {discount}%</span>
                 </>
               )}
@@ -302,7 +304,7 @@ export default function ProductDetails() {
                     <div className="p-3 text-center">
                       <h3 className="font-bold text-sm text-[#2a1a21] truncate">{p.name}</h3>
                       <div className="flex items-center justify-center gap-2 mt-1">
-                        <p className="text-sm text-[#2a1a21] font-bold">{pPrice.toLocaleString()} ر.ي</p>
+                        <p className="text-sm text-[#2a1a21] font-bold">{pPrice.toLocaleString()} {currency}</p>
                         {pDiscount > 0 && <p className="text-xs text-gray-400 line-through">{pCompare.toLocaleString()}</p>}
                       </div>
                     </div>
