@@ -169,8 +169,8 @@ export default function Home() {
           {/* شبكة المنتجات */}
 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {filteredProducts.map(product => {
-              const price = product.price || (product.priceHalalas ? product.priceHalalas / 100 : 0);
-              const compareAtPrice = product.compareAtPrice || (product.compareAtHalalas ? product.compareAtHalalas / 100 : 0);
+              const price = product.price || product.priceHalalas || 0;
+              const compareAtPrice = product.compareAtPrice || product.compareAtHalalas || 0;
               const discount = compareAtPrice > price ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100) : 0;
               const image = product.image || product.imageUrl;
               return (

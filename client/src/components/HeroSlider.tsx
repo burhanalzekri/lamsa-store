@@ -41,7 +41,7 @@ export default function HeroSlider({ products }: { products: any[] }) {
         <p className="text-[#d93844] font-bold text-2xl mb-6">
           {current.price} ر.ي
           <span className="text-gray-400 text-sm line-through mr-2">
-            {current.compareAtHalalas / 100} ر.ي
+            {current.compareAtHalalas} ر.ي
           </span>
         </p>
         <button 

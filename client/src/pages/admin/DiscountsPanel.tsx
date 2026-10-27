@@ -79,7 +79,7 @@ export default function DiscountsPanel() {
             <select value={form.productId} onChange={e => setForm({...form, productId: e.target.value})} className="w-full border p-2 rounded-lg">
               <option value="">-- اختر منتجاً --</option>
               {products.map(p => (
-                <option key={p.id} value={p.id}>{p.name} - {p.priceHalalas / 100} ر.ي</option>
+                <option key={p.id} value={p.id}>{p.name} - {p.priceHalalas} ر.ي</option>
               ))}
             </select>
           </div>
@@ -116,8 +116,8 @@ export default function DiscountsPanel() {
             </thead>
             <tbody>
               {filtered.map(d => {
-                const original = d.compareAtHalalas / 100;
-                const current = d.priceHalalas / 100;
+                const original = d.compareAtHalalas || 0;
+                const current = d.priceHalalas || 0;
                 const percent = Math.round(((original - current) / original) * 100);
                 const expired = isExpired(d.discountEndsAt);
                 return (

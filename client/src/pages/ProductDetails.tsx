@@ -52,7 +52,7 @@ export default function ProductDetails() {
   const addToCart = (goToCheckout: boolean) => {
     try {
       const cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
-      const price = product.priceHalalas ? product.priceHalalas / 100 : product.price;
+      const price = product.priceHalalas ? product.priceHalalas : product.price;
       
       const exists = cart.find((l: any) => l.id === product.id && l.size === selectedSize && l.color === selectedColor);
       if (exists) exists.quantity += quantity;
@@ -106,8 +106,8 @@ export default function ProductDetails() {
     productImages.unshift(product.image);
   }
 
-  const price = product.priceHalalas ? product.priceHalalas / 100 : (product.price || 0);
-  const compareAtPrice = product.compareAtHalalas ? product.compareAtHalalas / 100 : (product.compareAtPrice || 0);
+  const price = product.priceHalalas || product.price || 0;
+  const compareAtPrice = product.compareAtHalalas || product.compareAtPrice || 0;
   const discount = compareAtPrice > price ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100) : 0;
 
   const sizes = ["S", "M", "L", "XL"];
@@ -292,8 +292,8 @@ export default function ProductDetails() {
             <h2 className="text-2xl font-bold text-[#2a1a21] mb-6" style={{ fontFamily: "'Amiri', serif" }}>منتجات مشابهة قد تعجبك</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {related.map(p => {
-                const pPrice = p.priceHalalas ? p.priceHalalas / 100 : (p.price || 0);
-                const pCompare = p.compareAtHalalas ? p.compareAtHalalas / 100 : 0;
+                const pPrice = p.priceHalalas ? p.priceHalalas : (p.price || 0);
+                const pCompare = p.compareAtHalalas ? p.compareAtHalalas : 0;
                 const pDiscount = pCompare > pPrice ? Math.round(((pCompare - pPrice) / pCompare) * 100) : 0;
                 return (
                   <div key={p.id} onClick={() => setLocation(`/product/${p.id}`)} className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition cursor-pointer">
