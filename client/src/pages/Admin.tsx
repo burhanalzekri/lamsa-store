@@ -7,6 +7,7 @@ import DiscountsPanel from './admin/DiscountsPanel';
 import SettingsPanel from './admin/SettingsPanel';
 import InventoryReport from './admin/InventoryReport';
 import UserGuide from './admin/UserGuide';
+import BulkImport from './admin/BulkImport';
 import ReportsPanel from './admin/ReportsPanel';
 import VariantsPanel from './admin/VariantsPanel';
 import OverviewPanel from './admin/OverviewPanel';
@@ -16,7 +17,7 @@ import CategoriesPanel from './admin/CategoriesPanel';
 import AdminSidebar from './admin/AdminSidebar';
 
 export default function Admin({ user }: { user: any }) {
-  const [tab, setTab] = useState<'overview'|'products'|'orders'|'users'|'coupons'|'settings'|'reports'|'variants'|'categories'|'discounts'|'guide'|'inventory'>('overview');
+  const [tab, setTab] = useState<'overview'|'products'|'orders'|'users'|'coupons'|'settings'|'reports'|'variants'|'categories'|'discounts'|'guide'|'inventory'|'bulk-import'>('overview');
   const [, setLocation] = useLocation();
 
   const handleLogout = () => { 
@@ -57,6 +58,7 @@ export default function Admin({ user }: { user: any }) {
           {tab === 'coupons' && <CouponsPanel />}
           {tab === 'reports' && <ReportsPanel />}
           {tab === 'inventory' && <InventoryReport />}
+          {tab === 'bulk-import' && <BulkImport />}
           {tab === 'settings' && <SettingsPanel />}
           {tab === 'guide' && <UserGuide />}
         </main>

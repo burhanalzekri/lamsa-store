@@ -433,6 +433,53 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
     } catch (err: any) { res.status(500).json({ error: err.message }); }
   });
 
+  
+  // استيراد منتجات بالجملة من Excel
+  app.post("/api/admin/products/bulk", express.json(), requireAdmin, async (req: any, res: any) => {
+    try {
+      const { products } = req.body;
+      if (!Array.isArray(products) || products.length === 0) {
+        return res.status(400).json({ error: "لا توجد منتجات للاستيراد" });
+      }
+
+      const conn = await getConn();
+      let imported = 0;
+      const errors: any[] = [];
+
+      for (const p of products) {
+        try {
+          const id = "p_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+          await conn.execute(
+            `INSERT INTO store_products 
+             (id, name, category, description, imageUrl, priceHalalas, compareAtHalalas, stock, badge, material, active) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+            [
+              id,
+              p.name || 'بدون اسم',
+              p.category || 'عام',
+              p.description || null,
+              p.imageUrl || null,
+              Math.round(Number(p.price) * 100) || 0,
+              Math.round(Number(p.compareAtPrice || 0) * 100) || 0,
+              Number(p.stock) || 0,
+              p.badge || null,
+              p.material || null,
+            ]
+          );
+          imported++;
+        } catch (e: any) {
+          errors.push({ name: p.name, error: e.message });
+        }
+      }
+
+      await conn.end();
+      res.json({ success: true, imported, errors });
+    } catch (err: any) {
+      console.error('Bulk import error:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   app.get("/api/admin/all-products", async (req, res) => {
     try {
       const conn = await getConn();

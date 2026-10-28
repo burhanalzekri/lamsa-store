@@ -1,5 +1,5 @@
 import { 
-  LayoutDashboard, Package, ShoppingCart, Users, Tag, BarChart, Settings, LogOut, Percent, Boxes, BookOpen
+  LayoutDashboard, Package, ShoppingCart, Users, Tag, BarChart, Settings, LogOut, Percent, Boxes, BookOpen, Upload
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 
@@ -15,6 +15,7 @@ export default function AdminSidebar({ tab, setTab, onLogout }: AdminSidebarProp
   const menuItems = [
     { id: 'overview', label: 'نظرة عامة', icon: LayoutDashboard },
     { id: 'products', label: 'المنتجات', icon: Package },
+    { id: 'bulk-import', label: 'استيراد منتجات', icon: Upload },
     { id: 'variants', label: 'المتغيرات', icon: Tag },
     { id: 'categories', label: 'الفئات', icon: LayoutDashboard },
     { id: 'orders', label: 'الطلبات', icon: ShoppingCart },
