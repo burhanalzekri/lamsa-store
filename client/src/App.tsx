@@ -17,10 +17,11 @@ import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
-import { LogOut, Menu, X, ShoppingBag, Home as HomeIcon, Truck, User, LayoutDashboard, Search, Flame, Tag, Clock, Heart, Info, Bell, Sun, Moon, BookOpen } from "lucide-react";
+import { LogOut, Menu, X, ShoppingBag, Home as HomeIcon, Truck, User, LayoutDashboard, Search, Flame, Tag, Clock, Heart, Info, Bell, Sun, Moon, BookOpen, Store } from "lucide-react";
 import LuxuryLogo from './components/LuxuryLogo';
 import Checkout from './pages/Checkout';
 import UserGuide from './pages/admin/UserGuide';
+import { useOrderNotifications } from './hooks/useOrderNotifications';
 
 const Admin = lazy(() => import("./pages/Admin"));
 const CART_KEY = "lamsa-cart-v2";
@@ -32,6 +33,8 @@ function AppContent() {
       return saved ? JSON.parse(saved) : null;
     } catch { return null; }
   });
+  useOrderNotifications(user);
+
 
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('lamsa-theme') === 'dark');
   useEffect(() => {
@@ -114,6 +117,18 @@ function AppContent() {
         <button onClick={() => setMenuOpen(true)} className="p-2 text-[#482d39]"><Menu size={24}/></button>
         <div className="cursor-pointer scale-90" onClick={() => setLocation('/')}><LuxuryLogo size="sm" /></div>
         <div className="flex items-center gap-1">
+          {/* زر العودة للمتجر - يظهر فقط في لوحة التحكم */}
+          {typeof window !== 'undefined' && window.location.pathname.startsWith('/admin') && (
+            <button 
+              onClick={() => setLocation('/')} 
+              className="bg-[#C9A84C] hover:bg-[#b8952f] text-white px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 text-sm transition shadow-sm"
+              title="العودة للمتجر"
+            >
+              <Store size={16}/>
+              <span className="hidden sm:inline">المتجر</span>
+            </button>
+          )}
+          
           <button onClick={() => setDarkMode(!darkMode)} className="p-2 text-[#482d39] dark:text-[#C9A84C]" title="تبديل الوضع">
             {darkMode ? <Sun size={22}/> : <Moon size={22}/>}
           </button>

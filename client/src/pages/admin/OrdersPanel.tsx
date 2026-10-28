@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Printer, Download, Search } from 'lucide-react';
+import { Printer, Download, Search, MessageCircle } from 'lucide-react';
 import ConfirmModal from '../../components/ConfirmModal';
 
 export default function OrdersPanel() {
@@ -60,6 +60,12 @@ export default function OrdersPanel() {
   const statusLabel: any = { pending: "قيد الانتظار", processing: "قيد التجهيز", shipped: "تم الشحن", completed: "مكتمل", cancelled: "ملغي" };
   const statusColor: any = { pending: "bg-yellow-100 text-yellow-800", processing: "bg-blue-100 text-blue-800", shipped: "bg-purple-100 text-purple-800", completed: "bg-green-100 text-green-800", cancelled: "bg-red-100 text-red-800" };
 
+  const openWhatsApp = (order) => {
+    const phone = (order.phone || "").replace(/[^0-9]/g, "");
+    const msg = "مرحباً " + (order.customerName || "") + "،\nنشكرك على طلبك من متجر لمسة\n\nرقم الطلب: " + (order.orderNumber || order.id) + "\nالإجمالي: " + Number(order.totalAmount).toLocaleString() + " ريال\n\nنود تأكيد طلبك.";
+    window.open("https://wa.me/" + phone + "?text=" + encodeURIComponent(msg), "_blank");
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <h2 className="text-2xl font-bold text-[#482d39] mb-6">إدارة الطلبات ({orders.length})</h2>
@@ -90,7 +96,14 @@ export default function OrdersPanel() {
               <tr key={o.id} className="border-t hover:bg-gray-50">
                 <td className="p-3 font-mono text-xs">{o.orderNumber || o.id.slice(0,8)}</td>
                 <td className="p-3">{o.customerName}</td>
-                <td className="p-3" dir="ltr">{o.phone}</td>
+                <td className="p-3"><div className="flex items-center gap-2"><span dir="ltr" className="font-mono text-xs">{o.phone}</span><button 
+                      onClick={() => openWhatsApp(o)} 
+                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 text-xs font-bold" 
+                      title="تواصل عبر واتساب"
+                    >
+                      <MessageCircle size={14}/>
+                      واتساب
+                    </button></div></td>
                 <td className="p-3 font-bold">{Number(o.totalAmount).toLocaleString()} ر.ي</td>
                 <td className="p-3"><span className={`px-2 py-1 rounded text-xs font-bold ${statusColor[o.status] || 'bg-gray-100'}`}>{statusLabel[o.status] || o.status}</span></td>
                 <td className="p-3">

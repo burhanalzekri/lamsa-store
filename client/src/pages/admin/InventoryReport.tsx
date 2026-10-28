@@ -68,7 +68,7 @@ export default function InventoryReport() {
       </div>
 
       {/* البطاقات الإحصائية */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 stats-cards">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 stats-cards no-print">
         <div className="bg-white p-5 rounded-xl shadow-sm">
           <div className="flex items-center gap-3 mb-2">
             <div className="bg-blue-500 text-white p-2 rounded-lg icon-hide-print"><Boxes size={20}/></div>
