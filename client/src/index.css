@@ -766,3 +766,360 @@ button.bg-\[\#482d39\], button.bg-\[\#34212a\], button.bg-\[\#d93844\] {
 .dark .luxury-hero-slider p { color: #b0b0b0 !important; }
 .dark .bg-red-50, .dark .bg-green-50, .dark .bg-blue-50, .dark .bg-purple-50 { background-color: #1a1a1a !important; }
 
+
+/* تحسينات الطباعة العامة */
+
+  
+  /* إخفاء الأزرار */
+  button { display: none !important; }
+  
+  /* الصفحة البيضاء */
+  body {
+    background: white !important;
+  }
+}
+
+/* إخفاء السايدبار في الطباعة (باستخدام :has) */
+
+  
+  /* إخفاء الشريط العلوي */
+  nav, header {
+    display: none !important;
+  }
+  
+  /* إخفاء الأزرار */
+  button {
+    display: none !important;
+  }
+  
+  /* إظهار التقرير فقط */
+  #inventory-report {
+    margin: 0 !important;
+    padding: 15px !important;
+  }
+  
+  /* الطباعة A4 */
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+}
+
+/* ============ إعدادات الطباعة ============ */
+
+  
+  /* إخفاء الأزرار */
+  button {
+    display: none !important;
+  }
+  
+  /* إخفاء الفلاتر */
+  .no-print {
+    display: none !important;
+  }
+  
+  /* إظهار عنوان الطباعة */
+  .print-only-header {
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  /* إظهار التقرير فقط */
+  #inventory-report {
+    position: static !important;
+    padding: 20px !important;
+    width: 100% !important;
+  }
+  
+  /* إخفاء كل ما هو خارج التقرير */
+  body > div > *:not(:has(#inventory-report)) {
+    display: none !important;
+  }
+  
+  /* تنسيق البطاقات الإحصائية */
+  .stats-cards {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+    page-break-inside: avoid !important;
+  }
+  
+  .stats-cards > div {
+    background: #FAF3E0 !important;
+    border: 2px solid #C9A84C !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    text-align: center !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* إخفاء أيقونات البطاقات */
+  
+  
+  /* الجدول */
+  #inventory-report table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 11px !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  #inventory-report table th {
+    background: #482d39 !important;
+    color: white !important;
+    padding: 8px !important;
+    border: 1px solid #999 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  #inventory-report table td {
+    padding: 6px !important;
+    border: 1px solid #999 !important;
+  }
+  
+  #inventory-report table tr:nth-child(even) {
+    background: #FAF3E0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+}
+
+/* إخفاء عنوان الطباعة في المتصفح */
+.print-only-header {
+  display: none;
+}
+
+
+/* ============================================
+   إعدادات الطباعة الموحدة
+   ============================================ */
+@media print {
+  /* 1. إخفاء الشريط العلوي والسايدبار والأزرار */
+  nav, aside, header, footer, .admin-sidebar, button {
+    display: none !important;
+  }
+  
+  /* 2. إخفاء العناصر التي تحمل no-print */
+  .no-print {
+    display: none !important;
+  }
+  
+  /* 3. إظهار عنوان الطباعة فقط */
+  .print-only-header {
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  /* 4. الصفحة بيضاء */
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* 5. التقرير فقط */
+  #inventory-report {
+    padding: 20px !important;
+    margin: 0 !important;
+  }
+  
+  /* 6. البطاقات الإحصائية */
+  .stats-cards {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+    page-break-inside: avoid !important;
+    margin-bottom: 20px !important;
+  }
+  
+  .stats-cards > div {
+    background: #FAF3E0 !important;
+    border: 2px solid #C9A84C !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    text-align: center !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* إخفاء أيقونات البطاقات */
+  
+  
+  
+  
+  .stats-cards p:last-child {
+    font-size: 18px !important;
+    font-weight: bold !important;
+    color: #2a1a21 !important;
+    margin-top: 5px !important;
+  }
+  
+  /* 7. الجدول */
+  #inventory-report table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 11px !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  #inventory-report table th {
+    background: #482d39 !important;
+    color: white !important;
+    padding: 8px !important;
+    border: 1px solid #999 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  #inventory-report table td {
+    padding: 6px !important;
+    border: 1px solid #999 !important;
+  }
+  
+  #inventory-report table tr:nth-child(even) {
+    background: #FAF3E0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* 8. صفحة A4 */
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+}
+
+/* إخفاء عنوان الطباعة في المتصفح */
+.print-only-header {
+  display: none;
+}
+
+
+/* ============================================
+   إعدادات الطباعة (النسخة النهائية)
+   ============================================ */
+@media print {
+  /* إخفاء الشريط العلوي والسايدبار والأزرار */
+  nav, aside, header, footer, .admin-sidebar, button {
+    display: none !important;
+  }
+  
+  /* إخفاء الفلاتر */
+  .no-print {
+    display: none !important;
+  }
+  
+  /* إظهار عنوان الطباعة */
+  .print-only-header {
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  /* الصفحة بيضاء */
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* التقرير فقط */
+  #inventory-report {
+    padding: 20px !important;
+    margin: 0 !important;
+  }
+  
+  /* البطاقات الإحصائية */
+  .stats-cards {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid !important;
+  }
+  
+  .stats-cards > div {
+    background: #FAF3E0 !important;
+    border: 2px solid #C9A84C !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    text-align: center !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* ✅ إخفاء الأيقونة فقط */
+  .stats-cards .icon-hide-print {
+    display: none !important;
+  }
+  
+  /* ✅ إظهار العنوان (بخط أسود عريض) */
+  .stats-cards .title-print {
+    display: block !important;
+    color: #000000 !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    margin: 0 0 5px 0 !important;
+    text-align: center !important;
+    visibility: visible !important;
+  }
+  
+  /* ✅ إظهار القيمة (الرقم) */
+  .stats-cards .value-print {
+    display: block !important;
+    color: #2a1a21 !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    text-align: center !important;
+    visibility: visible !important;
+  }
+  
+  /* الجدول */
+  #inventory-report table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 11px !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  #inventory-report table th {
+    background: #482d39 !important;
+    color: white !important;
+    padding: 8px !important;
+    border: 1px solid #999 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  #inventory-report table td {
+    padding: 6px !important;
+    border: 1px solid #999 !important;
+  }
+  
+  #inventory-report table tr:nth-child(even) {
+    background: #FAF3E0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* صفحة A4 */
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+}
+
+/* إخفاء عنوان الطباعة في المتصفح */
+.print-only-header {
+  display: none;
+}

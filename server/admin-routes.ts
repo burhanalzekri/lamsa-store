@@ -398,6 +398,41 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
     } catch (err: any) { res.status(500).json({ error: err.message }); }
   });
 
+  
+  // تقرير المخزون
+  app.get("/api/admin/inventory-report", requireAdmin, async (req: any, res: any) => {
+    try {
+      const conn = await getConn();
+      const [rows]: any = await conn.query(`
+        SELECT 
+          id, name, category, stock, priceHalalas, costHalalas, 
+          (stock * priceHalalas) as totalValue,
+          (stock * costHalalas) as totalCost,
+          active
+        FROM store_products 
+        ORDER BY stock ASC, name ASC
+      `);
+      await conn.end();
+      
+      const totalValue = rows.reduce((s: number, r: any) => s + Number(r.totalValue || 0), 0);
+      const totalCost = rows.reduce((s: number, r: any) => s + Number(r.totalCost || 0), 0);
+      const outOfStock = rows.filter((r: any) => r.stock === 0).length;
+      const lowStock = rows.filter((r: any) => r.stock > 0 && r.stock <= 5).length;
+      
+      res.json({
+        products: rows,
+        summary: {
+          totalProducts: rows.length,
+          totalValue: totalValue / 100,
+          totalCost: totalCost / 100,
+          outOfStock,
+          lowStock,
+          expectedProfit: (totalValue - totalCost) / 100
+        }
+      });
+    } catch (err: any) { res.status(500).json({ error: err.message }); }
+  });
+
   app.get("/api/admin/all-products", async (req, res) => {
     try {
       const conn = await getConn();
