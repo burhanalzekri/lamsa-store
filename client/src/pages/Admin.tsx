@@ -33,7 +33,7 @@ export default function Admin({ user }: { user: any }) {
           <AlertTriangle className="text-red-500 w-16 h-16 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-[#482d39] mb-2">غير مصرح لك</h2>
           <p className="text-gray-600 mb-6">هذه الصفحة مخصصة للمسؤولين فقط.</p>
-          <button onClick={() => setLocation('/')} className="bg-[#482d39] text-white px-6 py-2 rounded-lg font-bold">العودة للمتجر</button>
+          <button onClick={() => setLocation('/')} className="bg-[#6b174d] text-white px-6 py-2 rounded-lg font-bold">العودة للمتجر</button>
         </div>
       </div>
     );
@@ -53,7 +53,7 @@ export default function Admin({ user }: { user: any }) {
           {tab === 'variants' && <VariantsPanel />}
           {tab === 'categories' && <CategoriesPanel />}
           {tab === 'orders' && <OrdersPanel />}
-          {tab === 'users' && <UsersPanel currentUserId={user.id} />}
+          {tab === 'users' && <UsersPanel />}
           {tab === 'discounts' && <DiscountsPanel />}
           {tab === 'coupons' && <CouponsPanel />}
           {tab === 'reports' && <ReportsPanel />}

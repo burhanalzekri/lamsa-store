@@ -94,7 +94,7 @@ export default function Register({ onLogin, goToLogin }: { onLogin: (user: any, 
               </button>
             </div>
 
-            <button disabled={loading} type="submit" className="w-full bg-[#482d39] text-white py-3.5 lg:py-4 rounded-2xl font-bold text-lg hover:bg-[#5a3847] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 group">
+            <button disabled={loading} type="submit" className="w-full bg-[#6b174d] text-white py-3.5 lg:py-4 rounded-2xl font-bold text-lg hover:bg-[#5a3847] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 group">
               {loading ? 'جارٍ الإنشاء...' : 'إنشاء الحساب'}
               {!loading && <ArrowRight size={20} className="group-hover:-translate-x-1 transition-transform" />}
             </button>

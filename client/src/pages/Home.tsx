@@ -67,7 +67,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#FAF3E0] pb-20" dir="rtl">
       {/* شريط التنبيهات المتحرك */}
-      <div className="bg-[#34212a] text-white text-xs py-2 overflow-hidden whitespace-nowrap">
+      <div className="bg-[#6b174d] text-white text-xs py-2 overflow-hidden whitespace-nowrap">
         <div className="animate-marquee inline-block">
           <span className="mx-4">🚚 توصيل مجاني للطلبات فوق 20,000 {currency}</span>
           <span className="mx-4">|</span>
@@ -162,7 +162,7 @@ export default function Home() {
           {/* التصنيفات */}
           <div className="flex overflow-x-auto gap-3 pb-4 mb-6 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
             {["الكل", "وصل حديثاً", "فساتين", "عبايات", "حقائب", "أحذية"].map(c => (
-              <button key={c} onClick={() => setActiveCategory(c)} className={`px-5 py-2 rounded-full whitespace-nowrap text-sm font-bold transition border ${activeCategory === c ? 'bg-[#34212a] text-white border-[#34212a]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>{c}</button>
+              <button key={c} onClick={() => setActiveCategory(c)} className={`px-5 py-2 rounded-full whitespace-nowrap text-sm font-bold transition border ${activeCategory === c ? 'bg-[#6b174d] text-white border-[#34212a]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>{c}</button>
             ))}
           </div>
 
@@ -197,7 +197,7 @@ export default function Home() {
                       </div>
                     )}
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); addToCart(product); }} className="absolute bottom-16 left-3 bg-[#34212a] text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg hover:bg-[#C9A84C] z-20" title="أضف للسلة">
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(product); }} className="absolute bottom-16 left-3 bg-[#6b174d] text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg hover:bg-[#C9A84C] z-20" title="أضف للسلة">
                     <ShoppingBag size={16} />
                   </button>
                 </div>
@@ -291,7 +291,7 @@ export default function Home() {
             {cart.length > 0 && (
               <div className="border-t pt-4 mt-4">
                 <div className="flex justify-between font-extrabold text-xl mb-4 text-[#34212a]"><span>الإجمالي:</span><span>{cartTotal} {currency}</span></div>
-                <button onClick={() => { toast.success("تم إرسال طلبك (تجريبي)"); setCart([]); setCartOpen(false); }} className="w-full bg-[#34212a] text-white py-4 rounded-xl font-bold text-lg hover:bg-black transition">إتمام الطلب</button>
+                <button onClick={() => { toast.success("تم إرسال طلبك (تجريبي)"); setCart([]); setCartOpen(false); }} className="w-full bg-[#6b174d] text-white py-4 rounded-xl font-bold text-lg hover:bg-black transition">إتمام الطلب</button>
               </div>
             )}
           </div>

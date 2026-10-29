@@ -21,21 +21,21 @@
   background: #f8f6f2;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --ink: #342a2d;
-  --muted-ink: #867d7a;
-  --plum: #482d39;
-  --rose: #b77f83;
-  --rose-light: #e5c8c5;
-  --cream: #f8f6f2;
-  --sand: #eee9e1;
-  --line: #e8e2da;
-  --background: #f8f6f2;
-  --foreground: #342a2d;
-  --primary: #482d39;
+  --ink: #28121f;
+  --muted-ink: #8e7785;
+  --plum: #351126;
+  --rose: #b12d78;
+  --rose-light: #f0c6dc;
+  --cream: #fff9fc;
+  --sand: #f7eaf1;
+  --line: #eedce6;
+  --background: #fff9fc;
+  --foreground: #28121f;
+  --primary: #6b174d;
   --primary-foreground: #fff;
-  --muted: #f1eee9;
-  --muted-foreground: #867d7a;
-  --border: #e8e2da;
+  --muted: #f8edf3;
+  --muted-foreground: #8e7785;
+  --border: #eedce6;
   --radius: 0.8rem;
 }
 
@@ -766,3 +766,704 @@ button.bg-\[\#482d39\], button.bg-\[\#34212a\], button.bg-\[\#d93844\] {
 .dark .luxury-hero-slider p { color: #b0b0b0 !important; }
 .dark .bg-red-50, .dark .bg-green-50, .dark .bg-blue-50, .dark .bg-purple-50 { background-color: #1a1a1a !important; }
 
+/* LAMSA CINEMATIC THEME V2 */
+:root {
+  --lamsa-ink: #28121f;
+  --lamsa-plum: #351126;
+  --lamsa-plum-dark: #260c1e;
+  --lamsa-plum-light: #51153e;
+  --lamsa-magenta: #a62970;
+  --lamsa-rose: #d95b9c;
+  --lamsa-gold: #d7ad68;
+  --lamsa-gold-light: #f3dfb7;
+  --lamsa-cream: #fff9fc;
+  --lamsa-blush: #f8eaf2;
+}
+
+body {
+  background-color: var(--lamsa-cream);
+  color: var(--lamsa-ink);
+}
+
+::selection {
+  background: var(--lamsa-magenta);
+  color: #fff;
+}
+
+a, button, input, select, textarea {
+  transition:
+    color .18s ease,
+    background-color .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--lamsa-gold);
+  outline-offset: 3px;
+}
+
+/* Brand and navigation */
+.announcement {
+  background: linear-gradient(
+    90deg,
+    var(--lamsa-plum-dark),
+    var(--lamsa-plum-light),
+    var(--lamsa-plum-dark)
+  );
+  color: #fff8fc;
+  border-bottom: 1px solid rgba(215, 173, 104, .48);
+}
+
+.announcement svg {
+  color: var(--lamsa-gold-light);
+}
+
+.site-header {
+  background: rgba(255, 249, 252, .96);
+  border-bottom-color: rgba(177, 45, 120, .16);
+  backdrop-filter: blur(16px);
+}
+
+.brand-mark {
+  border-color: var(--lamsa-gold);
+  box-shadow: 0 0 0 4px rgba(215, 173, 104, .08);
+}
+
+.brand-name {
+  color: var(--lamsa-plum);
+}
+
+.brand-name small {
+  color: var(--lamsa-magenta);
+}
+
+.main-nav a:hover {
+  color: var(--lamsa-magenta);
+}
+
+.icon-button:hover,
+.header-actions button:hover {
+  background: var(--lamsa-blush);
+}
+
+.header-search {
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 5px 20px rgba(53, 17, 38, .05);
+}
+
+.header-search:focus-within {
+  border-color: var(--lamsa-gold);
+  box-shadow: 0 0 0 3px rgba(215, 173, 104, .16);
+}
+
+/* Hero sections */
+.hero-copy h1,
+section h2,
+.section-heading h2 {
+  color: var(--lamsa-plum);
+}
+
+.hero-copy h1 em,
+.eyebrow {
+  color: var(--lamsa-magenta);
+}
+
+.eyebrow-line {
+  background: linear-gradient(
+    90deg,
+    var(--lamsa-gold),
+    var(--lamsa-magenta)
+  );
+}
+
+.hero-section img {
+  border-radius: 12px;
+}
+
+/* Buttons */
+button[class*="bg-[#482d39]"],
+button[class*="bg-[#34212a]"],
+a[class*="bg-[#482d39]"],
+a[class*="bg-[#34212a]"] {
+  background: linear-gradient(
+    135deg,
+    var(--lamsa-magenta),
+    var(--lamsa-plum-light)
+  ) !important;
+  color: #fff !important;
+  border: 1px solid rgba(215, 173, 104, .45);
+  box-shadow: 0 7px 20px rgba(53, 17, 38, .12);
+}
+
+button[class*="bg-[#482d39]"]:hover,
+button[class*="bg-[#34212a]"]:hover,
+a[class*="bg-[#482d39]"]:hover,
+a[class*="bg-[#34212a]"]:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* Forms */
+input,
+select,
+textarea {
+  border-color: #ead7e2;
+  border-radius: 10px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--lamsa-magenta);
+  box-shadow: 0 0 0 3px rgba(166, 41, 112, .10);
+}
+
+label {
+  color: #604454;
+}
+
+/* Product cards */
+.product-card,
+.product-tile,
+[class*="product-card"] {
+  border: 1px solid rgba(177, 45, 120, .12);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(53, 17, 38, .045);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+.product-card:hover,
+.product-tile:hover,
+[class*="product-card"]:hover {
+  transform: translateY(-3px);
+  border-color: rgba(215, 173, 104, .7);
+  box-shadow: 0 16px 32px rgba(53, 17, 38, .12);
+}
+
+.section-heading h2::after {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 2px;
+  margin-top: 12px;
+  background: linear-gradient(
+    90deg,
+    var(--lamsa-gold),
+    var(--lamsa-magenta)
+  );
+}
+
+/* Admin dashboard and tables */
+table thead,
+[class*="table-header"] {
+  background: var(--lamsa-blush);
+  color: var(--lamsa-plum);
+}
+
+table th {
+  font-weight: 700;
+}
+
+table tbody tr {
+  border-bottom: 1px solid #f1e2eb;
+}
+
+table tbody tr:hover {
+  background: #fff8fc;
+}
+
+aside,
+[class*="sidebar"],
+[class*="Sidebar"] {
+  scrollbar-width: thin;
+  scrollbar-color: #b85c91 #f8eaf2;
+}
+
+hr {
+  border-color: #eedce6;
+}
+
+/* Footer */
+footer {
+  background: linear-gradient(
+    135deg,
+    var(--lamsa-plum-dark),
+    var(--lamsa-plum-light)
+  );
+  color: #fff8fc;
+  border-top: 1px solid rgba(215, 173, 104, .5);
+}
+
+footer a:hover {
+  color: var(--lamsa-gold-light);
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+  .site-header {
+    max-width: 100%;
+  }
+
+  .header-search {
+    max-width: 100%;
+  }
+
+  .main-nav {
+    gap: 16px;
+  }
+
+  .product-card,
+  .product-tile {
+    border-radius: 12px;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* --- Lamsa Header & Navbar Overrides --- */
+.lamsa-navbar { background: #ffffff; border-bottom: 1px solid #f0e6ed; }
+.lamsa-nav-link { color: #333; font-weight: 500; transition: 0.3s; }
+.lamsa-nav-link:hover { color: #8b2252; }
+.lamsa-btn-primary { 
+  background: linear-gradient(135deg, #6b174d, #a62970); 
+  color: white; 
+  border-radius: 8px; 
+  padding: 10px 20px; 
+  transition: 0.3s; 
+  border: none;
+}
+.lamsa-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(166, 41, 112, 0.3); }
+
+/* --- Lamsa Product Cards Override --- */
+.lamsa-card { 
+  background: white; 
+  border-radius: 16px; 
+  overflow: hidden; 
+  border: 1px solid #f2e6ec; 
+  transition: all 0.3s ease; 
+}
+.lamsa-card:hover { 
+  transform: translateY(-5px); 
+  box-shadow: 0 12px 24px rgba(107, 23, 77, 0.08); 
+  border-color: #d7ad68; 
+}
+.lamsa-card-image { width: 100%; height: 250px; object-fit: cover; }
+.lamsa-card-title { font-weight: 600; color: #2d1b2e; font-size: 1rem; }
+.lamsa-card-price { color: #8b2252; font-weight: 700; font-size: 1.1rem; }
+
+/* --- Lamsa Forms & Inputs (Login/Register) --- */
+.lamsa-input { 
+  border: 1px solid #e0c8d6; 
+  border-radius: 8px; 
+  padding: 12px; 
+  width: 100%; 
+  transition: 0.3s; 
+}
+.lamsa-input:focus { border-color: #a62970; outline: none; box-shadow: 0 0 0 3px rgba(166, 41, 112, 0.1); }
+
+/* --- Lamsa Admin Dashboard Overrides --- */
+.admin-stat-card { 
+  border-radius: 16px; 
+  padding: 20px; 
+  color: white; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px;
+}
+.admin-stat-blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.admin-stat-green { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.admin-stat-orange { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.admin-stat-purple { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+
+.admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.admin-table th { background: #f8f9fa; padding: 15px; text-align: right; font-weight: 600; color: #333; border-bottom: 2px solid #edf2f7; }
+.admin-table td { padding: 15px; border-bottom: 1px solid #edf2f7; color: #555; }
+.admin-table tr:hover { background: #fafbfc; }
+
+/* --- LAMSA CINEMATIC CARDS & BUTTONS V3 --- */
+.lamsa-product-card {
+  background: #ffffff;
+  border-radius: 16px; /* حواف مستديرة مثل الفيديو */
+  overflow: hidden;
+  border: 1px solid #f0e6ed;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.lamsa-product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(107, 23, 77, 0.1);
+}
+.lamsa-product-image {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  background-color: #f9f9f9;
+}
+.lamsa-product-title {
+  font-weight: 600;
+  color: #2d1b2e;
+  font-size: 0.95rem;
+  margin-top: 10px;
+}
+.lamsa-product-price {
+  color: #8b2252;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.lamsa-btn-solid {
+  background: #6b174d; /* البنفسجي الملكي */
+  color: white !important;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  transition: background 0.3s;
+  width: 100%;
+  text-align: center;
+  display: block;
+  margin-top: 10px;
+}
+.lamsa-btn-solid:hover {
+  background: #8b2252;
+}
+.lamsa-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #e63946;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 10;
+}
+
+/* --- LAMSA CINEMATIC CATEGORY CHIPS --- */
+.lamsa-chip {
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid #e8e2da;
+  background-color: #ffffff;
+  color: #555;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.lamsa-chip:hover {
+  border-color: #6b174d;
+  color: #6b174d;
+}
+.lamsa-chip-active {
+  background-color: #6b174d !important; /* البنفسجي الملكي */
+  color: #ffffff !important;
+  border-color: #6b174d !important;
+}
+
+/* --- LAMSA CINEMATIC AUTH PAGES (LOGIN & REGISTER) --- */
+.lamsa-auth-container {
+  min-height: calc(100vh - 80px); /* لضمان توسط الشاشة */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fff9fc 0%, #f8eaf2 100%);
+  padding: 20px;
+}
+.lamsa-auth-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px 30px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 30px rgba(107, 23, 77, 0.08);
+  border: 1px solid rgba(215, 173, 104, 0.3); /* حدود ذهبية خفيفة */
+  text-align: center;
+}
+.lamsa-auth-title {
+  color: #6b174d;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+.lamsa-auth-subtitle {
+  color: #8e7785;
+  font-size: 0.9rem;
+  margin-bottom: 25px;
+}
+.lamsa-auth-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ead7e2;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  background-color: #fffafd;
+  transition: all 0.3s;
+}
+.lamsa-auth-input:focus {
+  border-color: #a62970;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(166, 41, 112, 0.1);
+  background-color: #fff;
+}
+.lamsa-auth-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #6b174d, #a62970);
+  color: white;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 10px;
+}
+.lamsa-auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(107, 23, 77, 0.2);
+}
+.lamsa-auth-link {
+  color: #a62970;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.lamsa-auth-link:hover {
+  text-decoration: underline;
+}
+
+/* --- LAMSA CINEMATIC PRODUCT & CART PAGES --- */
+.lamsa-btn-add-to-cart {
+  background: linear-gradient(135deg, #6b174d, #a62970) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+.lamsa-btn-add-to-cart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(107, 23, 77, 0.25) !important;
+}
+
+/* تعديل خلفية صفحة المنتج لتصبح ناعمة */
+.product-page-bg {
+  background: linear-gradient(180deg, #ffffff 0%, #fff9fc 100%);
+}
+
+/* تنسيقات السلة (Cart) */
+.lamsa-cart-item {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #f0e6ed;
+  transition: all 0.3s ease;
+}
+.lamsa-cart-item:hover {
+  box-shadow: 0 5px 15px rgba(107, 23, 77, 0.05);
+}
+.lamsa-btn-checkout {
+  background: #6b174d !important; /* البنفسجي الملكي */
+  color: white !important;
+  border-radius: 10px !important;
+  font-weight: bold !important;
+  width: 100%;
+  padding: 15px;
+  text-align: center;
+  transition: background 0.3s;
+  display: block;
+}
+.lamsa-btn-checkout:hover {
+  background: #8b2252 !important;
+}
+
+/* --- LAMSA ADMIN DASHBOARD V2 (CINEMATIC) --- */
+.admin-page-bg {
+  background-color: #f8f6f2;
+  min-height: 100vh;
+}
+
+/* البطاقات الإحصائية الملونة */
+.admin-stat-card {
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+.admin-stat-card:hover {
+  transform: translateY(-5px);
+}
+.stat-blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.stat-green { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.stat-orange { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.stat-purple { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+
+.stat-title { font-size: 1rem; font-weight: 600; opacity: 0.9; }
+.stat-value { font-size: 2rem; font-weight: bold; margin-top: 10px; }
+
+/* جداول لوحة التحكم */
+.admin-table-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+  overflow: hidden;
+  border: 1px solid #edf2f7;
+  margin-top: 24px;
+}
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th { 
+  background: #f8f9fa; 
+  padding: 16px; 
+  text-align: right; 
+  font-weight: 600; 
+  color: #4a5568; 
+  border-bottom: 2px solid #edf2f7; 
+}
+.admin-table td { 
+  padding: 16px; 
+  border-bottom: 1px solid #edf2f7; 
+  color: #2d3748; 
+}
+.admin-table tr:hover { background: #fafbfc; }
+
+/* القائمة الجانبية (Sidebar) */
+.admin-sidebar {
+  background: #ffffff;
+  border-left: 1px solid #edf2f7;
+  height: 100vh;
+}
+.admin-sidebar a {
+  color: #4a5568;
+  padding: 12px 20px;
+  display: block;
+  transition: all 0.3s;
+}
+.admin-sidebar a:hover, .admin-sidebar a.active {
+  background: #f8eaf2;
+  color: #6b174d;
+  border-right: 4px solid #6b174d;
+}
+
+/* --- LAMSA LUXURY TYPOGRAPHY --- */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+
+body, h1, h2, h3, h4, p, span, div, button, input, a {
+  font-family: 'Tajawal', sans-serif !important;
+}
+
+h1, h2, h3 {
+  color: #6b174d;
+  letter-spacing: -0.5px;
+}
+
+/* تنسيق شريط الإعلانات (Announcement Bar) ليكون أنيقاً */
+.announcement {
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  padding: 8px 0;
+  text-align: center;
+}
+
+/* تنسيق عناوين المنتجات (بطاقات المنتجات) */
+.product-title {
+  color: #2d1b2e;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 8px;
+}
+.product-price {
+  color: #8b2252;
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+/* تنسيقات لوحة التحكم والجداول */
+.admin-table {
+  font-family: 'Tajawal', sans-serif;
+}
+.admin-table th {
+  font-weight: 700;
+  color: #6b174d;
+  font-size: 1rem;
+}
+.admin-table td {
+  font-size: 0.95rem;
+  color: #4a5568;
+}
+
+/* تنسيقات نماذج الدخول والتسجيل */
+.lamsa-auth-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #6b174d;
+  margin-bottom: 8px;
+}
+
+/* --- LAMSA LOGIN FIX (RESPONSIVE CARD) --- */
+.lamsa-login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px);
+  background: #fcf9f2; /* لون كريمي ناعم */
+  padding: 20px;
+}
+
+.lamsa-login-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px; /* حجم مناسب للجوال والكمبيوتر */
+  border-radius: 24px;
+  padding: 40px 30px;
+  box-shadow: 0 15px 35px rgba(107, 23, 77, 0.08);
+  border: 1px solid #f0e6ed;
+  text-align: center;
+}
+
+/* إصلاح حقول الإدخال لتكون بيضاء ونظيفة */
+.lamsa-login-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #ead7e2;
+  border-radius: 12px;
+  background-color: #ffffff !important; /* إجبار الخلفية البيضاء */
+  font-size: 1rem;
+  margin-bottom: 16px;
+  transition: all 0.3s;
+  color: #333;
+}
+.lamsa-login-input:focus {
+  border-color: #6b174d;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(107, 23, 77, 0.1);
+}
+body {
+  background-color: #fcf9f2 !important; /* لون كريمي ناعم للخلفية */
+}

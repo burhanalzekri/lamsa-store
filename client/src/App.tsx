@@ -138,7 +138,7 @@ function AppContent() {
   return (
     <>
       <nav className="bg-white border-b shadow-sm p-3 flex justify-between items-center sticky top-0 z-[60]" dir="rtl">
-        <button onClick={() => setMenuOpen(true)} className="p-2 text-[#482d39]"><Menu size={24}/></button>
+        <button onClick={() => setMenuOpen(true)} className="p-2 text-[#6b174d]"><Menu size={24}/></button>
         <div className="cursor-pointer scale-90" onClick={() => setLocation('/')}><LuxuryLogo size="sm" /></div>
         <div className="flex items-center gap-1">
           {/* زر العودة للمتجر - يظهر فقط في لوحة التحكم */}
@@ -153,14 +153,14 @@ function AppContent() {
             </button>
           )}
           
-          <button onClick={() => setDarkMode(!darkMode)} className="p-2 text-[#482d39] dark:text-[#C9A84C]" title="تبديل الوضع">
+          <button onClick={() => setDarkMode(!darkMode)} className="p-2 text-[#6b174d] dark:text-[#C9A84C]" title="تبديل الوضع">
             {darkMode ? <Sun size={22}/> : <Moon size={22}/>}
           </button>
-          <button onClick={() => setShowNotif(!showNotif)} className="relative p-2 text-[#482d39]">
+          <button onClick={() => setShowNotif(!showNotif)} className="relative p-2 text-[#6b174d]">
             <Bell size={24} />
             {notifications.length > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">{notifications.length}</span>}
           </button>
-          <button onClick={() => setLocation('/cart')} className="relative p-2 text-[#482d39]">
+          <button onClick={() => setLocation('/cart')} className="relative p-2 text-[#6b174d]">
             <ShoppingBag size={24} />
             {cartCount > 0 && <span className="absolute -top-1 -right-1 bg-[#d93844] text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">{cartCount}</span>}
           </button>
@@ -170,7 +170,7 @@ function AppContent() {
       {showNotif && (
         <div className="fixed top-16 right-4 left-4 md:left-auto md:w-80 bg-white shadow-2xl rounded-xl border border-gray-100 z-[65] p-4" dir="rtl">
           <div className="flex justify-between items-center mb-3 border-b pb-2">
-            <h3 className="font-bold text-[#482d39]">الإشعارات ({notifications.length})</h3>
+            <h3 className="font-bold text-[#6b174d]">الإشعارات ({notifications.length})</h3>
             <button onClick={() => setShowNotif(false)} className="text-gray-400"><X size={16}/></button>
           </div>
           <div className="max-h-64 overflow-y-auto space-y-2">
@@ -228,32 +228,32 @@ function AppContent() {
                 <div className="bg-white p-2.5 rounded-xl shadow-sm group-hover:bg-[#482d39] group-hover:text-white transition-all">
                   <HomeIcon size={18}/>
                 </div>
-                <span className="text-[9px] font-bold text-gray-600 group-hover:text-[#482d39]">الرئيسية</span>
+                <span className="text-[9px] font-bold text-gray-600 group-hover:text-[#6b174d]">الرئيسية</span>
               </button>
               <button onClick={() => { setLocation('/cart'); setMenuOpen(false); }} className="flex flex-col items-center gap-1 group">
                 <div className="bg-white p-2.5 rounded-xl shadow-sm group-hover:bg-[#482d39] group-hover:text-white transition-all relative">
                   <ShoppingBag size={18}/>
                   {cartCount > 0 && <span className="absolute -top-1 -right-1 bg-[#d93844] text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full">{cartCount}</span>}
                 </div>
-                <span className="text-[9px] font-bold text-gray-600 group-hover:text-[#482d39]">السلة</span>
+                <span className="text-[9px] font-bold text-gray-600 group-hover:text-[#6b174d]">السلة</span>
               </button>
               <button onClick={() => { setLocation('/track'); setMenuOpen(false); }} className="flex flex-col items-center gap-1 group">
                 <div className="bg-white p-2.5 rounded-xl shadow-sm group-hover:bg-[#482d39] group-hover:text-white transition-all">
                   <Truck size={18}/>
                 </div>
-                <span className="text-[9px] font-bold text-gray-600 group-hover:text-[#482d39]">تتبع</span>
+                <span className="text-[9px] font-bold text-gray-600 group-hover:text-[#6b174d]">تتبع</span>
               </button>
               <button onClick={() => { setLocation('/wishlist'); setMenuOpen(false); }} className="flex flex-col items-center gap-1 group">
                 <div className="bg-white p-2.5 rounded-xl shadow-sm group-hover:bg-[#482d39] group-hover:text-white transition-all">
                   <Heart size={18}/>
                 </div>
-                <span className="text-[9px] font-bold text-gray-600 group-hover:text-[#482d39]">المفضلة</span>
+                <span className="text-[9px] font-bold text-gray-600 group-hover:text-[#6b174d]">المفضلة</span>
               </button>
               <button onClick={() => { setLocation(user ? '/profile' : '/login'); setMenuOpen(false); }} className="flex flex-col items-center gap-1 group">
                 <div className="bg-white p-2.5 rounded-xl shadow-sm group-hover:bg-[#482d39] group-hover:text-white transition-all">
                   <User size={18}/>
                 </div>
-                <span className="text-[9px] font-bold text-gray-600 group-hover:text-[#482d39]">حسابي</span>
+                <span className="text-[9px] font-bold text-gray-600 group-hover:text-[#6b174d]">حسابي</span>
               </button>
             </div>
 
@@ -328,7 +328,7 @@ function AppContent() {
                   <LayoutDashboard size={18}/> لوحة التحكم
                 </button>
               )}
-              <button onClick={() => { setLocation('/about'); setMenuOpen(false); }} className="w-full flex items-center gap-2 p-2.5 text-sm text-[#482d39] font-bold hover:bg-white rounded-lg transition">
+              <button onClick={() => { setLocation('/about'); setMenuOpen(false); }} className="w-full flex items-center gap-2 p-2.5 text-sm text-[#6b174d] font-bold hover:bg-white rounded-lg transition">
                 <Info size={16}/> من نحن / اتصل بنا
               </button>
               {user && (

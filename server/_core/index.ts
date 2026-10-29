@@ -36,7 +36,7 @@ function verifyPassword(plainPassword: string, hashedPassword: string): boolean 
     
     return hash === originalHash;
   } catch (e) { 
-    console.log('❌ [VERIFY] خطأ:', e.message);
+    console.log("❌ [VERIFY] خطأ:", (e as any).message);
     return false; 
   }
 }

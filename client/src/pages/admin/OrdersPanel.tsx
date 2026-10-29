@@ -60,7 +60,7 @@ export default function OrdersPanel() {
   const statusLabel: any = { pending: "قيد الانتظار", processing: "قيد التجهيز", shipped: "تم الشحن", completed: "مكتمل", cancelled: "ملغي" };
   const statusColor: any = { pending: "bg-yellow-100 text-yellow-800", processing: "bg-blue-100 text-blue-800", shipped: "bg-purple-100 text-purple-800", completed: "bg-green-100 text-green-800", cancelled: "bg-red-100 text-red-800" };
 
-  const openWhatsApp = (order) => {
+  const openWhatsApp = (order: any) => {
     const phone = (order.phone || "").replace(/[^0-9]/g, "");
     const msg = "مرحباً " + (order.customerName || "") + "،\nنشكرك على طلبك من متجر لمسة\n\nرقم الطلب: " + (order.orderNumber || order.id) + "\nالإجمالي: " + Number(order.totalAmount).toLocaleString() + " ريال\n\nنود تأكيد طلبك.";
     window.open("https://wa.me/" + phone + "?text=" + encodeURIComponent(msg), "_blank");

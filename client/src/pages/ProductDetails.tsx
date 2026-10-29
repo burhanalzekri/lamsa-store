@@ -281,7 +281,7 @@ export default function ProductDetails() {
                 </div>
               </div>
 
-              <button type="submit" disabled={isSubmitting} className="w-full bg-[#2a1a21] text-white py-2 rounded-lg font-bold disabled:opacity-50 hover:bg-[#482d39] transition">{isSubmitting ? 'جارٍ النشر...' : 'نشر التقييم'}</button>
+              <button type="submit" disabled={isSubmitting} className="w-full bg-[#2a1a21] text-white py-2 rounded-lg font-bold disabled:opacity-50 hover:bg-[#6b174d] transition">{isSubmitting ? 'جارٍ النشر...' : 'نشر التقييم'}</button>
             </form>
           </div>
         </div>

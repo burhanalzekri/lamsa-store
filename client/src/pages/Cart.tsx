@@ -135,7 +135,7 @@ export default function Cart() {
           <ShoppingBag size={64} className="mx-auto text-[#C9A84C] mb-4" />
           <h2 className="text-2xl font-bold text-[#2a1a21] mb-2">سلتك فارغة</h2>
           <p className="text-gray-500 mb-6">لم تقم بإضافة أي منتجات بعد</p>
-          <button onClick={() => setLocation('/')} className="bg-[#2a1a21] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#482d39] transition">تسوقي الآن</button>
+          <button onClick={() => setLocation('/')} className="bg-[#2a1a21] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#6b174d] transition">تسوقي الآن</button>
         </div>
       </div>
     );
@@ -208,7 +208,7 @@ export default function Cart() {
                     <Tag className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={16}/>
                     <input value={couponCode} onChange={e => setCouponCode(e.target.value)} placeholder="كود الخصم" className="w-full border rounded-lg py-2 pr-9 pl-3 text-sm" />
                   </div>
-                  <button onClick={applyCoupon} className="bg-[#2a1a21] text-white px-4 rounded-lg text-sm font-bold hover:bg-[#482d39] transition">تطبيق</button>
+                  <button onClick={applyCoupon} className="bg-[#2a1a21] text-white px-4 rounded-lg text-sm font-bold hover:bg-[#6b174d] transition">تطبيق</button>
                 </div>
                 {couponMsg.text && <p className={`text-xs mt-1 ${couponMsg.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{couponMsg.text}</p>}
               </div>
