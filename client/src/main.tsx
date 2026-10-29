@@ -1,3 +1,11 @@
+if (typeof window !== "undefined" && import.meta.env.DEV) {
+  const origLog = console.log;
+  console.log = (...args) => {
+    if (typeof args[0] === "string" && (args[0].includes("React DevTools") || args[0].includes("[vite]"))) return;
+    origLog(...args);
+  };
+}
+
 // تسجيل Service Worker
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
