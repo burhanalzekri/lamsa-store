@@ -1,42 +1,31 @@
-const CACHE_NAME = 'lamsa-v3';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/manifest.webmanifest',
-];
+const CACHE_NAME = "lamsa-v1";
+const OFFLINE_URL = "/offline";
+const PRECACHE = ["/", "/offline", "/manifest.json"];
 
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE)).catch(() => {})
+  );
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
-  );
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames.map((name) => {
-          if (name !== CACHE_NAME) return caches.delete(name);
-        })
-      )
-    ).then(() => self.clients.claim())
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    )
   );
+  self.clients.claim();
 });
 
-self.addEventListener('fetch', (event) => {
-  // تجنب تخزين طلبات API
-  if (event.request.url.includes('/api/')) return;
-  
+self.addEventListener("fetch", (event) => {
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(OFFLINE_URL))
+    );
+    return;
+  }
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request).then((fetchResponse) => {
-        // تخزين الصور والخطوط
-        if (fetchResponse.ok && (event.request.url.match(/\.(png|jpg|jpeg|svg|woff2?)$/i))) {
-          const clone = fetchResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-        }
-        return fetchResponse;
-      }).catch(() => caches.match('/'));
-    })
+    caches.match(event.request).then((res) => res || fetch(event.request))
   );
 });

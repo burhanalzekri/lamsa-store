@@ -2,6 +2,7 @@ import { lazy, Suspense, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
+import Offline from "@/pages/Offline";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import GlobalFeedback from "./components/GlobalFeedback";
@@ -93,6 +94,29 @@ function AppContent() {
         .catch(() => {});
     }
   }, [menuOpen]);
+
+  // كشف انقطاع الإنترنت
+  useEffect(() => {
+    const goOffline = () => {
+      if (window.location.pathname !== "/offline") {
+        sessionStorage.setItem("lamsa_from", window.location.pathname);
+        setLocation("/offline");
+      }
+    };
+    const goOnline = () => {
+      if (window.location.pathname === "/offline") {
+        const from = sessionStorage.getItem("lamsa_from") || "/";
+        sessionStorage.removeItem("lamsa_from");
+        setLocation(from);
+      }
+    };
+    window.addEventListener("offline", goOffline);
+    window.addEventListener("online", goOnline);
+    return () => {
+      window.removeEventListener("offline", goOffline);
+      window.removeEventListener("online", goOnline);
+    };
+  }, [setLocation]);
 
   const handleLogout = () => {
     setUser(null); localStorage.removeItem('lamsa_user'); localStorage.removeItem('lamsa_token'); setLocation('/'); window.location.reload();
@@ -345,6 +369,7 @@ function AppContent() {
           }}
         </Route>
         <Route path="/404" component={NotFound} />
+              <Route path="/offline" component={Offline} />
         <Route component={NotFound} />
       </Switch>
     </>
