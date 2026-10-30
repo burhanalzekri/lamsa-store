@@ -1,134 +1,106 @@
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Star } from 'lucide-react';
-import { useLocation } from 'wouter';
+import { useState } from "react";
+import { Link } from "wouter";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 
-export default function Login({ onLogin, goToRegister }: { onLogin: (user: any, token: string) => void, goToRegister: () => void }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+export default function Login({ onLogin, goToRegister }: { onLogin: (u: any, t: string) => void, goToRegister: () => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [, setLocation] = useLocation();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      console.log('🔍 [LOGIN] Response:', { status: res.status, data });
-      if (data.success) {
-        toast.success("مرحباً بعودتك! 💕");
-        onLogin(data.user, data.token);
-      } else {
-        toast.error(data.error || 'بيانات الدخول غير صحيحة');
-      }
-    } catch (e) { toast.error('خطأ في الاتصال بالخادم'); }
-    setLoading(false);
+      if (!res.ok) throw new Error(data.message || "خطأ في تسجيل الدخول");
+      onLogin(data.user, data.token);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row-reverse" dir="rtl" style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}>
-      
-      {/* القسم الأيمن (الفاخر - الداكن) */}
-      <div className="relative w-full lg:w-1/2 bg-gradient-to-br from-[#2a1a21] via-[#482d39] to-[#2a1a21] flex flex-col items-center justify-center p-12 overflow-hidden min-h-[40vh] lg:min-h-screen">
-        {/* زخارف نباتية ذهبية */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#C9A84C]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#C9A84C]/10 rounded-full blur-3xl"></div>
+    <div className="min-h-screen flex items-center justify-center bg-[#fcf9f2] p-4" dir="rtl">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-[0_10px_40px_rgba(107,23,77,0.08)] p-8 sm:p-10 border border-[#f0e6ed]">
         
-        <div className="relative z-10 text-center">
-          {/* شعار دائري فاخر */}
-          <div className="w-24 h-24 mx-auto bg-[#FAF3E0]/10 rounded-full backdrop-blur-md border border-[#C9A84C]/30 flex items-center justify-center mb-8 shadow-2xl">
-             <Star className="text-[#C9A84C] fill-[#C9A84C]" size={40} />
+        {/* الشعار والعنوان */}
+        <div className="text-center mb-10">
+          <div className="w-16 h-16 bg-[#6b174d] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-2xl text-white font-bold">ل</span>
           </div>
-          <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">متجر لمسة</h1>
-          <p className="text-[#E8C87A] text-lg mb-8 max-w-sm mx-auto leading-relaxed">اكتشفي أحدث صيحات الموضة والأناقة، وتمتعي بتجربة تسوق لا تُنسى.</p>
-          <div className="flex items-center justify-center gap-2 text-[#FAF3E0]/60 text-sm">
-            <span className="w-8 h-[1px] bg-[#C9A84C]/50"></span>
-            <span>LAMSA STORE</span>
-            <span className="w-8 h-[1px] bg-[#C9A84C]/50"></span>
-          </div>
+          <h2 className="text-2xl font-bold text-[#351126] mb-2">مرحباً بك في لمسة</h2>
+          <p className="text-gray-500 text-sm">سجلي الدخول لمتابعة تسوقك</p>
         </div>
-      </div>
 
-      {/* القسم الأيسر (نموذج الدخول - الفاتح) */}
-      <div className="w-full lg:w-1/2 bg-[#FAF3E0] flex items-center justify-center p-6 relative">
-        <div className="w-full max-w-md">
-          
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-[#482d39] mb-2">مرحباً بعودتك</h2>
-            <p className="text-[#777] text-sm">سجلي الدخول لمتابعة تسوقك</p>
-          </div>
+        {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm text-center">{error}</div>}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* حقل البريد */}
-            <div className="relative group">
-              <Mail className="absolute right-4 top-1/2 -translate-y-1/2 text-[#C9A84C] group-focus-within:text-[#482d39] transition-colors" size={20} />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-bold text-[#351126] mb-2">البريد الإلكتروني</label>
+            <div className="relative">
+              <Mail className="absolute right-3 top-3.5 text-gray-400 w-5 h-5" />
               <input
-                required
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="البريد الإلكتروني"
-                className="w-full pr-12 pl-4 py-4 bg-white border border-[#C9A84C]/30 rounded-2xl text-[#34212a] placeholder-[#999] focus:border-[#482d39] focus:ring-4 focus:ring-[#482d39]/5 outline-none transition-all shadow-sm"
-                disabled={loading}
-                dir="ltr"
+                className="w-full bg-white border border-[#ead7e2] rounded-xl py-3 pr-10 pl-4 focus:outline-none focus:border-[#6b174d] focus:ring-1 focus:ring-[#6b174d] transition-all text-left dir-ltr"
+                placeholder="admin@lamsa.com"
+                required
               />
             </div>
+          </div>
 
-            {/* حقل كلمة المرور */}
-            <div className="relative group">
-              <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-[#C9A84C] group-focus-within:text-[#482d39] transition-colors" size={20} />
+          <div>
+            <label className="block text-sm font-bold text-[#351126] mb-2">كلمة المرور</label>
+            <div className="relative">
+              <Lock className="absolute right-3 top-3.5 text-gray-400 w-5 h-5" />
               <input
-                required
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="كلمة المرور"
-                className="w-full pr-12 pl-12 py-4 bg-white border border-[#C9A84C]/30 rounded-2xl text-[#34212a] placeholder-[#999] focus:border-[#482d39] focus:ring-4 focus:ring-[#482d39]/5 outline-none transition-all shadow-sm"
-                disabled={loading}
-                dir="ltr"
+                className="w-full bg-white border border-[#ead7e2] rounded-xl py-3 pr-10 pl-12 focus:outline-none focus:border-[#6b174d] focus:ring-1 focus:ring-[#6b174d] transition-all text-left dir-ltr"
+                placeholder="••••••••"
+                required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C9A84C] hover:text-[#482d39] transition-colors"
+                className="absolute left-3 top-3.5 text-gray-400 hover:text-[#6b174d]"
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
+          </div>
 
-            {/* زر تسجيل الدخول */}
-            <button
-              disabled={loading}
-              type="submit"
-              className="w-full bg-[#6b174d] text-white py-4 rounded-2xl font-bold text-lg hover:bg-[#5a3847] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
-            >
-              {loading ? 'جارٍ تسجيل الدخول...' : 'تسجيل الدخول'}
-              {!loading && <ArrowRight size={20} className="group-hover:-translate-x-1 transition-transform" />}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#6b174d] hover:bg-[#8b2252] text-white font-bold py-3.5 rounded-xl transition-all mt-6"
+          >
+            {loading ? "جاري الدخول..." : "تسجيل الدخول"}
+          </button>
+        </form>
+
+        <div className="text-center mt-8">
+          <p className="text-gray-500 text-sm">
+            ليس لديك حساب؟{" "}
+            <button onClick={goToRegister} className="text-[#6b174d] font-bold hover:underline">
+              إنشاء حساب جديد
             </button>
-          </form>
-
-          <div className="mt-8 text-center">
-            <p className="text-sm text-[#777]">
-              ليس لديك حساب؟{' '}
-              <button
-                onClick={goToRegister}
-                className="font-bold text-[#482d39] hover:text-[#C9A84C] transition-colors underline underline-offset-4 decoration-[#C9A84C]/50"
-              >
-                إنشاء حساب جديد
-              </button>
-            </p>
-          </div>
-          
-          <div className="mt-12 text-center lg:mt-8">
-             <button onClick={() => setLocation('/')} className="text-sm text-[#999] hover:text-[#482d39] transition flex items-center justify-center gap-2 mx-auto">
-               <ArrowRight size={16} /> العودة للمتجر
-             </button>
-          </div>
+          </p>
+          <Link href="/" className="inline-block mt-6 text-sm text-gray-400 hover:text-[#6b174d] transition-colors">
+            العودة للمتجر
+          </Link>
         </div>
       </div>
     </div>
