@@ -36,14 +36,21 @@ export default function OverviewPanel({ setTab }: { setTab?: (t: any) => void })
 
   // تحديث حالة الطلب بسرعة
   const updateStatus = async (id: string, status: string) => {
+    const allowedStatuses = ['pending', 'processing', 'shipped', 'completed', 'cancelled'];
+    if (!allowedStatuses.includes(status)) { toast.error("حالة الطلب غير صحيحة"); return; }
     try {
-      await fetch(`/api/admin/orders/${id}/status`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      const token = localStorage.getItem('lamsa_token');
+      if (!token) { toast.error("انتهت جلسة الدخول"); return; }
+      const response = await fetch(`/api/admin/orders/${encodeURIComponent(id)}/status`, {
+        method: 'PUT', 
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status })
       });
-      toast.success("تم تحديث حالة الطلب");
-      fetchData(); // إعادة جلب البيانات
-    } catch { toast.error("فشل التحديث"); }
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) { throw new Error(result.error || "تعذر تحديث الحالة"); }
+      toast.success("تم تحديث الحالة");
+      fetchData();
+    } catch (error) { toast.error(error instanceof Error ? error.message : "فشل التحديث"); }
   };
 
   return (

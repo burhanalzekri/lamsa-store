@@ -13,8 +13,8 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
       const secret = process.env.JWT_SECRET || "lamsa_secret_2026";
       const decoded: any = jwt.verify(token, secret);
       
-      // نتحقق من الدور (admin) أو من بريد الأدمن
-      if (decoded.role !== 'admin' && decoded.email !== 'admin@lamsa.com') {
+      // نتحقق من الدور (admin) فقط — تم إزالة البريد الثابت لأسباب أمنية
+      if (decoded.role !== 'admin') {
         return res.status(403).json({ error: 'غير مصرح لك بالوصول' });
       }
       next();
@@ -480,7 +480,7 @@ export function registerAdminRoutes(app: express.Express, getConn: () => Promise
     }
   });
 
-  app.get("/api/admin/all-products", async (req, res) => {
+  app.get("/api/admin/all-products", requireAdmin, async (req, res) => {
     try {
       const conn = await getConn();
       const [rows]: any = await conn.query("SELECT * FROM store_products ORDER BY createdAt DESC");

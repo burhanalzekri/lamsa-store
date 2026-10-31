@@ -51,10 +51,21 @@ export default function OrdersPanel() {
   const filtered = filteredAll.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   const exportCSV = () => {
-    let csv = "رقم الطلب,العميل,الهاتف,الإجمالي,الحالة\n";
-    filteredAll.forEach(o => { csv += `"${o.orderNumber || o.id}","${o.customerName}","${o.phone}",${o.totalAmount},"${o.status}"\n`; });
+    const escapeCSV = (value: unknown) => {
+      let text = String(value ?? '');
+      if (/^[\s]*[=+@\-]/.test(text)) { text = "'" + text; }
+      return '"' + text.replace(/"/g, '""') + '"';
+    };
+    const rows = [
+      ["رقم الطلب", "العميل", "الهاتف", "الإجمالي", "الحالة"],
+      ...filteredAll.map(o => [ o.orderNumber || o.id, o.customerName, o.phone, o.totalAmount, statusLabel[o.status] || o.status ])
+    ];
+    const csv = rows.map(row => row.map(escapeCSV).join(',')).join('\r\n');
     const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "orders.csv"; link.click();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a"); link.href = url; link.download = "lamsa-orders.csv"; link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast.success("تم تنزيل الملف");
   };
 
   const statusLabel: any = { pending: "قيد الانتظار", processing: "قيد التجهيز", shipped: "تم الشحن", completed: "مكتمل", cancelled: "ملغي" };
