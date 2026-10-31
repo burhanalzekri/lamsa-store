@@ -30,13 +30,13 @@ export default function ReportsPanel() {
 
   useEffect(() => { fetchReports(); }, [days]);
 
-  if (loading) return <div className="text-center py-10"><RefreshCw className="animate-spin mx-auto text-[#482d39]"/></div>;
+  if (loading) return <div className="text-center py-10"><RefreshCw className="animate-spin mx-auto text-[#6b174d]"/></div>;
   if (error) return (
     <div className="text-center py-10 text-red-500 bg-red-50 rounded-xl">
       <AlertTriangle className="mx-auto mb-2" size={32}/>
       <p className="font-bold">فشل تحميل التقارير</p>
       <p className="text-sm mt-1">{error}</p>
-      <button onClick={fetchReports} className="mt-4 bg-[#482d39] text-white px-4 py-2 rounded-lg text-sm">إعادة المحاولة</button>
+      <button onClick={fetchReports} className="mt-4 bg-[#6b174d] text-white px-4 py-2 rounded-lg text-sm">إعادة المحاولة</button>
     </div>
   );
   if (!data) return <div className="text-center py-10 text-gray-500">لا توجد بيانات</div>;
@@ -50,12 +50,12 @@ export default function ReportsPanel() {
   const stagnantProducts = Array.isArray(data.stagnantProducts) ? data.stagnantProducts : [];
   const reorderRecommendations = Array.isArray(data.reorderRecommendations) ? data.reorderRecommendations : [];
 
-  const COLORS = ['#C9A84C', '#482d39', '#8b5cf6', '#10b981', '#3b82f6', '#ec4899'];
+  const COLORS = ['#C9A84C', '#6b174d', '#8b5cf6', '#10b981', '#3b82f6', '#ec4899'];
 
   return (
     <div className="space-y-6 pb-10" id="reports-container">
       <div className="flex justify-between items-center flex-wrap gap-2">
-        <h1 className="text-2xl font-bold text-[#482d39]">لوحة التقارير الذكية</h1>
+        <h1 className="text-2xl font-bold text-[#6b174d]">لوحة التقارير الذكية</h1>
         <div className="flex gap-2 items-center">
           <button onClick={() => window.print()} className="bg-white border p-2 rounded-lg text-gray-600 hover:bg-gray-50" title="طباعة"><Printer size={18}/></button>
           <button onClick={fetchReports} className="bg-white border p-2 rounded-lg text-gray-600 hover:bg-gray-50" title="تحديث"><RefreshCw size={18}/></button>
@@ -64,7 +64,7 @@ export default function ReportsPanel() {
 
       <div className="flex gap-2 bg-white p-1 rounded-lg shadow-sm w-fit border">
         {[7, 30, 90].map(d => (
-          <button key={d} onClick={() => setDays(d)} className={`px-4 py-1.5 rounded-md text-sm font-bold transition ${days === d ? 'bg-[#482d39] text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
+          <button key={d} onClick={() => setDays(d)} className={`px-4 py-1.5 rounded-md text-sm font-bold transition ${days === d ? 'bg-[#6b174d] text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
             آخر {d} يوم
           </button>
         ))}
@@ -86,7 +86,7 @@ export default function ReportsPanel() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-bold text-[#482d39] mb-6">المبيعات اليومية</h2>
+          <h2 className="text-lg font-bold text-[#6b174d] mb-6">المبيعات اليومية</h2>
           {dailySales.length > 0 ? (
             <div className="h-72 w-full" dir="ltr">
               <ResponsiveContainer width="100%" height="100%">
@@ -103,7 +103,7 @@ export default function ReportsPanel() {
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-bold text-[#482d39] mb-6 text-center">توزيع المبيعات (الفئات)</h2>
+          <h2 className="text-lg font-bold text-[#6b174d] mb-6 text-center">توزيع المبيعات (الفئات)</h2>
           {categorySales.length > 0 ? (
             <div className="h-72 w-full" dir="ltr">
               <ResponsiveContainer width="100%" height="100%">
@@ -128,7 +128,7 @@ export default function ReportsPanel() {
             <div className="space-y-2">
               {reorderRecommendations.map((p: any) => (
                 <div key={p.id} className="flex justify-between items-center bg-orange-50 p-3 rounded-lg border border-orange-100">
-                  <div><p className="font-bold text-[#482d39] text-sm">{p.name}</p><p className="text-xs text-gray-600">معدل: {p.dailyRate}/يوم</p></div>
+                  <div><p className="font-bold text-[#6b174d] text-sm">{p.name}</p><p className="text-xs text-gray-600">معدل: {p.dailyRate}/يوم</p></div>
                   <span className="bg-white text-orange-600 font-bold px-3 py-1 rounded-full text-xs border border-orange-200">{p.daysLeft} يوم</span>
                 </div>
               ))}
@@ -137,13 +137,13 @@ export default function ReportsPanel() {
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-bold text-[#482d39] flex items-center gap-2 mb-4"><Users size={20}/> أفضل العملاء</h2>
+          <h2 className="text-lg font-bold text-[#6b174d] flex items-center gap-2 mb-4"><Users size={20}/> أفضل العملاء</h2>
           {topCustomers.length > 0 ? (
             <div className="space-y-2">
               {topCustomers.map((c: any, i: number) => (
                 <div key={i} className="flex justify-between items-center border-b pb-2 last:border-0">
                   <div><p className="font-medium text-sm">{c.customerName}</p><p className="text-xs text-gray-500" dir="ltr">{c.phone}</p></div>
-                  <div className="text-left"><p className="font-bold text-[#482d39] text-sm">{Number(c.totalSpent).toLocaleString()} ر.ي</p><p className="text-xs text-gray-500">{c.orderCount} طلب</p></div>
+                  <div className="text-left"><p className="font-bold text-[#6b174d] text-sm">{Number(c.totalSpent).toLocaleString()} ر.ي</p><p className="text-xs text-gray-500">{c.orderCount} طلب</p></div>
                 </div>
               ))}
             </div>
@@ -153,7 +153,7 @@ export default function ReportsPanel() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-bold text-[#482d39] mb-4">الأكثر مبيعاً</h2>
+          <h2 className="text-lg font-bold text-[#6b174d] mb-4">الأكثر مبيعاً</h2>
           <div className="space-y-3">
             {topProducts.slice(0, 5).map((p: any, i: number) => (
               <div key={p.id} className="flex items-center gap-3">
@@ -169,7 +169,7 @@ export default function ReportsPanel() {
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-bold text-[#482d39] flex items-center gap-2 mb-4"><Package size={20}/> منتجات راكدة</h2>
+          <h2 className="text-lg font-bold text-[#6b174d] flex items-center gap-2 mb-4"><Package size={20}/> منتجات راكدة</h2>
           <div className="space-y-2 max-h-56 overflow-y-auto">
             {stagnantProducts.slice(0, 5).map((p: any) => (
               <div key={p.id} className="flex justify-between text-sm border-b pb-2 last:border-0">
@@ -192,7 +192,7 @@ function StatCard({ icon, label, value, color, extra }: any) {
         <div className={`${color} text-white p-2 rounded-lg`}>{icon}</div>
         <p className="text-gray-500 text-sm">{label}</p>
       </div>
-      <p className="text-xl font-bold text-[#482d39]">{value}</p>
+      <p className="text-xl font-bold text-[#6b174d]">{value}</p>
       {extra && <div className="mt-1">{extra}</div>}
     </div>
   );

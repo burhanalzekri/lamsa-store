@@ -83,8 +83,8 @@ export default function UsersPanel() {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-[#482d39]">إدارة المستخدمين ({users.length})</h2>
-        <button onClick={() => setShowForm(!showForm)} className="bg-[#482d39] text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-[#6b174d]">إدارة المستخدمين ({users.length})</h2>
+        <button onClick={() => setShowForm(!showForm)} className="bg-[#6b174d] text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
           <Plus size={16}/> إضافة مدير جديد
         </button>
       </div>
@@ -95,7 +95,7 @@ export default function UsersPanel() {
           <input required type="email" placeholder="البريد الإلكتروني" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="border p-2 rounded" dir="ltr" />
           <div className="relative">
             <input required type={showPassword ? "text" : "password"} placeholder="كلمة المرور" value={form.password} onChange={e=>setForm({...form, password: e.target.value})} className="border p-2 rounded w-full pl-10" dir="ltr" />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#482d39]">
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#6b174d]">
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
@@ -151,7 +151,7 @@ export default function UsersPanel() {
         <span className="text-sm text-gray-500">عرض {filtered.length} من {filteredAll.length}</span>
         <div className="flex gap-1">
           <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">السابق</button>
-          <span className="px-3 py-1 bg-[#482d39] text-white rounded text-sm">{page} / {totalPages}</span>
+          <span className="px-3 py-1 bg-[#6b174d] text-white rounded text-sm">{page} / {totalPages}</span>
           <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">التالي</button>
         </div>
       </div>

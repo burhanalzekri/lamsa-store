@@ -79,7 +79,7 @@ export default function OrdersPanel() {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <h2 className="text-2xl font-bold text-[#482d39] mb-6">إدارة الطلبات ({orders.length})</h2>
+      <h2 className="text-2xl font-bold text-[#6b174d] mb-6">إدارة الطلبات ({orders.length})</h2>
 
       <div className="flex flex-col md:flex-row gap-3 mb-4 justify-between items-center">
         <div className="flex gap-2 w-full md:w-auto">
@@ -133,7 +133,7 @@ export default function OrdersPanel() {
         <span className="text-sm text-gray-500">عرض {filtered.length} من {filteredAll.length}</span>
         <div className="flex gap-1">
           <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">السابق</button>
-          <span className="px-3 py-1 bg-[#482d39] text-white rounded text-sm">{page} / {totalPages}</span>
+          <span className="px-3 py-1 bg-[#6b174d] text-white rounded text-sm">{page} / {totalPages}</span>
           <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">التالي</button>
         </div>
       </div>

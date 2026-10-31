@@ -154,8 +154,8 @@ export default function ProductsPanel() {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-[#482d39]">إدارة المنتجات ({products.length})</h2>
-        <button onClick={() => { setIsAdding(!isAdding); setEditingId(null); setForm({ name: '', price: '', compareAtPrice: '', costPrice: '', category: 'فساتين', imageUrl: '', images: '', badge: '', material: '', description: '', stock: '10' }); }} className="bg-[#482d39] text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-[#6b174d]">إدارة المنتجات ({products.length})</h2>
+        <button onClick={() => { setIsAdding(!isAdding); setEditingId(null); setForm({ name: '', price: '', compareAtPrice: '', costPrice: '', category: 'فساتين', imageUrl: '', images: '', badge: '', material: '', description: '', stock: '10' }); }} className="bg-[#6b174d] text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
           <Plus size={16}/> إضافة منتج
         </button>
       </div>
@@ -257,7 +257,7 @@ export default function ProductsPanel() {
         <span className="text-sm text-gray-500">عرض {filtered.length} من {filteredAll.length} منتج</span>
         <div className="flex gap-1">
           <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">السابق</button>
-          <span className="px-3 py-1 bg-[#482d39] text-white rounded text-sm">{page} / {totalPages}</span>
+          <span className="px-3 py-1 bg-[#6b174d] text-white rounded text-sm">{page} / {totalPages}</span>
           <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">التالي</button>
         </div>
       </div>
@@ -277,7 +277,7 @@ export default function ProductsPanel() {
               <h3 className="text-xl font-bold text-[#2a1a21]">تطبيق خصم</h3>
               <button onClick={() => setDiscountModal({ isOpen: false, product: null })} className="text-gray-400 hover:text-gray-600"><X size={20}/></button>
             </div>
-            <div className="bg-[#FAF3E0] p-3 rounded-lg mb-4 flex items-center gap-3">
+            <div className="bg-[#fcf9f2] p-3 rounded-lg mb-4 flex items-center gap-3">
               <img src={discountModal.product.image} className="w-12 h-14 object-cover rounded" />
               <div>
                 <p className="font-bold text-sm">{discountModal.product.name}</p>

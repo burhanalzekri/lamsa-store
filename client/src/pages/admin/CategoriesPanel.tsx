@@ -58,11 +58,11 @@ export default function CategoriesPanel() {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <h2 className="text-2xl font-bold text-[#482d39] mb-6">إدارة الفئات ({categories.length})</h2>
+      <h2 className="text-2xl font-bold text-[#6b174d] mb-6">إدارة الفئات ({categories.length})</h2>
 
       <form onSubmit={handleSave} className="flex gap-2 mb-6">
         <input placeholder="اسم الفئة (مثل: فساتين)" value={name} onChange={e => setName(e.target.value)} className="border p-2 rounded flex-1" />
-        <button type="submit" className="bg-[#482d39] text-white px-4 py-2 rounded font-bold flex items-center gap-2">
+        <button type="submit" className="bg-[#6b174d] text-white px-4 py-2 rounded font-bold flex items-center gap-2">
           {editingId ? <Check size={16}/> : <Plus size={16}/>} {editingId ? 'حفظ التعديل' : 'إضافة'}
         </button>
         {editingId && <button type="button" onClick={() => { setName(''); setEditingId(null); }} className="bg-gray-300 px-4 py-2 rounded"><X size={16}/></button>}

@@ -29,10 +29,10 @@ export default function AdminSidebar({ tab, setTab, onLogout }: AdminSidebarProp
   ];
 
   return (
-    <aside className="w-40 sm:w-48 lg:w-64 bg-white flex flex-col h-full min-h-screen border-l border-[#E8C87A]/40 shadow-sm z-50 shrink-0 sticky top-0">
+    <aside className="w-40 sm:w-48 lg:w-64 bg-[#fcf9f2] flex flex-col h-full min-h-screen border-l border-[#E8C87A]/40 shadow-sm z-50 shrink-0 sticky top-0">
       {/* رأس القائمة */}
-      <div className="p-3 lg:p-6 border-b border-[#E8C87A]/30 bg-[#FAF3E0]">
-        <h2 className="text-sm lg:text-2xl font-bold text-[#482d39] whitespace-nowrap overflow-hidden text-ellipsis">لوحة لمسة</h2>
+      <div className="p-3 lg:p-6 border-b border-[#E8C87A]/30 bg-[#fcf9f2]">
+        <h2 className="text-sm lg:text-2xl font-bold text-[#6b174d] whitespace-nowrap overflow-hidden text-ellipsis">لوحة لمسة</h2>
         <p className="text-[10px] lg:text-xs text-[#C9A84C] font-bold mt-1 hidden sm:block">الإدارة</p>
       </div>
 
@@ -47,8 +47,8 @@ export default function AdminSidebar({ tab, setTab, onLogout }: AdminSidebarProp
               onClick={() => setTab(item.id)}
               className={`w-full flex items-center gap-2 lg:gap-3 px-1.5 lg:px-4 py-2.5 lg:py-3 rounded-lg lg:rounded-xl font-bold transition-all duration-200 text-xs lg:text-sm ${
                 isActive 
-                  ? 'bg-[#482d39] text-white shadow-md' 
-                  : 'text-[#34212a] hover:bg-[#FAF3E0] hover:text-[#482d39]'
+                  ? 'bg-[#6b174d] text-white shadow-md' 
+                  : 'text-[#351126] hover:bg-[#fcf9f2] hover:text-[#6b174d]'
               }`}
             >
               <Icon size={16} className={`shrink-0 lg:w-5 lg:h-5 ${isActive ? 'text-[#E8C87A]' : 'text-[#C9A84C]'}`} />
@@ -59,7 +59,7 @@ export default function AdminSidebar({ tab, setTab, onLogout }: AdminSidebarProp
       </div>
 
       {/* زر تسجيل الخروج */}
-      <div className="p-1.5 lg:p-4 border-t border-[#E8C87A]/30 bg-[#FAF3E0]">
+      <div className="p-1.5 lg:p-4 border-t border-[#E8C87A]/30 bg-[#fcf9f2]">
         <button
           onClick={() => {
             onLogout();

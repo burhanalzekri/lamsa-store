@@ -44,7 +44,7 @@ export default function SettingsPanel() {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-2xl">
-      <h2 className="text-2xl font-bold text-[#482d39] mb-6">إعدادات المتجر</h2>
+      <h2 className="text-2xl font-bold text-[#6b174d] mb-6">إعدادات المتجر</h2>
       
       <form onSubmit={handleSave} className="space-y-4">
         <div>
@@ -82,7 +82,7 @@ export default function SettingsPanel() {
           <input value={form.instagram || ''} onChange={e => setForm({...form, instagram: e.target.value})} className="w-full border p-2 rounded" dir="ltr" />
         </div>
         
-        <button type="submit" disabled={saving} className="bg-[#482d39] text-white px-6 py-2 rounded font-bold flex items-center gap-2 disabled:opacity-50 mt-4">
+        <button type="submit" disabled={saving} className="bg-[#6b174d] text-white px-6 py-2 rounded font-bold flex items-center gap-2 disabled:opacity-50 mt-4">
           <Save size={18} /> {saving ? "جاري الحفظ..." : "حفظ الإعدادات"}
         </button>
       </form>

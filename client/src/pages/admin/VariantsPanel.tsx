@@ -77,7 +77,7 @@ export default function VariantsPanel() {
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border">
-      <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-[#482d39]"><Layers size={22}/> إدارة المتغيرات</h2>
+      <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-[#6b174d]"><Layers size={22}/> إدارة المتغيرات</h2>
       
       {loading ? (
         <p className="text-center text-gray-500 py-4">جاري تحميل المنتجات...</p>
@@ -108,7 +108,7 @@ export default function VariantsPanel() {
                 </select>
                 <input required type="number" placeholder="السعر" value={form.price} onChange={e=>setForm({...form, price: e.target.value})} className="border p-2 rounded-lg text-sm" />
                 <input required type="number" placeholder="المخزون" value={form.stock} onChange={e=>setForm({...form, stock: e.target.value})} className="border p-2 rounded-lg text-sm" />
-                <button type="submit" className="bg-[#482d39] text-white rounded-lg font-bold text-sm flex items-center justify-center gap-1 hover:bg-[#654151]"><Plus size={16}/> إضافة</button>
+                <button type="submit" className="bg-[#6b174d] text-white rounded-lg font-bold text-sm flex items-center justify-center gap-1 hover:bg-[#654151]"><Plus size={16}/> إضافة</button>
               </form>
 
               <div className="space-y-2">
@@ -116,7 +116,7 @@ export default function VariantsPanel() {
                   <p className="text-gray-500 text-center text-sm py-2">لا توجد متغيرات لهذا المنتج.</p>
                 ) : variants.map(v => (
                   <div key={v.id} className="flex justify-between items-center border p-3 rounded-lg bg-gray-50 text-sm">
-                    <span className="font-bold text-[#482d39]">{v.color} - {v.size}</span>
+                    <span className="font-bold text-[#6b174d]">{v.color} - {v.size}</span>
                     <span className="font-bold">{v.price} ر.ي</span>
                     <span className="text-xs text-gray-500">مخزون: {v.stock}</span>
                     <button onClick={() => handleDelete(v.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={16}/></button>

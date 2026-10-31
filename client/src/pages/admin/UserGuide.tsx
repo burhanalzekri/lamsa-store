@@ -42,7 +42,7 @@ export default function UserGuide() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF3E0] py-8" dir="rtl">
+    <div className="min-h-screen bg-[#fcf9f2] py-8" dir="rtl">
       <div className="max-w-5xl mx-auto px-4">
 
         {/* العنوان */}
@@ -192,15 +192,15 @@ export default function UserGuide() {
             </button>
             <div className="space-y-4">
               <div>
-                <h3 className="font-bold text-[#482d39] mb-2">🔍 البحث</h3>
+                <h3 className="font-bold text-[#6b174d] mb-2">🔍 البحث</h3>
                 <p className="text-gray-700 text-sm">استخدم شريط البحث في الأعلى أو من القائمة الجانبية.</p>
               </div>
               <div>
-                <h3 className="font-bold text-[#482d39] mb-2">📂 الفئات</h3>
+                <h3 className="font-bold text-[#6b174d] mb-2">📂 الفئات</h3>
                 <p className="text-gray-700 text-sm">اختر من: فساتين، عبايات، أحذية، حقائب.</p>
               </div>
               <div>
-                <h3 className="font-bold text-[#482d39] mb-2">🏷️ الفلاتر</h3>
+                <h3 className="font-bold text-[#6b174d] mb-2">🏷️ الفلاتر</h3>
                 <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 pr-4">
                   <li><b>عروض:</b> منتجات عليها خصم</li>
                   <li><b>الأكثر مبيعاً:</b> المنتجات الرائجة</li>
@@ -423,10 +423,10 @@ export default function UserGuide() {
           <p className="text-lg font-bold text-[#2a1a21]" style={{ fontFamily: "'Amiri', serif" }}>متجر لمسة</p>
           <p className="text-sm text-gray-500 mt-1">دليل الاستخدام الإصدار 3.0</p>
           <div className="flex justify-center gap-4 mt-3 text-sm">
-            <a href="tel:+967775799926" className="flex items-center gap-1 text-[#482d39] hover:text-[#C9A84C]">
+            <a href="tel:+967775799926" className="flex items-center gap-1 text-[#6b174d] hover:text-[#C9A84C]">
               <Phone size={14}/> +967 775 799 926
             </a>
-            <a href="mailto:burhanalzekri77@gmail.com" className="flex items-center gap-1 text-[#482d39] hover:text-[#C9A84C]">
+            <a href="mailto:burhanalzekri77@gmail.com" className="flex items-center gap-1 text-[#6b174d] hover:text-[#C9A84C]">
               <Mail size={14}/> burhanalzekri77@gmail.com
             </a>
           </div>

@@ -40,7 +40,7 @@ export default function InventoryReport() {
     toast.success("تم تصدير التقرير");
   };
 
-  if (loading) return <div className="text-center py-10"><Loader2 className="animate-spin mx-auto text-[#482d39]"/></div>;
+  if (loading) return <div className="text-center py-10"><Loader2 className="animate-spin mx-auto text-[#6b174d]"/></div>;
   if (!data) return <div className="text-center py-10 text-red-500">لا توجد بيانات</div>;
 
   return (
@@ -107,7 +107,7 @@ export default function InventoryReport() {
           { id: 'low', label: 'منخفض المخزون' },
           { id: 'out', label: 'نفد المخزون' },
         ].map(f => (
-          <button key={f.id} onClick={() => setFilter(f.id as any)} className={`px-4 py-1.5 rounded-md text-sm font-bold transition ${filter === f.id ? 'bg-[#482d39] text-white' : 'text-gray-500 hover:bg-gray-100'}`}>{f.label}</button>
+          <button key={f.id} onClick={() => setFilter(f.id as any)} className={`px-4 py-1.5 rounded-md text-sm font-bold transition ${filter === f.id ? 'bg-[#6b174d] text-white' : 'text-gray-500 hover:bg-gray-100'}`}>{f.label}</button>
         ))}
       </div>
 
@@ -126,7 +126,7 @@ export default function InventoryReport() {
                   <span className={`px-2 py-1 rounded text-xs font-bold ${p.stock === 0 ? 'bg-red-100 text-red-700' : p.stock <= 5 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>{p.stock}</span>
                 </td>
                 <td className="p-3">{Number(p.priceHalalas/100).toLocaleString()} {currency}</td>
-                <td className="p-3 font-bold text-[#482d39]">{Number(p.totalValue/100).toLocaleString()} {currency}</td>
+                <td className="p-3 font-bold text-[#6b174d]">{Number(p.totalValue/100).toLocaleString()} {currency}</td>
                 <td className="p-3">
                   {p.stock === 0 ? <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">نفد</span> :
                    p.stock <= 5 ? <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold">منخفض</span> :
@@ -200,7 +200,7 @@ export default function InventoryReport() {
           }
           
           .stats-cards > div {
-            background: #FAF3E0 !important;
+            background: #fcf9f2 !important;
             border: 1px solid #C9A84C !important;
             border-radius: 8px !important;
             padding: 10px !important;
@@ -234,7 +234,7 @@ export default function InventoryReport() {
           }
           
           #inventory-report table th {
-            background: #482d39 !important;
+            background: #6b174d !important;
             color: white !important;
             font-weight: bold !important;
             padding: 8px 6px !important;
@@ -255,7 +255,7 @@ export default function InventoryReport() {
           }
           
           #inventory-report table tr:nth-child(even) {
-            background: #FAF3E0 !important;
+            background: #fcf9f2 !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }

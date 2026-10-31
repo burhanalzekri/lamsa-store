@@ -180,7 +180,7 @@ export default function BulkImport() {
               <h3 className="font-bold text-[#2a1a21] mb-2">معاينة المنتجات ({rows.length})</h3>
               <div className="overflow-x-auto max-h-96 border rounded-lg">
                 <table className="w-full text-right text-sm">
-                  <thead className="bg-[#482d39] text-white sticky top-0">
+                  <thead className="bg-[#6b174d] text-white sticky top-0">
                     <tr>
                       <th className="p-2">#</th>
                       <th className="p-2">الاسم</th>

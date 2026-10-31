@@ -66,7 +66,7 @@ export default function DiscountsPanel() {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-[#482d39]">إدارة الخصومات ({discounts.length})</h2>
+        <h2 className="text-2xl font-bold text-[#6b174d]">إدارة الخصومات ({discounts.length})</h2>
         <button onClick={() => setShowAdd(!showAdd)} className="bg-[#C9A84C] text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-[#b8952f]">
           <Plus size={16}/> إضافة خصم
         </button>

@@ -1549,3 +1549,152 @@ body {
     margin-top: 20px;
   }
 }
+
+/* --- LAMSA ADMIN DASHBOARD V2 --- */
+.admin-stat-card {
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.admin-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.12);
+}
+.stat-blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.stat-green { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.stat-orange { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.stat-purple { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+.stat-gold { background: linear-gradient(135deg, #C9A84C 0%, #f3dfb7 100%); }
+
+.admin-table-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+  overflow: hidden;
+  border: 1px solid #edf2f7;
+}
+.admin-table th {
+  background: #f8f9fa;
+  padding: 16px;
+  text-align: right;
+  font-weight: 600;
+  color: #6b174d;
+  border-bottom: 2px solid #edf2f7;
+}
+.admin-table td {
+  padding: 16px;
+  border-bottom: 1px solid #edf2f7;
+}
+.admin-table tr:hover { background: #fafbfc; }
+
+/* الشريط الجانبي */
+.admin-sidebar-cinematic {
+  background: linear-gradient(180deg, #351126 0%, #6b174d 100%);
+  color: white;
+  border-radius: 16px;
+}
+.admin-sidebar-cinematic a {
+  color: rgba(255,255,255,0.8);
+  transition: all 0.3s;
+  border-radius: 8px;
+  padding: 10px 15px;
+  display: block;
+  margin-bottom: 4px;
+}
+.admin-sidebar-cinematic a:hover,
+.admin-sidebar-cinematic a.active {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+
+/* --- LAMSA ADMIN FINAL (CLEAN) --- */
+
+/* القائمة الجانبية (الشريط الجانبي) */
+aside, .admin-sidebar, [class*="sidebar"] {
+  background-color: #2a0d1e !important; /* لون بنفسجي داكن جداً */
+  color: #ffffff !important;
+}
+aside a, .admin-sidebar a {
+  color: rgba(255, 255, 255, 0.7) !important;
+  transition: all 0.2s ease;
+}
+aside a:hover, .admin-sidebar a:hover,
+aside a.active, .admin-sidebar a.active {
+  color: #C9A84C !important; /* لون ذهبي */
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* البطاقات الإحصائية */
+.admin-stat-card {
+  border-radius: 16px;
+  padding: 24px;
+  color: #ffffff !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 110px;
+}
+.admin-stat-card p, .admin-stat-card span {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+.admin-stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* ألوان البطاقات */
+.stat-blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.stat-green { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.stat-purple { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+.stat-gold { background: linear-gradient(135deg, #C9A84C 0%, #f3dfb7 100%); }
+
+/* إخفاء أي رسوم بيانية خطية قديمة */
+.sparkline-container, .recharts-responsive-container {
+  display: none !important;
+}
+
+/* --- LAMSA ADMIN STAT CARDS (FINAL & CONSISTENT) --- */
+.lamsa-stat-card {
+  padding: 24px;
+  border-radius: 20px;
+  color: #ffffff !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+}
+.lamsa-stat-card:hover {
+  transform: translateY(-5px);
+}
+.lamsa-stat-card .stat-label {
+  font-size: 1rem;
+  font-weight: 600;
+  opacity: 0.95;
+  margin-bottom: 8px;
+}
+.lamsa-stat-card .stat-number {
+  font-size: 2.2rem; /* حجم خط كبير وواضح */
+  font-weight: 800;
+  line-height: 1.2;
+}
+.lamsa-stat-card .stat-icon {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ألوان البطاقات */
+.bg-stat-blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.bg-stat-purple { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+.bg-stat-green { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.bg-stat-gold { background: linear-gradient(135deg, #C9A84C 0%, #f3dfb7 100%); }

@@ -82,10 +82,10 @@ export default function CouponsPanel() {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-[#482d39]">إدارة الكوبونات</h2>
+        <h2 className="text-2xl font-bold text-[#6b174d]">إدارة الكوبونات</h2>
         <div className="flex gap-2 bg-gray-50 p-1 rounded-lg">
-          <button onClick={() => { setTab('active'); setPage(1); }} className={`px-4 py-1.5 rounded-md text-sm font-bold ${tab === 'active' ? 'bg-white shadow text-[#482d39]' : 'text-gray-500'}`}>الكوبونات ({coupons.length})</button>
-          <button onClick={() => { setTab('history'); setPage(1); }} className={`px-4 py-1.5 rounded-md text-sm font-bold ${tab === 'history' ? 'bg-white shadow text-[#482d39]' : 'text-gray-500'}`}>السجل ({history.length})</button>
+          <button onClick={() => { setTab('active'); setPage(1); }} className={`px-4 py-1.5 rounded-md text-sm font-bold ${tab === 'active' ? 'bg-white shadow text-[#6b174d]' : 'text-gray-500'}`}>الكوبونات ({coupons.length})</button>
+          <button onClick={() => { setTab('history'); setPage(1); }} className={`px-4 py-1.5 rounded-md text-sm font-bold ${tab === 'history' ? 'bg-white shadow text-[#6b174d]' : 'text-gray-500'}`}>السجل ({history.length})</button>
         </div>
       </div>
 
@@ -93,9 +93,9 @@ export default function CouponsPanel() {
         <form onSubmit={handleSave} className="bg-gray-50 p-4 rounded-xl mb-6 grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
           <div><label className="block text-sm font-bold text-gray-700 mb-1">كود الخصم</label><input required placeholder="SALE20" value={form.code} onChange={e => setForm({...form, code: e.target.value.toUpperCase()})} className="w-full border p-2 rounded" dir="ltr" /></div>
           <div><label className="block text-sm font-bold text-gray-700 mb-1">نسبة الخصم (%)</label><input required type="number" min="1" max="100" value={form.discountPercent} onChange={e => setForm({...form, discountPercent: e.target.value})} className="w-full border p-2 rounded" /></div>
-          <div className="flex items-center gap-2 pb-2"><input type="checkbox" id="active" checked={form.active} onChange={e => setForm({...form, active: e.target.checked})} className="w-4 h-4 accent-[#482d39]" /><label htmlFor="active" className="text-sm font-bold text-gray-700">نشط</label></div>
+          <div className="flex items-center gap-2 pb-2"><input type="checkbox" id="active" checked={form.active} onChange={e => setForm({...form, active: e.target.checked})} className="w-4 h-4 accent-[#6b174d]" /><label htmlFor="active" className="text-sm font-bold text-gray-700">نشط</label></div>
           <div className="flex gap-2">
-            <button type="submit" className="bg-[#482d39] text-white px-4 py-2 rounded font-bold flex items-center justify-center gap-2 flex-1">{editingId ? <Check size={16}/> : <Plus size={16}/>} {editingId ? 'حفظ' : 'إضافة'}</button>
+            <button type="submit" className="bg-[#6b174d] text-white px-4 py-2 rounded font-bold flex items-center justify-center gap-2 flex-1">{editingId ? <Check size={16}/> : <Plus size={16}/>} {editingId ? 'حفظ' : 'إضافة'}</button>
             {editingId && <button type="button" onClick={() => { setForm({ code: '', discountPercent: '', active: true }); setEditingId(null); }} className="bg-gray-300 px-3 rounded"><X size={16}/></button>}
           </div>
         </form>
@@ -124,7 +124,7 @@ export default function CouponsPanel() {
           <tbody>
             {tab === 'active' ? filtered.map((c: any) => (
               <tr key={c.id} className="border-t hover:bg-gray-50">
-                <td className="p-3 font-mono font-bold text-[#482d39]">{c.code}</td>
+                <td className="p-3 font-mono font-bold text-[#6b174d]">{c.code}</td>
                 <td className="p-3 text-green-600 font-bold">{c.discountPercent}%</td>
                 <td className="p-3"><span className={`px-2 py-1 rounded text-xs font-bold ${c.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{c.active ? 'نشط' : 'معطل'}</span></td>
                 <td className="p-3 flex gap-2"><button onClick={() => handleEdit(c)} className="text-blue-500 p-1"><Edit size={16}/></button><button onClick={() => handleDeleteClick(c.id)} className="text-red-500 p-1"><Trash2 size={16}/></button></td>
@@ -146,7 +146,7 @@ export default function CouponsPanel() {
         <span className="text-sm text-gray-500">عرض {filtered.length} من {filteredAll.length}</span>
         <div className="flex gap-1">
           <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">السابق</button>
-          <span className="px-3 py-1 bg-[#482d39] text-white rounded text-sm">{page} / {totalPages}</span>
+          <span className="px-3 py-1 bg-[#6b174d] text-white rounded text-sm">{page} / {totalPages}</span>
           <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1 border rounded disabled:opacity-50 text-sm">التالي</button>
         </div>
       </div>

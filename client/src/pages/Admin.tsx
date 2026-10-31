@@ -28,10 +28,10 @@ export default function Admin({ user }: { user: any }) {
 
   if (!user || user.role !== "admin") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAF3E0]">
+      <div className="min-h-screen flex items-center justify-center bg-[#fcf9f2]">
         <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
           <AlertTriangle className="text-red-500 w-16 h-16 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-[#482d39] mb-2">غير مصرح لك</h2>
+          <h2 className="text-2xl font-bold text-[#6b174d] mb-2">غير مصرح لك</h2>
           <p className="text-gray-600 mb-6">هذه الصفحة مخصصة للمسؤولين فقط.</p>
           <button onClick={() => setLocation('/')} className="bg-[#6b174d] text-white px-6 py-2 rounded-lg font-bold">العودة للمتجر</button>
         </div>
@@ -40,7 +40,7 @@ export default function Admin({ user }: { user: any }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#FAF3E0]" dir="rtl" style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}>
+    <div className="flex min-h-screen bg-[#fcf9f2]" dir="rtl" style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}>
       
       {/* القائمة الجانبية الثابتة */}
       <AdminSidebar tab={tab} setTab={setTab} onLogout={handleLogout} />
