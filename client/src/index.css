@@ -1467,3 +1467,85 @@ h1, h2, h3 {
 body {
   background-color: #fcf9f2 !important; /* لون كريمي ناعم للخلفية */
 }
+
+/* --- LAMSA HOMEPAGE CINEMATIC V2 --- */
+.hero-cinematic {
+  background: linear-gradient(135deg, #fcf9f2 0%, #f8eaf2 100%);
+  border-radius: 24px;
+  padding: 40px;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(107, 23, 77, 0.05);
+}
+
+.hero-cinematic-text h1 {
+  color: #351126;
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 15px;
+}
+
+.hero-cinematic-text p {
+  color: #6b174d;
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+}
+
+.hero-cinematic-btn {
+  background: #6b174d;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(107, 23, 77, 0.3);
+}
+
+.hero-cinematic-btn:hover {
+  background: #8b2252;
+  transform: translateY(-2px);
+}
+
+.hero-cinematic img {
+  width: 300px;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(53, 17, 38, 0.15);
+}
+
+/* تحسين شكل بطاقات المنتجات */
+.product-card-cinematic {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #f0e6ed;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+}
+
+.product-card-cinematic:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(107, 23, 77, 0.1);
+}
+
+@media (max-width: 768px) {
+  .hero-cinematic {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 20px;
+  }
+  .hero-cinematic-text h1 { font-size: 1.8rem; }
+  .hero-cinematic img {
+    width: 100%;
+    height: 250px;
+    margin-top: 20px;
+  }
+}
